@@ -1,0 +1,226 @@
+/* General body and container styling */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9fb;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #333;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1d3557;
+  color: white;
+  padding: 50px 30px; /* Increased top and bottom padding */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-links {
+  display: flex;
+  list-style-type: none;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar-links li {
+  display: inline;
+}
+
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-links a:hover {
+  color: #a8dadc;
+}
+
+.logout-button {
+  background-color: #e63946;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #d62828;
+  transform: scale(1.05);
+}
+
+
+/* Add more space between navbar and machine form container */
+.machine-form-container {
+  background-color: #ffffff;
+  padding: 25px;
+  margin: 90px auto; /* Increased top margin */
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+.machine-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 20px;
+  
+}
+
+.machine-button {
+  background-color: #1d3557;
+  color: white;
+  border: none;
+  padding: 20px 40px;  /* Increased padding for larger buttons */
+  font-size: 20px;      /* Increased font size */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.machine-button:hover {
+  background-color: #1d3557;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal styling */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column; /* Ensures label and input are stacked vertically */
+}
+
+
+
+
+.input-field input,
+.input-field select,
+.input-field textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field input:focus,
+.input-field select:focus,
+.input-field textarea:focus {
+  border-color: #457b9d;
+  outline: none;
+  box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
+}
+
+.submit-btn {
+  background-color: #2a9d8f;
+  color: white;
+  padding: 12px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #21867a;
+  transform: scale(1.05);
+}
+
+/* Step animation */
+.animated-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.animated-form > div {
+  display: none;
+}
+
+.animated-form > div.show {
+  display: block;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Typography for headings */
+h2 {
+  text-align: center;
+  color: #1d3557;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+h2 span {
+  color: #e63946;
+  font-weight: bold;
+}
+.blue-button {
+  background-color: rgb(63, 136, 188) !important;
+  border-color: blue !important;
+  color: white;
+}
+
+
+.typedefaut-production{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.typedefaut-cf{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.typedefaut-csl{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 80px; /* Adds space between the fields */
+}

@@ -1,0 +1,220 @@
+/* Container for the form and image */
+.form-page-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background-color: #f7f9fc;
+  }
+  
+  /* Image Section */
+  .image-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    background-image: url('../assets/time-management-retro-cartoon-concept-with-productivity-man-sitting-hourglass-white-background_1284-17698.avif');
+  }
+  
+  /* Form Image */
+  .form-image {
+    width: 80%;
+    max-width: 500px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+  
+  /* Form Section */
+  .form-section {
+    flex: 1;
+    padding: 80px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+  }
+  
+  /* Form Title */
+  .form-section h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    color: #333;
+    font-weight: 600;
+  }
+  
+  /* Form Styling */
+  .animated-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* Form Rows */
+  .form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  /* Input and Textarea Fields */
+  .form-row input,
+  .form-row textarea,
+  .form-row select {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Focus Effect */
+  .form-row input:focus,
+  .form-row textarea:focus,
+  .form-row select:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.2);
+  }
+  
+  /* Placeholder Color */
+  .form-row input::placeholder,
+  .form-row textarea::placeholder {
+    color: #9ca3af;
+  }
+  
+  /* Textarea Resize */
+  textarea {
+    resize: vertical;
+  }
+  
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  /* Submit Button Hover and Active Effects */
+  .submit-btn:hover {
+    background-color: #1558b0;
+    transform: translateY(-2px);
+  }
+  
+  .submit-btn:active {
+    background-color: #0d47a1;
+    transform: translateY(0);
+  }
+  
+  /* Responsive Design */
+  @media screen and (max-width: 768px) {
+    .form-page-container {
+      flex-direction: column;
+    }
+  
+    .image-section {
+      display: none; /* Hide image on mobile for better focus on the form */
+    }
+  
+    .form-section {
+      padding: 20px;
+      width: 100%;
+    }
+  
+    .form-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .form-image {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  }
+  
+  /* Page Wrapper */
+  .page-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+  }
+  
+  /* Navbar */
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1a73e8;
+    padding: 10px 20px;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 60px;
+    z-index: 1000;
+  }
+  
+  /* Navbar Links */
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  .navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    
+  }
+  
+  .navbar-links li {
+    display: inline;
+  }
+  .navbar-links a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .logout-button {
+    background: linear-gradient(135deg, #4a90e2, #007aff); /* Gradient background */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Slight shadow for a 3D effect */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Animation effects */
+  }
+  
+  .logout-button:hover {
+    transform: translateY(-2px); /* Lift effect on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Increase shadow on hover */
+  }
+  
+  .logout-button:active {
+    transform: translateY(0); /* Reset transform on click */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Reset shadow on click */
+  }
+  
+  .logout-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.4); /* Focus ring */
+  }
+  

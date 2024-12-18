@@ -1,0 +1,23 @@
+.machine-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .machine-buttons button {
+    background: linear-gradient(90deg, #3b82f6, #6366f1); /* Blue to Indigo */
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .machine-buttons button:hover {
+    transform: scale(1.05);
+  }
+
+  

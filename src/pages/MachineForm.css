@@ -1,0 +1,199 @@
+/* General styles */
+.body_container {
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9; /* Light gray background */
+}
+.phase {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  
+}
+
+/* Navbar */
+.navbar {
+  background-color: #2c3e50; /* Dark blue-gray */
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin-right: 20px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: #1abc9c; /* Aqua green */
+}
+
+.logout-button {
+  background-color: #e74c3c; /* Red */
+  color: white;
+  font-size: 14px;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #c0392b; /* Darker red */
+}
+
+/* Machine buttons */
+.machine-form-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.machine-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px; /* Space between buttons */
+  margin-top: 20px;
+}
+
+.machine-button {
+  background-color: #3498db; /* Light blue */
+  color: white;
+  font-size: 14px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.3s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.machine-button:hover {
+  background-color: #2980b9; /* Darker blue */
+  transform: scale(1.05);
+}
+
+/* Modal */
+.ant-modal-content {
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.ant-modal-header {
+  background-color: #3498db; /* Light blue */
+  border-radius: 10px 10px 0 0;
+  color: white;
+  text-align: center;
+  font-size: 18px;
+}
+
+.ant-modal-body {
+  padding: 20px;
+}
+
+.input-field {
+  margin-bottom: 15px;
+}
+
+.input-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.ant-input,
+.ant-select-selector {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  transition: border-color 0.3s;
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector {
+  border-color: #3498db; /* Light blue */
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.ant-btn-primary {
+  background-color: #2ecc71; /* Green */
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.ant-btn-primary:hover {
+  background-color: #27ae60; /* Darker green */
+  transform: scale(1.03);
+}
+
+.ant-btn[disabled] {
+  background-color: #bdc3c7; /* Light gray */
+  cursor: not-allowed;
+}
+
+/* Add space between sections */
+.machine-form-container h2 {
+  margin-bottom: 20px;
+}
+.button-submit {
+  background-color: rgb(63, 136, 188) !important;
+  border-color: blue !important;
+  color: white;
+}
+.button-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Custom button style */
+.custom-button {
+  background-color: #007bff; /* Primary background color */
+  color: white; /* Text color */
+  border: none; /* Remove default border */
+  padding: 10px 20px; /* Vertical and horizontal padding */
+  font-size: 16px; /* Font size */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Cursor pointer on hover */
+  transition: background-color 0.3s, transform 0.3s; /* Smooth transition for background color and hover effect */
+}
+
+.custom-button:hover {
+  background-color: #0056b3; /* Darker background color on hover */
+  transform: scale(1.05); /* Slight scale-up effect on hover */
+}
+
+.custom-button:active {
+  background-color: #004085; /* Even darker background when button is clicked */
+}
+
+.custom-button:focus {
+  outline: none; /* Remove default focus outline */
+}
+
+.custom-button:disabled {
+  background-color: #c6c6c6; /* Disabled state background color */
+  cursor: not-allowed; /* Disable pointer cursor */
+}

@@ -1,0 +1,119 @@
+/* Base styling for the page */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .animated-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  /* Navbar Styling */
+  .navbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+  }
+  .navbar-links {
+    display: flex;
+    gap: 20px; /* Space between menu items */
+    list-style-type: none;
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 20px;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar a:hover {
+    color: #FFD700; /* Gold color on hover */
+  }
+  
+  /* Animated Background Image */
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 1s ease-in-out;
+    z-index: -1;
+  }
+  
+  .content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+  }
+  
+  .content h1 {
+    font-size: 3em;
+    font-weight: bold;
+  }
+  
+  .content p {
+    font-size: 1.5em;
+  }
+  
+  /* Background images will change in the JavaScript interval */
+  .background-0 {
+    background-image: url("../assets/artisan-sanding-wooden-object-disc-sander-assembling-shop_482257-86526.avif"); /* First image */
+  }
+  
+  .background-1 {
+    background-image: url("../assets/craftsman-sawing-metal-with-disk-grinder-saw-workshop_183314-623.jpg"); /* Second image */
+  }
+  
+  .background-2 {
+    background-image: url("../assets/technician-worker-cutting-metal-with-many-sharp-sparks-using-equipments-cat-iron_158595-8143.avif"); /* Third image */
+  }
+  .logout-button {
+    background: linear-gradient(135deg, #4a90e2, #007aff); /* Gradient background */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Slight shadow for a 3D effect */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Animation effects */
+  }
+  
+  .logout-button:hover {
+    transform: translateY(-2px); /* Lift effect on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Increase shadow on hover */
+  }
+  
+  .logout-button:active {
+    transform: translateY(0); /* Reset transform on click */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Reset shadow on click */
+  }
+  
+  .logout-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.4); /* Focus ring */
+  }
+  

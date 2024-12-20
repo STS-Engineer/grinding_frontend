@@ -31,6 +31,7 @@ jobs:
         
       - name: Build project
         run: npm run build
+        
       - name: Zip artifact for deployment
         run: zip release.zip ./build
 

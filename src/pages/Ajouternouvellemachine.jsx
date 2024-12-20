@@ -29,7 +29,7 @@ const Ajoutermachine = () => {
   const [dureevierefmeulelargeuroutil,setDureevierefmeulelargeuroutil]= useState('');
   const [phase4usinagechanfreins,setPhase4usinagechanfreins]= useState('');
   const [refmeulechanfreinsoutil,setRefmeulechanfreinsoutil]= useState('');
-  const [dureevierefmeulerefmeulechanfreinsoutil,setDureevierefmeulerefmeulechanfreinsoutil]= useState('');
+  const [dureevierefmeulechanfrein,setDureevierefmeulechanfrein]= useState('');
   const [phase5usinagerainure,setPhase5usinagerainure]= useState('');
   const [outillageusinagerainureoutil,setOutillageusinagerainureoutil]= useState('');
   const [dureevieoutillageusinagerainureoutil,setDureevieoutillageusinagerainureoutil]= useState('');
@@ -68,49 +68,66 @@ const Ajoutermachine = () => {
   console.log(userID);
 
   const handleSubmit = async (values) => {
-    try {
-      await axios.post(
-       "http://localhost:4000/ajouter/machine",
-        {
+    // Prepare the tools array based on the form values
+    const tools = [
+      {
+        phase: 'Chargement',
+        nom_outil: refroueoutil,  // Replace with your actual form value
+        dureedevie: dureevierefroueoutil, // Replace with your actual form value
+      },
+      {
+        phase: 'Usinagehauteur',
+        nom_outil: refmeulehauteuroutil,  // Replace with your actual form value
+        dureedevie: dureevierefmeulehauteuroutil, // Replace with your actual form value
+      },
+      {
+        phase: 'Usinagelargeur',
+        nom_outil: refmeulelargeuroutil, // Replace with your actual form value
+        dureedevie: dureevierefmeulelargeuroutil, // Replace with your actual form value
+      },
 
-          nom: nommachine,
-          reference:reference,
-          date:date,
-          user_id: userID,
-          cadence_horaire: cadence_horaire,
-          nombre_operateur_chargement: nombre_operateur_chargement,
-          cadence_horaire_cf: cadence_horaire_cf,
-          cadence_horaire_csl:cadence_horaire_csl,
-          phase1chargement:phase1chargement,
-          phase1roueavancement: phase1roueavancement,
-          refroueoutil: refroueoutil,
-          dureevierefroueoutil: dureevierefroueoutil,
-          phase2usinagehauteur: phase2usinagehauteur,
-          refmeulehauteuroutil: refmeulehauteuroutil,
-          dureevierefmeulehauteuroutil: dureevierefmeulehauteuroutil,
-          phase3usinagelargeur: phase3usinagelargeur,
-          refmeulelargeuroutil: refmeulelargeuroutil,
-          dureevierefmeulelargeuroutil: dureevierefmeulelargeuroutil,
-          phase4usinagechanfreins: phase4usinagechanfreins,
-          refmeulechanfreinsoutil: refmeulechanfreinsoutil,
-          dureevierefmeulerefmeulechanfreinsoutil: dureevierefmeulerefmeulechanfreinsoutil,
-          phase5usinagerainure: phase5usinagerainure,
-          outillageusinagerainureoutil: outillageusinagerainureoutil,
-          dureevieoutillageusinagerainureoutil: dureevieoutillageusinagerainureoutil,
-          phase5usinagerayonnage: phase5usinagerayonnage,
-          refmeulerayonnage: refmeulerayonnage,
-          dureevierefmeulerayonnageoutil: dureevierefmeulerayonnageoutil,
-          phase5usinagetete: phase5usinagetete,
-          outillageusinagetete:outillageusinagetete,
-          dureevieusinagetete: dureevieusinagetete,
-          phase6inspectioncf: phase6inspectioncf,
-          nombre_operateur_cf: nombre_operateur_cf,
-          phase6inspectioncsl: phase6inspectioncsl,
-          nombre_operateur_csl:nombre_operateur_csl
-        }, 
+      {
+        phase: 'Usinagechanfreins',
+        nom_outil: refmeulechanfreinsoutil,  // Replace with your actual form value
+        dureedevie: dureevierefmeulechanfrein, // Replace with your actual form value
+      },
+      {
+        phase: 'Usinagrainure',
+        nom_outil: outillageusinagerainureoutil,  // Replace with your actual form value
+        dureedevie: dureevieoutillageusinagerainureoutil, // Replace with your actual form value
+      },
+      {
+        phase: 'Usinagerayonnage',
+        nom_outil: refmeulerayonnage, // Replace with your actual form value
+        dureedevie: dureevierefmeulerayonnageoutil, // Replace with your actual form value
+      },
+      {
+        phase: 'Usinagetete',
+        nom_outil: outillageusinagetete,  // Replace with your actual form value
+        dureedevie: dureevieusinagetete, // Replace with your actual form value
+      }
+      
+     
+    ];
+  
+    try {
+      // Sending the request with the correct body format
+      await axios.post(
+        "http://localhost:4000/ajouter/machinee",
+        {
+          nom: nommachine, // Replace with actual value from the form
+          referenceproduit: reference, // Replace with actual value from the form
+          date: date, // Replace with actual value from the form
+          cadence_horaire: cadence_horaire, // Replace with actual value from the form
+          nombre_operateur_chargement: nombre_operateur_chargement, // Replace with actual value from the form
+          cadence_horaire_cf: cadence_horaire_cf, // Replace with actual value from the form
+          cadence_horaire_csl: cadence_horaire_csl, // Replace with actual value from the form
+          phase1chargement: phase1chargement, // Replace with actual value from the form
+          tools: tools, // Send the tools array to the server
+        },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure token is valid
             "Content-Type": "application/json",
           },
         }
@@ -119,10 +136,9 @@ const Ajoutermachine = () => {
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to add machine.");
-    } finally {
- 
     }
   };
+  
 
   const handleLogout = () => {
     navigate('/login');
@@ -138,7 +154,7 @@ const Ajoutermachine = () => {
           <li><a href="/ajouteroutil">Ajouter un outil</a></li>
           <li><a href="/machineform">Ajouter un machine</a></li>
           <li><a href="/details">Détails des machines</a></li>
-          <li><a href="/calendar">Calnedrier</a></li>
+          <li><a href="/calendar">Calendrier</a></li>
           <button className='logout-button' onClick={handleLogout}>logout</button>
         </ul>
       </div>
@@ -358,7 +374,7 @@ const Ajoutermachine = () => {
               
                   <div className="input-field">
                    <label>Durée de vie</label>
-                   <Input type='number' value={dureevierefmeulerefmeulechanfreinsoutil} onChange={(e)=>setDureevierefmeulerefmeulechanfreinsoutil(e.target.value)}/>
+                   <Input type='number' value={dureevierefmeulechanfrein} onChange={(e)=>setDureevierefmeulechanfrein(e.target.value)}/>
                    </div>
                   </div>
                 )

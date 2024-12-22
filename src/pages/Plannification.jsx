@@ -62,7 +62,7 @@ const PlannificationForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const machinereponse = await axios.get("http://localhost:4000/ajouter/machines");
+        const machinereponse = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines");
         setMachines(machinereponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -70,7 +70,7 @@ const PlannificationForm = () => {
     };
     const fetchoperateur = async()=>{
       try {
-        const response = await axios.get("http://localhost:4000/ajouter/getoperateurs");
+        const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/getoperateurs");
         setOperateurs(response.data.operateurs);
         console.log(response.data);
 
@@ -172,7 +172,7 @@ const PlannificationForm = () => {
     setLoading(true);
 
     try {
-      await axios.put(`http://localhost:4000/ajouter/machine/${selectedMachine.id}/outil`, 
+      await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/machine/${selectedMachine.id}/outil`, 
         {
           phasechargement: phasechargement,
           phase: phasechargement,
@@ -251,7 +251,7 @@ const PlannificationForm = () => {
       };
   
       // Send the data to the backend
-      await axios.post("http://localhost:4000/ajouter/plannification", plannificationData, {
+      await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",

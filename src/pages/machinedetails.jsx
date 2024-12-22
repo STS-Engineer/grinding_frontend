@@ -12,7 +12,7 @@ const MachineDetails = () => {
   const fetchMachines = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:4000/ajouter/machines", {
+      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

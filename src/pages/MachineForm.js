@@ -55,7 +55,7 @@ const MachineForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const machinereponse = await axios.get("http://localhost:4000/ajouter/machines");
+        const machinereponse = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines");
         setMachines(machinereponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -119,7 +119,7 @@ const MachineForm = () => {
   
     try {
       await axios.put(
-        `http://localhost:4000/ajouter/machine/${selectedMachine.id}/outil`,
+        `https://grinding-backend.azurewebsites.net/ajouter/machine/${selectedMachine.id}/outil`,
         dataToSend,
         {
           headers: {

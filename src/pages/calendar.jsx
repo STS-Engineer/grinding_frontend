@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
-import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker  } from 'antd';
+import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker, InputNumber  } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {moment} from 'moment';
 import './calendar.css'
@@ -72,18 +72,33 @@ const Calendar = () => {
     const [phasecfshift2, setPhasecfshift2] = useState('');
     const [operateurcfshift2, setOperateurcfshift2] = useState(null);
     const [selectedOperators, setSelectedOperators] = useState([]);
+    const [selectedreguleurOperators, setSelectedreguleurOperators] = useState([]);
+    const [selectedcfOperators, setSelectedCFOperators] = useState([]);
+    const [selectedcslOperators, setSelectedCSLOperators] = useState([]);
+    const [selectedshift2reguleurOperators, setSelectedshift2reguleurOperators] = useState([]);
+    const [selectedOperatorsshift2production, setSelectedOperatorsShift2production] = useState([]);
+    const [selectedcfOperatorsshift2cf, setSelectedCFOperatorsShift2cf] = useState([]);
+    const [selectedcslOperatorsshift2csl, setSelectedCSLOperatorsShift2csl] = useState([]);
     const [compteur,setCompteur] = useState([]);
     const [startDate, setStartDate] = useState(new Date('2024-12-01'));
     const [endDate, setEndDate] = useState(new Date('2024-12-31'));
-    const [plannifications, setPlannifications] = useState([]);
+    const [productionShift1, setproductionShift1] = useState(0);
+    const [reguleurShift1, setReguleurShift1] = useState(0); // State for the first input
+    const [cfShift1, setCfShift1] = useState(0); // State for the second input
+    const [cslShift1, setCSLShift1] = useState(0); 
+    const [productionShift2, setproductionShift2] = useState(0);
+    const [reguleurShift2, setReguleurShift2] = useState(0); // State for the first input
+    const [cfShift2, setCfShift2] = useState(0); // State for the second input
+    const [cslShift2, setCSLShift2] = useState(0); 
 
 
 
-  // Fetch machines on mount
-  useEffect(() => {
+
+
+
     const fetchMachines = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/ajouter/machines', {
+        const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/machines', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -94,11 +109,14 @@ const Calendar = () => {
         console.error('Error fetching machines:', error);
       }
     };
+  // Fetch machines on mount
+  useEffect(() => {
+
 
     fetchMachines();
     const fetchoperateur = async()=>{
       try {
-        const response = await axios.get("http://localhost:4000/ajouter/getoperateurs");
+        const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/getoperateurs");
         setOperateurs(response.data.operateurs);
         console.log(response.data);
 
@@ -150,7 +168,7 @@ const Calendar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const machinereponse = await axios.get("http://localhost:4000/ajouter/machines");
+        const machinereponse = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines");
         setMachines(machinereponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -158,7 +176,7 @@ const Calendar = () => {
     };
     const fetchoperateur = async()=>{
       try {
-        const response = await axios.get("http://localhost:4000/ajouter/getoperateurs");
+        const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/getoperateurs");
         setOperateurs(response.data.operateurs);
         console.log(response.data);
 
@@ -174,13 +192,25 @@ const Calendar = () => {
     setDate(today);
   }, []);
 
+  const totalmanqueoperateurshift1 = productionShift1 + reguleurShift1 + cfShift1 +cslShift1;
+   const totalmanqueoperateurshift2 = productionShift2 + reguleurShift2 + cfShift2 +cslShift2;
+  useEffect(()=>{
+
+  },[productionShift1, reguleurShift1, cfShift1,cslShift1, productionShift2, reguleurShift2, cfShift2, cslShift2   ]);
+
+
+  console.log(totalmanqueoperateurshift1);
+  console.log(totalmanqueoperateurshift2);
+
 
   
-  const handleMachineSelect = (machine) => {
-    setSelectedMachine(machine);
-    console.log('Selected Machine:', machine); // Debugg
-    setCurrentStep(2);
-  };
+ // Handling machine selection
+const handleMachineSelect = (machine) => {
+  setSelectedMachine(machine);
+  console.log('Selected Machine:', machine); // Debugging
+  setCurrentStep(2);
+  fetchEvents(startDate, endDate, machine.id_machine);  // Fetch events for selected machine
+};
 
   const handleCheckboxChange = (checkedvalues) => {
     
@@ -193,6 +223,99 @@ const Calendar = () => {
 
     
   };
+
+  
+  const handleCheckboxChangereguleur = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedreguleurOperators(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+  const handleCheckboxChangeCF = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedCFOperators(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+
+  const handleCheckboxChangeCSL = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedCSLOperators(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+  const handleCheckboxChangeshift2production = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedOperatorsShift2production(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+
+  const handleCheckboxChangereguleurshift2 = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedshift2reguleurOperators(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+
+  const handleCheckboxChangeshift2cf = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedCFOperatorsShift2cf(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+
+  const handleCheckboxChangeshift2csl = (checkedvalues) => {
+    
+
+    if (checkedvalues.includes("-1")){
+      setCompteur(compteur+1);
+    }
+  // Update the selected operators (excluding -1)
+  setSelectedCSLOperatorsShift2csl(checkedvalues.filter(value=>value !== "-1"));
+
+    
+  };
+
+
+
+
 
   const getNotAffectedOperators = () => {
     // If all operators are selected, show -1
@@ -215,17 +338,19 @@ const Calendar = () => {
     }
   }, [isMachinesLoaded, startDate, endDate]);
  // Function to fetch events based on the selected date range
- const fetchEvents = async (startDate, endDate) => {
+// Fetch events based on the selected machine
+const fetchEvents = async (startDate, endDate, machineId = null) => {
   try {
     // Format dates to match your backend format (YYYY-MM-DD)
     const formattedStartDate = startDate.toISOString().split('T')[0]; 
     const formattedEndDate = endDate.toISOString().split('T')[0];
 
-    // Send the start_date and end_date as query parameters
-    const response = await axios.get("http://localhost:4000/ajouter/plannifications", {
+    // If a machineId is provided, filter the events by the selected machine
+    const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
       params: {
         start_date: formattedStartDate,
         end_date: formattedEndDate,
+        machine_id: machineId,  // Pass machineId to the backend to filter events
       },
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -242,10 +367,10 @@ const Calendar = () => {
     response.data.forEach((event) => {
       // Find the machine using id_machine from the event
       const machine = machines.find((m) => m.id_machine === event.id_machine);
-      console.log('machinenom',machine.nom);
-      
+      console.log('machinenom', machine ? machine.nom : "Unknown");
+
       // Log machine and event data for debugging
-      console.log(`Event ID: ${event.id}, Machine ID: ${machine.id}, Machine:`, machine);
+      console.log(`Event ID: ${event.id}, Machine ID: ${event.id_machine}, Machine:`, machine);
 
       const eventStartDate = new Date(event.start_date);
       const eventEndDate = new Date(event.end_date);
@@ -262,7 +387,7 @@ const Calendar = () => {
       ) {
         eventsData.push({
           id: event.id,
-          title: machine ? machine.nom : "Unknown Machine", // Check if machine is found
+          title: event.machine_name ? event.machine_name : "Unknown Machine", // Use machine's name if found
           start: event.start_date, // Use event's start date
           end: event.end_date, // Use event's end date
           extendedProps: {
@@ -285,20 +410,12 @@ const Calendar = () => {
 };
 
 
+
 // Fetch events when the component mounts or when the date range changes
 useEffect(() => {
   fetchEvents(startDate, endDate);
 }, [startDate, endDate]); // Re-run when startDate or endDate changes
 
-  
-  
-  
-  
-  
-  
-  
-
-  
   
 
   const onclose = () => {
@@ -345,14 +462,22 @@ useEffect(() => {
       const generateWeeklyDates = (start, end) => {
         const dates = [];
         let currentDate = new Date(start);
-  
-        while (currentDate <= new Date(end)) {
-          dates.push(new Date(currentDate).toISOString().split("T")[0]); // Format as YYYY-MM-DD
-          currentDate.setDate(currentDate.getDate() + 7); // Move to next week
+      
+        // Ensure the loop includes the end date exactly as selected
+        const finalEndDate = new Date(end);
+      
+        while (currentDate <= finalEndDate) {
+          // Add the current date in YYYY-MM-DD format
+          dates.push(currentDate.toISOString().split("T")[0]);
+      
+          // Increment by 7 days (next week)
+          currentDate.setDate(currentDate.getDate() + 7);
         }
-  
+      
         return dates;
       };
+      
+      
   
       // Generate all weekly dates within the range
       const plannificationDates = generateWeeklyDates(startDate, endDate);
@@ -395,7 +520,7 @@ useEffect(() => {
         };
   
         // Send request for each weekly plannification
-        await axios.post("http://localhost:4000/ajouter/plannification", plannificationData, {
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
@@ -412,38 +537,14 @@ useEffect(() => {
       setLoading(false);
     }
   };
-  // Function to generate the date range
-  const generateDateRange = (start, end) => {
-    let dates = [];
-    let currentDate = moment(start);
-    const endDateObj = moment(end);
 
-    while (currentDate <= endDateObj) {
-      dates.push(currentDate.format('YYYY-MM-DD'));
-      currentDate = currentDate.add(1, 'days');
-    }
-
-    return dates;
-  };
 
   const handleDateRangeChange = (dates, dateStrings) => {
     setStartDate(dateStrings[0]);
     setEndDate(dateStrings[1]);
   };
 
-  const handleDuplicatePlannifications = () => {
-    const datesInRange = generateDateRange(startDate, endDate);
-    const newPlannifications = datesInRange.map(date => ({
-      date,
-      // Other data that you want to associate with each planning entry
-      shift1: nombre_heure_shift1,
-      shift2: nombre_heure_shift2,
-      // Add any other necessary fields here
-    }));
-
-    // Save all duplicated plannifications
-    setPlannifications(newPlannifications);
-  };
+ 
   
 
 
@@ -647,14 +748,21 @@ key={selectedMachine.id}
       ))}
       </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase chargement)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={productionShift1}
+              onChange={(value)=>setproductionShift1(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
      
 
       {/* Display selected operators */}
@@ -680,8 +788,8 @@ key={selectedMachine.id}
      
   
        
-     <Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+     <Checkbox.Group   value={selectedreguleurOperators}
+        onChange={handleCheckboxChangereguleur}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -695,14 +803,22 @@ key={selectedMachine.id}
       ))}
       </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+   
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+          <Col span={8}>
+          Manque(phase reguleur)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={reguleurShift1}
+              onChange={(value)=>setReguleurShift1(value || 0)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+     
      
             
     
@@ -727,8 +843,8 @@ key={selectedMachine.id}
     <label>Objective CF</label>
       <input type="number" value={totalcf} readOnly />
     </div>
-    <Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+    <Checkbox.Group   value={selectedcfOperators}
+        onChange={handleCheckboxChangeCF}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -742,14 +858,21 @@ key={selectedMachine.id}
       ))}
       </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase CF)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={cfShift1}
+              onChange={(value)=>setCfShift1(value || 0)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
       </div>
  
   
@@ -772,8 +895,8 @@ key={selectedMachine.id}
       <label>Objective CSL</label>
       <input type="number" value={totalcsl} readOnly />
       </div>
-      <Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+      <Checkbox.Group   value={selectedcslOperators}
+        onChange={handleCheckboxChangeCSL}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -787,14 +910,22 @@ key={selectedMachine.id}
       ))}
       </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+      
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase CSL)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={cslShift1}
+              onChange={(value)=>setCSLShift1(value || 0)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
       </div>
            
    
@@ -875,8 +1006,8 @@ transition={{ duration: 0.5 }}
 <label>Objective Production</label>
 <input type="number" value={totalproductionshift2} readOnly />
 </div>
-<Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+<Checkbox.Group   value={selectedOperatorsshift2production}
+        onChange={handleCheckboxChangeshift2production}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -890,14 +1021,21 @@ transition={{ duration: 0.5 }}
       ))}
       </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase Chargement)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={productionShift2}
+              onChange={(value)=>setproductionShift2(value || 0)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
 </div>
 
 
@@ -915,8 +1053,8 @@ transition={{ duration: 0.5 }}
 
 
 
-   <Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+   <Checkbox.Group   value={selectedshift2reguleurOperators}
+        onChange={handleCheckboxChangereguleurshift2}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -929,15 +1067,21 @@ transition={{ duration: 0.5 }}
        
       ))}
       </Checkbox.Group>
-
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase reguleur)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value= {reguleurShift2}
+              onChange={(value)=>setReguleurShift2(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
 
      
 
@@ -958,8 +1102,8 @@ transition={{ duration: 0.5 }}
 <label>Objective CF</label>
 <input type="number" value={totalcfshift2} readOnly />
 </div>
-<Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+<Checkbox.Group   value={selectedcfOperatorsshift2cf}
+        onChange={handleCheckboxChangeshift2cf}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -972,15 +1116,22 @@ transition={{ duration: 0.5 }}
        
       ))}
       </Checkbox.Group>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase CF)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value= {cfShift2}
+              onChange={(value)=>setCfShift2(value || 0)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
 </div>
 
 
@@ -1004,8 +1155,8 @@ transition={{ duration: 0.5 }}
 <label>Objective CSL</label>
 <input type="number" value={totalcslshift2} readOnly />
 </div>
-<Checkbox.Group   value={selectedOperators}
-        onChange={handleCheckboxChange}
+<Checkbox.Group   value={selectedcslOperatorsshift2csl}
+        onChange={handleCheckboxChangeshift2csl}
         style={{ width: '100%' }}>
       {operateurs.map((operateur)=>(
          <Row>
@@ -1019,14 +1170,22 @@ transition={{ duration: 0.5 }}
       ))}
       </Checkbox.Group>
 
-       <Checkbox.Group style={{ width: '100%' }}>
-         <Row>
-           <Col span={8}>
-             <Checkbox >-1</Checkbox>
-           </Col>
-          
-         </Row>
-       </Checkbox.Group>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque(phase CSL)
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value= {cslShift2}
+              onChange={(value)=>setCSLShift2(value || 0)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+
 </div>
 
 

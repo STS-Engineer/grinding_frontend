@@ -15,7 +15,7 @@ const Login = () => {
 
     try {
       // Sending POST request to login endpoint
-      const response = await axios.post("http://localhost:4000/ajouter/login", {
+      const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/login", {
         email,
         password,
       });

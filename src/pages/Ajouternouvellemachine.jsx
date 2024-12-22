@@ -51,7 +51,7 @@ const Ajoutermachine = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const machinereponse = await axios.get("http://localhost:4000/ajouter/machine");
+        const machinereponse = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machine");
         setMachines(machinereponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -113,7 +113,7 @@ const Ajoutermachine = () => {
     try {
       // Sending the request with the correct body format
       await axios.post(
-        "http://localhost:4000/ajouter/machinee",
+        "https://grinding-backend.azurewebsites.net/ajouter/machinee",
         {
           nom: nommachine, // Replace with actual value from the form
           referenceproduit: reference, // Replace with actual value from the form

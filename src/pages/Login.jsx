@@ -30,7 +30,7 @@ const Login = () => {
         navigate('/home')
         // Optionally, navigate to a different page or set a token in local storage
       }
-    
+             
     } catch (error) {
       console.error("Failed login", error);
       alert("Invalid email or password. Please try again.");

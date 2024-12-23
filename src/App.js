@@ -6,7 +6,7 @@ import MachineDetails from './pages/machinedetails';
 import MachineForm from './pages/MachineForm';
 import Login from './pages/Login';
 import PlannificationForm from './pages/Plannification';
-import Ajoutermachine from './pages/Ajouternouvellemachine';
+import Ajouternouvellemachine from './pages/Ajouternouvellemachine';
 import Calendar from './pages/calendar';
 
 
@@ -21,7 +21,7 @@ function App() {
       <Route path="/home" element={<AnimatedPage />} />
       <Route path="/details" element={<MachineDetails />} />
       <Route path="/machineform" element={<MachineForm />} />
-      <Route path="/ajoutermachine" element={<Ajoutermachine />} />
+      <Route path="/ajouternouvellemachine" element={<Ajouternouvellemachine />} />
       <Route path="/calendar" element={<Calendar />} />
     
       <Route path="/plannification" element={<PlannificationForm/>} />

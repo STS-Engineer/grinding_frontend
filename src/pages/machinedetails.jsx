@@ -106,11 +106,11 @@ const MachineDetails = () => {
                   </div>
                   <div className="machine-details">
                     <p><strong>Matricule Utilisateur:</strong> {machine.user_id}</p>
-                    <p><strong>Code:</strong> {machine.codemachine}</p>
-                    <p><strong>Reference:</strong> {machine.reference}</p>
-                    <p><strong>Phase:</strong> {machine.phase}</p>
-                    <p><strong>Date:</strong> {new Date(machine.date).toLocaleDateString()}</p>
-                    <p><strong>Outillage:</strong> {machine.outillage}</p>
+                    <p><strong>Reference:</strong> {machine.referenceproduit}</p>
+                    <p><strong>Cadence_horaire_production:</strong> {machine.cadence_horaire}</p>
+                    <p><strong>Cadence_horaire_cf:</strong> {machine.cadence_horaire_cf}</p>
+                    <p><strong>Cadence_horaire_csl:</strong> {machine.cadence_horaire_csl}</p>
+                    <p><strong>Date de creation:</strong> {new Date(machine.date).toLocaleDateString()}</p>
                   </div>
                 </div>
               ))}

@@ -222,75 +222,62 @@ const handleMachineSelect = (machine) => {
   }, [isMachinesLoaded, startDate, endDate]);
  // Function to fetch events based on the selected date range
 // Fetch events based on the selected machine
-const fetchEvents = async (startDate, endDate, machineId = null) => {
-  try {
-    // Format dates to match your backend format (YYYY-MM-DD)
-    const formattedStartDate = startDate.toISOString().split('T')[0]; 
-    const formattedEndDate = endDate.toISOString().split('T')[0];
-
-    // If a machineId is provided, filter the events by the selected machine
-    const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
-      params: {
-        start_date: formattedStartDate,
-        end_date: formattedEndDate,
-        machine_id: machineId,  // Pass machineId to the backend to filter events
-      },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    const eventsData = [];
-    
-    // Log machines and events for debugging
-    console.log('Machines:', machines); 
-    console.log('Fetched Events:', response.data);
-
-    // Loop through the fetched events and add them to eventsData
-    response.data.forEach((event) => {
-      // Find the machine using id_machine from the event
-      const machine = machines.find((m) => m.id_machine === event.id_machine);
-      console.log('machinenom', machine ? machine.nom : "Unknown");
-
-      // Log machine and event data for debugging
-      console.log(`Event ID: ${event.id}, Machine ID: ${event.id_machine}, Machine:`, machine);
-
-      const eventStartDate = new Date(event.start_date);
-      const eventEndDate = new Date(event.end_date);
-      
-      if (isNaN(eventStartDate.getTime()) || isNaN(eventEndDate.getTime())) {
-        console.error('Invalid event date:', event);
-        return;
-      }
-
-      // Check if the event is within the selected date range
-      if (
-        (eventStartDate >= startDate && eventStartDate <= endDate) || 
-        (eventEndDate >= startDate && eventEndDate <= endDate)
-      ) {
-        eventsData.push({
-          id: event.id,
-          title: event.machine_name ? event.machine_name : "Unknown Machine", // Use machine's name if found
-          start: event.start_date, // Use event's start date
-          end: event.end_date, // Use event's end date
-          extendedProps: {
-            phasechargement: event.phasechargement,
-            shift: event.shift,
-            shift2: event.shift2,
-            start_date: event.start_date,
-            end_date: event.end_date,
-          },
-        });
-      }
-    });
-
-    // Set the events data after filtering
-    setEvents(eventsData);
-    console.log('Processed Events:', eventsData); // Log the processed events data for verification
-  } catch (error) {
-    console.error("Error fetching events:", error);
-  }
-};
+  const fetchEvents = async (startDate, endDate, machineId = null) => {
+    try {
+      const formattedStartDate = startDate.toISOString().split("T")[0];
+      const formattedEndDate = endDate.toISOString().split("T")[0];
+      const today = new Date();
+      const formattedToday = today.toISOString().split("T")[0]; // Format today's date
+  
+      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
+        params: {
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+          machine_id: machineId,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
+      const eventsData = [];
+  
+      response.data.forEach((event) => {
+        const eventStartDate = new Date(event.start_date).toISOString().split("T")[0];
+        const eventEndDate = new Date(event.end_date).toISOString().split("T")[0];
+  
+        // Skip events occurring on the current date
+        if (eventStartDate === formattedToday || eventEndDate === formattedToday) {
+          return;
+        }
+  
+        const machine = machines.find((m) => m.id_machine === event.id_machine);
+  
+        if (
+          (eventStartDate >= formattedStartDate && eventStartDate <= formattedEndDate) ||
+          (eventEndDate >= formattedStartDate && eventEndDate <= formattedEndDate)
+        ) {
+          eventsData.push({
+            id: event.id,
+            title: event.machine_name || "Unknown Machine",
+            start: event.start_date,
+            end: event.end_date,
+            extendedProps: {
+              phasechargement: event.phasechargement,
+              shift: event.shift,
+              shift2: event.shift2,
+              start_date: event.start_date,
+              end_date: event.end_date,
+            },
+          });
+        }
+      });
+  
+      setEvents(eventsData);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
 
 
 
@@ -341,30 +328,9 @@ useEffect(() => {
     }
   
     try {
-      // Function to generate plannification dates (weekly)
-      const generateWeeklyDates = (start, end) => {
-        const dates = [];
-        let currentDate = new Date(start);
+     
+ 
       
-        // Ensure the loop includes the end date exactly as selected
-        const finalEndDate = new Date(end);
-      
-        while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
-          dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
-          currentDate.setDate(currentDate.getDate() + 7);
-        }
-      
-        return dates;
-      };
-      
-      // Generate all weekly dates within the range
-      const plannificationDates = generateWeeklyDates(startDate, endDate);
-  
-      // Loop through the dates and send plannification requests
-      for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -390,7 +356,7 @@ useEffect(() => {
             "Content-Type": "application/json",
           },
         });
-      }
+      
 
       setCurrentStep(3);
     
@@ -412,32 +378,6 @@ useEffect(() => {
     }
   
     try {
-      // Function to generate plannification dates (weekly)
-      const generateWeeklyDates = (start, end) => {
-        const dates = [];
-        let currentDate = new Date(start);
-      
-        // Ensure the loop includes the end date exactly as selected
-        const finalEndDate = new Date(end);
-      
-        while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
-          dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
-          currentDate.setDate(currentDate.getDate() + 7);
-        }
-      
-        return dates;
-      };
-      
-      
-  
-      // Generate all weekly dates within the range
-      const plannificationDates = generateWeeklyDates(startDate, endDate);
-  
-      // Loop through the dates and send plannification requests
-      for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -480,9 +420,6 @@ useEffect(() => {
             "Content-Type": "application/json",
           },
         });
-      }
-  
-
       
       setCurrentStep(4);
 
@@ -504,32 +441,6 @@ useEffect(() => {
     }
   
     try {
-      // Function to generate plannification dates (weekly)
-      const generateWeeklyDates = (start, end) => {
-        const dates = [];
-        let currentDate = new Date(start);
-      
-        // Ensure the loop includes the end date exactly as selected
-        const finalEndDate = new Date(end);
-      
-        while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
-          dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
-          currentDate.setDate(currentDate.getDate() + 7);
-        }
-      
-        return dates;
-      };
-      
-      
-  
-      // Generate all weekly dates within the range
-      const plannificationDates = generateWeeklyDates(startDate, endDate);
-  
-      // Loop through the dates and send plannification requests
-      for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -558,7 +469,7 @@ useEffect(() => {
             "Content-Type": "application/json",
           },
         });
-      }
+      
 
       setCurrentStep(5);
       
@@ -581,32 +492,6 @@ useEffect(() => {
     }
   
     try {
-      // Function to generate plannification dates (weekly)
-      const generateWeeklyDates = (start, end) => {
-        const dates = [];
-        let currentDate = new Date(start);
-      
-        // Ensure the loop includes the end date exactly as selected
-        const finalEndDate = new Date(end);
-      
-        while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
-          dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
-          currentDate.setDate(currentDate.getDate() + 7);
-        }
-      
-        return dates;
-      };
-      
-      
-  
-      // Generate all weekly dates within the range
-      const plannificationDates = generateWeeklyDates(startDate, endDate);
-  
-      // Loop through the dates and send plannification requests
-      for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -635,7 +520,7 @@ useEffect(() => {
             "Content-Type": "application/json",
           },
         });
-      }
+      
   
       setCurrentStep(6);
     
@@ -657,32 +542,6 @@ useEffect(() => {
     }
   
     try {
-      // Function to generate plannification dates (weekly)
-      const generateWeeklyDates = (start, end) => {
-        const dates = [];
-        let currentDate = new Date(start);
-      
-        // Ensure the loop includes the end date exactly as selected
-        const finalEndDate = new Date(end);
-      
-        while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
-          dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
-          currentDate.setDate(currentDate.getDate() + 7);
-        }
-      
-        return dates;
-      };
-      
-      
-  
-      // Generate all weekly dates within the range
-      const plannificationDates = generateWeeklyDates(startDate, endDate);
-  
-      // Loop through the dates and send plannification requests
-      for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -725,7 +584,7 @@ useEffect(() => {
             "Content-Type": "application/json",
           },
         });
-      }
+      
  
       setCurrentStep(7);
    
@@ -747,32 +606,6 @@ useEffect(() => {
     }
   
     try {
-      // Function to generate plannification dates (weekly)
-      const generateWeeklyDates = (start, end) => {
-        const dates = [];
-        let currentDate = new Date(start);
-      
-        // Ensure the loop includes the end date exactly as selected
-        const finalEndDate = new Date(end);
-      
-        while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
-          dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
-          currentDate.setDate(currentDate.getDate() + 7);
-        }
-      
-        return dates;
-      };
-      
-      
-  
-      // Generate all weekly dates within the range
-      const plannificationDates = generateWeeklyDates(startDate, endDate);
-  
-      // Loop through the dates and send plannification requests
-      for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -815,7 +648,7 @@ useEffect(() => {
             "Content-Type": "application/json",
           },
         });
-      }
+      
 
       setCurrentStep(8);
 
@@ -1056,29 +889,7 @@ key={selectedMachine.id}
 
 <h1 style={{fontSize:'20px', fontWeight:"bold", display:'flex', justifyContent:'center', alignItems:'center'}}>Shift 1 Plannification</h1>
 
-<div style={{marginBottom:'30px'}}>
-{selectedMachine && machineReferences[selectedMachine.nom] && (
-<div className="references-dropdown">
-<label>References</label>
-<Select
-  value={selectedReference}
-  onChange={handleReferenceSelect}
-  style={{ width: '100%' }}
-  placeholder="Select reference"
->
-  {/* Check if references are an array before mapping */}
-  {Array.isArray(machineReferences[selectedMachine.nom]) && 
-    machineReferences[selectedMachine.nom].map((reference, index) => (
-      <Option key={index} value={reference}>
-        {reference}
-      </Option>
-    ))
-  }
-</Select>
-</div>
-)}
 
-</div>
 <div className="input-field">
         <Checkbox.Group
          style={{ width: '100%' }}
@@ -1090,14 +901,45 @@ key={selectedMachine.id}
         
        </Checkbox.Group>
     </div>
+
+{shift.includes("shift1") && (
+ <div style={{marginBottom:'30px'}}>
+ {selectedMachine && machineReferences[selectedMachine.nom] && (
+ <div className="references-dropdown">
+ <label>References</label>
+ <Select
+   value={selectedReference}
+   onChange={handleReferenceSelect}
+   style={{ width: '100%' }}
+   placeholder="Select reference"
+ >
+   {/* Check if references are an array before mapping */}
+   {Array.isArray(machineReferences[selectedMachine.nom]) && 
+     machineReferences[selectedMachine.nom].map((reference, index) => (
+       <Option key={index} value={reference}>
+         {reference}
+       </Option>
+     ))
+   }
+ </Select>
+ </div>
+ )}
+ 
+ </div>
+)}
+
 {shift.includes("shift1")  && (
   <div>
   <label>Nombre d'heure shift 1</label>
   <Input type='number' value={nombre_heure_shift1} onChange={(e)=> setNombre_heure_shift1(e.target.value)}></Input>
   </div>
    )}
-    
-
+   {shift.includes("shift1")  && (
+     <div className="input-field">
+    <label>Objective Production</label>
+      <input type="number" value={totalproduction} readOnly />
+    </div>
+    )}
     
     {shift.includes("shift1")  && (
             <div className="input-field">
@@ -1113,12 +955,8 @@ key={selectedMachine.id}
            </div> 
       )}
     
-    
+    {phasechargement.includes("chargement") && (
     <div>
-    <div className="input-field">
-    <label>Objective Production</label>
-      <input type="number" value={totalproduction} readOnly />
-    </div>
     <div className="operateur-select">
       <h3>Select Operators</h3>
      
@@ -1154,14 +992,10 @@ key={selectedMachine.id}
       </Checkbox.Group>
      
 
-      {/* Display selected operators */}
-      <div>
-        {/* Display the names of unaffected operators or -1 if all are affected */}
-        <p>Not Affected: {getNotAffectedOperators()}</p>
-      </div>
-
     </div>
     </div>
+    )}
+    
     <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent()}>Next </button>
     </div>
@@ -1180,13 +1014,14 @@ key={selectedMachine.id}
                 <Checkbox value="reguleur">Phase Reguleur</Checkbox>
                </Checkbox.Group>
            </div> 
-     
+     {phasechargement.includes("reguleur") && (
+    <div>
     <div className="input-field">
-    <label>Objective Production</label>
+    <label>Objective Reguleur</label>
       <input type="number" value={totalproduction} readOnly />
     </div>
-       
-           <Checkbox.Group
+             
+  <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
         style={{ width: '100%' }}
@@ -1198,7 +1033,7 @@ key={selectedMachine.id}
       </Col>
     </Row>
   ))}
-</Checkbox.Group>
+  </Checkbox.Group>
 
    
       <Checkbox.Group style={{ width: '100%' }}>
@@ -1215,7 +1050,9 @@ key={selectedMachine.id}
           </Col>
         </Row>
       </Checkbox.Group>
-     
+    </div>
+     )}
+  
     <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent2()}>Next </button>
     </div>
@@ -1236,9 +1073,10 @@ key={selectedMachine.id}
               </Checkbox.Group>
           </div> 
 
-     <div>
-                    
-    <div className="input-field">
+     
+    {phasechargement.includes("cf") && (
+      <div>
+          <div className="input-field">
     <label>Objective CF</label>
       <input type="number" value={totalcf} readOnly />
     </div>
@@ -1272,6 +1110,9 @@ key={selectedMachine.id}
         </Row>
       </Checkbox.Group>
       </div>
+    )}                
+ 
+     
       <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent3()}>Next </button>
     </div>
@@ -1290,8 +1131,10 @@ key={selectedMachine.id}
             <Checkbox value="csl">Phase CSL</Checkbox>
            </Checkbox.Group>
        </div> 
-      <div>
-      <div className="input-field">
+    
+        {phasechargement.includes("csl") && (
+        <div>
+       <div className="input-field">
       <label>Objective CSL</label>
       <input type="number" value={totalcsl} readOnly />
       </div>
@@ -1307,7 +1150,7 @@ key={selectedMachine.id}
       </Col>
     </Row>
   ))}
-</Checkbox.Group>
+     </Checkbox.Group>
       
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
@@ -1324,7 +1167,10 @@ key={selectedMachine.id}
           </Col>
         </Row>
       </Checkbox.Group>
-      </div>
+        </div>
+        )}
+      
+      
       <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent4()}>Next to plannify shift 2 </button>
       </div>
@@ -1361,8 +1207,10 @@ transition={{ duration: 0.5 }}
         
        </Checkbox.Group>
     </div>
-<div>
-{selectedMachine && machineReferences[selectedMachine.nom] && (
+
+  {shift.includes("shift2") && (
+   <div>
+    {selectedMachine && machineReferences[selectedMachine.nom] && (
 <div className="references-dropdown">
 <label>References</label>
 <Select
@@ -1382,10 +1230,14 @@ transition={{ duration: 0.5 }}
 </Select>
 </div>
 )}
-</div>
+
 <div>
 <label>Nombre d'heure shift 2</label>
 <Input type='number' value={nombre_heure_shift2} onChange={(e)=> setNombre_heure_shift2(e.target.value)}></Input>
+</div>
+<div className="input-field">
+<label>Objective Production</label>
+<input type="number" value={totalproductionshift2} readOnly />
 </div>
 <div className="input-field">
     <Checkbox.Group
@@ -1396,11 +1248,8 @@ transition={{ duration: 0.5 }}
         <Checkbox value="Chargementshift2">Phase Chargement</Checkbox> 
        </Checkbox.Group>
    </div> 
-<div>
-<div className="input-field">
-<label>Objective Production</label>
-<input type="number" value={totalproductionshift2} readOnly />
-</div>
+
+
 <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1429,7 +1278,10 @@ transition={{ duration: 0.5 }}
           </Col>
         </Row>
       </Checkbox.Group>
-</div>
+   </div>
+  )}
+
+
 
 <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent5()}>Next </button>
@@ -1445,18 +1297,19 @@ transition={{ duration: 0.5 }}
       <div className="input-field">
     <Checkbox.Group
          style={{ width: '100%'}}
-         value={phasereguleurshif2}
-         onChange={(value)=>setPhasereguleurshif2(value)}
+         value={phasereguleurshif2} // Wrap single value in an array
+         onChange={(value) => setPhasereguleurshif2(value)}
        >
         <Checkbox value="reguleur">Phase Reguleur</Checkbox>
        </Checkbox.Group>
    </div> 
-
-  <Checkbox.Group
+{phasereguleurshif2.includes("reguleur") && (
+  <div>
+    <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
         style={{ width: '100%' }}
-   >
+>
   {operateurs.map((operateur) => (
     <Row key={operateur.id}>
       <Col span={8}>
@@ -1480,6 +1333,9 @@ transition={{ duration: 0.5 }}
           </Col>
         </Row>
       </Checkbox.Group>
+  </div>
+)}
+  
 
       <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent6()}>Next </button>
@@ -1499,41 +1355,45 @@ transition={{ duration: 0.5 }}
        <Checkbox value="cfshift2">Phase CF</Checkbox>
       </Checkbox.Group>
   </div> 
-<div>
-<div className="input-field">
-<label>Objective CF</label>
-<input type="number" value={totalcfshift2} readOnly />
-</div>
-<Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-  </Checkbox.Group>
-      <Checkbox.Group style={{ width: '100%' }}>
-        <Row>
-       
-          <Col span={8}>
-          Manque(phase CF)
-            <InputNumber
-              min={0}
-              placeholder="Enter a number"
-              style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
-            />
-          </Col>
-        </Row>
-      </Checkbox.Group>
 
-    </div>
+  {phasecfshift2.includes("cfshift2") && (
+  <div>
+  <div className="input-field">
+  <label>Objective CF</label>
+  <input type="number" value={totalcfshift2} readOnly />
+  </div>
+  <Checkbox.Group
+          value={operateurreguleur} // Wrap single value in an array
+          onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
+          style={{ width: '100%' }}
+  >
+    {operateurs.map((operateur) => (
+      <Row key={operateur.id}>
+        <Col span={8}>
+          <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+        </Col>
+      </Row>
+    ))}
+       </Checkbox.Group>
+        <Checkbox.Group style={{ width: '100%' }}>
+          <Row>
+         
+            <Col span={8}>
+            Manque(phase CF)
+              <InputNumber
+                min={0}
+                placeholder="Enter a number"
+                style={{ marginLeft: 10 }}
+                value={nombremanque}
+                onChange={(value) => setNombremanque(value)}
+              />
+            </Col>
+          </Row>
+        </Checkbox.Group>
+  
+      </div>
+  )}
+
 
     <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent7()}>Next </button>
@@ -1555,42 +1415,50 @@ transition={{ duration: 0.5 }}
     <Checkbox value="cslshift2">Phase CSL</Checkbox>
    </Checkbox.Group>
 </div> 
-
-<div>
-<div className="input-field">
-<label>Objective CSL</label>
-<input type="number" value={totalcslshift2} readOnly />
-</div>
-<Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
- </Checkbox.Group>
-      <Checkbox.Group style={{ width: '100%' }}>
-        <Row>
-       
-          <Col span={8}>
-          Manque(phase CSL)
-            <InputNumber
-              min={0}
-              placeholder="Enter a number"
-              style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
-            />
-          </Col>
-        </Row>
+{phasecslshift2.includes("cslshift2") && (
+ <div>
+ <div className="input-field">
+ <label>Objective CSL</label>
+ <input type="number" value={totalcslshift2} readOnly />
+ </div>
+ <Checkbox.Group
+         value={operateurreguleur} // Wrap single value in an array
+         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
+         style={{ width: '100%' }}
+ >
+ <Checkbox.Group
+         value={operateurreguleur} // Wrap single value in an array
+         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
+         style={{ width: '100%' }}
+ >
+   {operateurs.map((operateur) => (
+     <Row key={operateur.id}>
+       <Col span={8}>
+         <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+       </Col>
+     </Row>
+   ))}
       </Checkbox.Group>
+ </Checkbox.Group>
+       <Checkbox.Group style={{ width: '100%' }}>
+         <Row>
+        
+           <Col span={8}>
+           Manque(phase CSL)
+             <InputNumber
+               min={0}
+               placeholder="Enter a number"
+               style={{ marginLeft: 10 }}
+               value={nombremanque}
+               onChange={(value) => setNombremanque(value)}
+             />
+           </Col>
+         </Row>
+       </Checkbox.Group>
+ 
+ </div>
+)}
 
-</div>
 <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent7()}>Submit </button>
 </div>

@@ -899,7 +899,7 @@ useEffect(() => {
         };
   
         // Send request for each weekly plannification
-        await axios.post("https://grinding-backend.azurewebsites.net/plannification", plannificationData, {
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",

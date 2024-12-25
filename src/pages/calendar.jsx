@@ -1452,20 +1452,19 @@ transition={{ duration: 0.5 }}
        </Checkbox.Group>
    </div> 
 
-   <Checkbox.Group      value={operateurreguleur}
-        onChange={(value)=>setOperateurreguleur(value[0])}
-        style={{ width: '100%' }}>
-      {operateurs.map((operateur)=>(
-         <Row>
-           <Col span={8}>
-             <Checkbox key={operateur.id} value={operateur.nom}>{operateur.nom}</Checkbox>
-        
-           </Col>
-          
-         </Row>
-       
-      ))}
-      </Checkbox.Group>
+  <Checkbox.Group
+        value={operateurreguleur} // Wrap single value in an array
+        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
+        style={{ width: '100%' }}
+   >
+  {operateurs.map((operateur) => (
+    <Row key={operateur.id}>
+      <Col span={8}>
+        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+      </Col>
+    </Row>
+  ))}
+     </Checkbox.Group>
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
@@ -1517,7 +1516,7 @@ transition={{ duration: 0.5 }}
       </Col>
     </Row>
   ))}
-</Checkbox.Group>
+  </Checkbox.Group>
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
@@ -1574,7 +1573,7 @@ transition={{ duration: 0.5 }}
       </Col>
     </Row>
   ))}
-</Checkbox.Group>
+ </Checkbox.Group>
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        

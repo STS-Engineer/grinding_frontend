@@ -41,6 +41,7 @@ const Form = () => {
   const [nommachine, setNommachine] = useState('');
   const [machineId, setMachineId] = useState(null);
   const [totalplanifie, setTotalplanifie] = useState(null);
+  const [selectedDate, setSelectedDate] = useState("");
   const [objectivecf, setObjectivecf] = useState(null);
   const [objectivecsl, setObjectivecsl] = useState(null);
   const [selectedReference, setSelectedReference] = useState('');
@@ -55,6 +56,7 @@ const Form = () => {
   const [durationproduction, setDurationproduction] = useState('');
   const [durationcf, setDurationcf] = useState('');
   const [durationcsl, setDurationcsl] = useState('');
+  const [plannifications,setPlannifications]= useState([]);
   const navigate = useNavigate();
 
   // Function to determine current shift
@@ -93,6 +95,63 @@ const Form = () => {
     return () => clearInterval(interval); // Cleanup interval
   }, []);
 
+  useEffect(() => {
+    const fetchPlannifications = async () => {
+      try {
+        const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        console.log("Plannifications fetched successfully:", response.data);
+        setPlannifications(response.data);
+      } catch (error) {
+        console.error("Internal error while fetching plannifications:", error);
+      }
+    };
+
+    fetchPlannifications();
+  }, []);
+
+  const handleDateChange = (value) => {
+    // Convert the selected value (date) to a comparable format (YYYY-MM-DD)
+    const selectedDate = new Date(value).toISOString().split("T")[0]; // Get just the date part
+  
+    // Find the plannification that matches the selected date and selected machine
+    const selectedPlannification = plannifications.find(
+      (plannification) =>
+        plannification.date_creation.split("T")[0] === selectedDate && 
+        plannification.id_machine === selectedMachine.id // Match selected machine
+    );
+  
+    // If a matching plannification is found
+    if (selectedPlannification) {
+      // Check for the "chargement" phase
+      if (selectedPlannification.phase === "chargement") {
+        const totalPlanifie = selectedPlannification.totalplanifie; // Retrieve totalplanifie for "chargement"
+        setTotalplanifie(totalPlanifie); // Update the state for totalplanifie
+      }
+  
+      // Check for the "cf" phase
+      if (selectedPlannification.phase === "cf") {
+        const objectiveCf = selectedPlannification.totalplanifie; // Retrieve totalplanifie for "cf"
+        setObjectivecf(objectiveCf); // Update the state for objectivecf
+      }
+
+       // Check for the "cf" phase
+       if (selectedPlannification.phase === "csl") {
+        const objectivecsl = selectedPlannification.totalplanifie; // Retrieve totalplanifie for "cf"
+        setObjectivecsl(objectivecsl); // Update the state for objectivecf
+      }
+    } else {
+      // Default to 0 if no matching plannification or if phases don't match
+      setTotalplanifie(0);
+      setObjectivecf(0);
+      setObjectivecsl(0);
+    }
+  };
+  
+  
   const calculateDuration = (start, end) => {
     if (start && end) {
       const startDate = new Date(`1970-01-01T${start}:00`);
@@ -157,10 +216,9 @@ const Form = () => {
     setNommachine(machine.nom);
     try {
       const response = await axios.get(`https://grinding-backend.azurewebsites.net/ajouter/plannification/${machine.id}`);
-      const fetchedtotalplanifie = response.data.totalplanifie;
       const fetchedtobjectivecf= response.data.objectivecf;
       const fetchedobjectivecsl= response.data.objectivecsl;
-      setTotalplanifie(fetchedtotalplanifie);
+
       setObjectivecf(fetchedtobjectivecf);
       setObjectivecsl(fetchedobjectivecsl);
 
@@ -295,7 +353,7 @@ const Form = () => {
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter un machine</a></li>
           <li><a href="/details">Détails des machines</a></li>
-          <li><a href="/calendar">Calendrier</a></li>
+          <li><a href="/calendar">Plannification</a></li>
           <button className='logout-button' onClick={handleLogout}>logout</button>
         </ul>
       </div>
@@ -337,6 +395,7 @@ const Form = () => {
     <>
       <h2>Current shift: {shift}</h2>
 
+
       {selectedMachine && (
         <div key={selectedMachine.id}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -345,6 +404,22 @@ const Form = () => {
           </div>
         </div>
       )}
+
+<div>
+  <label>Plannification Date</label>
+  <Select
+    style={{ width: "100%", marginBottom: "50px" }}
+    placeholder="Select plannification date"
+    onChange={handleDateChange}  // Make sure the date selection triggers the handleDateChange function
+  >
+    <Option value="">Select plannification date</Option>
+    {plannifications.map((plannification) => (
+      <Option key={plannification.id} value={plannification.date_creation}>
+        {plannification.date_creation}
+      </Option>
+    ))}
+  </Select>
+</div>
 
       {selectedMachine && machineReferences[selectedMachine.nom] && (
         <div className="references-dropdown">
@@ -365,11 +440,12 @@ const Form = () => {
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <label style={{ fontWeight: 'bold' }}>Objective Production:</label>
-        <span>{totalplanifie}</span>
+          {/* Display Objective Production */}
+      <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
+        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective Production:</label>
+        <span>{totalplanifie !== null ? totalplanifie : "Select a date"}</span>
       </div>
-
+   
       {nommachine && (
         <div className="input-field">
           <label>Production</label>
@@ -393,7 +469,9 @@ const Form = () => {
           />
         </div>
       )}
+  {phase.includes("Production") && (
 
+  <div>
       <div>
         <div className="form-row">
           <div className="input-field">
@@ -491,6 +569,10 @@ const Form = () => {
           )}
         </div>
       </div>
+  </div>
+
+  )}
+    
       <div className="button-step1">
             <button className="custom-button" onClick={()=>handleSubmitproduction()}>Next</button>
           </div>
@@ -507,10 +589,27 @@ const Form = () => {
   transition={{ duration: 0.5 }}>
 { currentstep === 2 && (
   <div>
-    <div style={{ display: 'flex',  alignItems: 'center' }}>
-    <label style={{ fontWeight: 'bold' }}>Objective CF:</label>
-    <span>{objectivecf}</span>
+
+<div>
+  <label>Plannification Date</label>
+  <Select
+    style={{ width: "100%", marginBottom: "50px" }}
+    placeholder="Select plannification date"
+    onChange={handleDateChange}  // Make sure the date selection triggers the handleDateChange function
+  >
+    <Option value="">Select plannification date</Option>
+    {plannifications.map((plannification) => (
+      <Option key={plannification.id} value={plannification.date_creation}>
+        {plannification.date_creation}
+      </Option>
+    ))}
+  </Select>
+</div>
+   <div style={{ display: 'flex', alignItems: 'center' }}>
+  <label style={{ fontWeight: 'bold' }}>Objective CF:</label>
+  <span>{objectivecf}</span>
   </div>
+
    
    <div className="input-field">
    <label>CF</label>
@@ -519,11 +618,11 @@ const Form = () => {
       value={phase}
       onChange={(value)=>setPhase(value[0])}
     >
-      <Checkbox value="CF"></Checkbox>
+      <Checkbox value="cf"></Checkbox>
     </Checkbox.Group>
  </div>
 
-{ phase.includes("CF") && (
+{ phase.includes("cf") && (
                  <div className="input-field">
                  <label>Total produit CSL</label>
                  <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
@@ -531,6 +630,7 @@ const Form = () => {
           )
 
           }
+{phase.includes("cf") && (
 
 <div>
  <div className='form-row'>
@@ -588,6 +688,9 @@ const Form = () => {
 
 
   </div>
+
+)}
+
   <div className="button-step1">
             <button className="custom-button" onClick={()=>handleSubmitcf()}>Next </button>
           </div>
@@ -617,14 +720,14 @@ const Form = () => {
       value={phase}
       onChange={(value)=>setPhase(value[0])}
     >
-      <Checkbox value="CSL"></Checkbox>
+      <Checkbox value="csl"></Checkbox>
    
     </Checkbox.Group>
  </div>
 
 
   
-{ phase.includes("CSL") && (
+{ phase.includes("csl") && (
                  <div className="input-field">
                  <label>Total produit CSL</label>
                  <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
@@ -633,59 +736,64 @@ const Form = () => {
 
           }
 
-<div>
- <div className='form-row'>
-<div className='input-field'>
-<label>Type de probléme</label>
-<Select value={typeproblemecsl} onChange={(value)=>setTypeproblemecsl(value)}>
- <Option value=''>select Type de probléme</Option>
- <Option  value="problemmeelectrique">Probléme Electrique</Option>
- <Option value="courtcircuit">Court circuit</Option>
-</Select>
-</div >
-</div>
-<div className='form-row'>
-<div className="input-field">
-            <label htmlFor="start-time">Start Time:</label>
-            <Input
-              id="start-time"
-              type="time"
-              value={startTimecsl}
-              onChange={(e) => setStartTimecsl(e.target.value)}
-            />
-          </div>
-          <div className="input-field">
-            <label htmlFor="end-time">End Time:</label>
-            <Input
-              id="end-time"
-              type="time"
-              value={endTimecsl}
-              onChange={(e) => setEndTimecsl(e.target.value)}
-            />
-          </div>
-          {durationcsl && (
-            <p style={{ marginTop: '10px' }}>
-              Durée: <strong>{durationcsl}</strong>
-            </p>
-          )}
-          </div>
-
-<div className="input-field" >
-      <label>
-        Commentaires  (
-        {parseInt(totalproduitcsl) < parseInt(objectivecsl)
-          ? 'Total produit  < Objective'
-          : ''}
-        )
-      </label>
-      <Input.TextArea
-        value={commentairescsl}
-        onChange={(e) => setCommentairecsl(e.target.value)}
-      />
+  {phase.includes("csl") && (
+   <div>
+   <div className='form-row'>
+  <div className='input-field'>
+  <label>Type de probléme</label>
+  <Select value={typeproblemecsl} onChange={(value)=>setTypeproblemecsl(value)}>
+   <Option value=''>select Type de probléme</Option>
+   <Option  value="problemmeelectrique">Probléme Electrique</Option>
+   <Option value="courtcircuit">Court circuit</Option>
+  </Select>
+  </div >
+  </div>
+  <div className='form-row'>
+  <div className="input-field">
+              <label htmlFor="start-time">Start Time:</label>
+              <Input
+                id="start-time"
+                type="time"
+                value={startTimecsl}
+                onChange={(e) => setStartTimecsl(e.target.value)}
+              />
+            </div>
+            <div className="input-field">
+              <label htmlFor="end-time">End Time:</label>
+              <Input
+                id="end-time"
+                type="time"
+                value={endTimecsl}
+                onChange={(e) => setEndTimecsl(e.target.value)}
+              />
+            </div>
+            {durationcsl && (
+              <p style={{ marginTop: '10px' }}>
+                Durée: <strong>{durationcsl}</strong>
+              </p>
+            )}
+            </div>
+  
+  <div className="input-field" >
+        <label>
+          Commentaires  (
+          {parseInt(totalproduitcsl) < parseInt(objectivecsl)
+            ? 'Total produit  < Objective'
+            : ''}
+          )
+        </label>
+        <Input.TextArea
+          value={commentairescsl}
+          onChange={(e) => setCommentairecsl(e.target.value)}
+        />
+      </div>
+  
+  
     </div>
 
+  )}        
 
-  </div>
+
   <div className="button-step1">
             <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
           </div>

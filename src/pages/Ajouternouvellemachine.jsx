@@ -163,7 +163,6 @@ const Ajoutermachine = () => {
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleSubmit}
           initialValues={{
             date,
           }}

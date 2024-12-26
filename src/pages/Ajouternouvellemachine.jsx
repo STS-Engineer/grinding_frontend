@@ -198,7 +198,7 @@ const Ajoutermachine = () => {
             label="Date"
             rules={[{ required: true, message: 'Veuillez sélectionner une date!' }]}
           >
-            <Input type="text"  value={date} onChange={setDate} />
+            <Input type="date"  value={date} onChange={setDate} />
           </Form.Item>
 
   

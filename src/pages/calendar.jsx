@@ -1248,8 +1248,11 @@ transition={{ duration: 0.5 }}
         <Checkbox value="Chargementshift2">Phase Chargement</Checkbox> 
        </Checkbox.Group>
    </div> 
+   </div>
+  )}
 
-
+{phasechargementshif2.includes("Chargementshift2") && (
+  <div>
 <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1278,8 +1281,8 @@ transition={{ duration: 0.5 }}
           </Col>
         </Row>
       </Checkbox.Group>
-   </div>
-  )}
+  </div>
+)}
 
 
 

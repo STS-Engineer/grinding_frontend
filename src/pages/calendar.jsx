@@ -706,7 +706,7 @@ useEffect(() => {
           referenceproduit: selectedReference,
         };
   
-        await axios.post("http://localhost:4000/ajouter/plannification", plannificationData, {
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
@@ -782,19 +782,17 @@ useEffect(() => {
           referenceproduit: selectedReference,
         };
   
-        await axios.post("http://localhost:4000/ajouter/plannification", plannificationData, {
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
       }
-  
-      // Directly fetch events after successful addition
-      await fetchEvents(startDate, endDate);
-  
       message.success("Plannification added successfully.");
-      setIsAddModalVisible(false); // Close modal after fetching events
+      setIsAddModalVisible(false);
+      // Directly fetch events after successful addition without page reload
+      await fetchEvents(new Date(startDate), new Date(endDate)); // Ensure the dates are passed correctly
     } catch (error) {
       message.error("Failed to add plannifications.");
       console.error(error);

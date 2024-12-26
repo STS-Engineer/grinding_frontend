@@ -260,6 +260,7 @@ const handleMachineSelect = (machine) => {
           eventsData.push({
             id: event.id,
             title: event.machine_name || "Unknown Machine",
+            referenceproduit: event.referenceproduit,
             start: event.start_date,
             end: event.end_date,
             extendedProps: {
@@ -293,15 +294,14 @@ useEffect(() => {
   };
 
   const handleEventClick = (clickInfo) => {
-    const { id, title, extendedProps } = clickInfo.event;
+    const { id, title } = clickInfo.event;
+    const { referenceproduit } = clickInfo.event.extendedProps;
 
     setSelectedEvent({
       id,
       title,
-      phasechargement: extendedProps.phasechargement,
-      id_operateur: extendedProps.id_operateur,
-      shift: extendedProps.shift,
-      shift2: extendedProps.shift2,
+      referenceproduit
+    
     });
     setIsModalvisible(true);
   };
@@ -784,15 +784,12 @@ useEffect(() => {
         dateClick={handleDateClick} // Open modal on date click
       />
       {/* Event Details Modal */}
-      <Modal visible={isModalVisible} onOk={onclose} onCancel={onclose}>
+     <Modal visible={isModalVisible} onOk={onclose} onCancel={onclose}>
         {selectedEvent && (
           <div>
             <h3>Event Details</h3>
             <p><strong>Title:</strong> {selectedEvent.title}</p>
-            <p><strong>Phase Chargement:</strong> {selectedEvent.phasechargement}</p>
-            <p><strong>ID Operateur:</strong> {selectedEvent.id_operateur || 'N/A'}</p>
-            <p><strong>Shift:</strong> {selectedEvent.shift}</p>
-            <p><strong>Shift 2:</strong> {selectedEvent.shift2}</p>
+            <p><strong>referenceproduit:</strong> {selectedEvent.referenceproduit}</p>
           </div>
         )}
       </Modal>

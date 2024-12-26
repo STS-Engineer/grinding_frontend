@@ -660,41 +660,92 @@ useEffect(() => {
     }
   };
 
-  const handleAddEvent7 = async () => {
+ const handleAddEvent7 = async () => {
     setLoading(true);
   
-    // Ensure startDate and endDate are provided
     if (!startDate || !endDate) {
       message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
       return;
     }
   
     try {
-      // Function to generate plannification dates (weekly)
+   
+        const plannificationData = {
+          phase: phasechargement,
+          id_machine: selectedMachine.id,
+          id_operateur: operateurs.id,
+          phasereguleur: phasereguleur,
+          operateurs: operateurreguleur,
+          phasecsl: phasecsl,
+          operateur_csl: operateur_csl,
+          phasecf: phasecf,
+          operateur_cf: operateur_cf,
+          operateur_chargement: operateurchargement,
+          totalplanifie: totalproduction,
+          nombre_heure_shift1: nombre_heure_shift1,
+          nombre_heure_shift2: nombre_heure_shift2,
+          shift: shift,
+          shift2: shift2,
+          phasechargementshif2: phasechargementshif2,
+          operateurchargementshift2: operateurchargementshift2,
+          phasereguleurshif2: phasereguleurshif2,
+          operateur_reguleurshif2: operateur_reguleurshif2,
+          phasecslshift2: phasecslshift2,
+          operateurcslshift2: operateurcslshift2,
+          phasecfshift2: phasecfshift2,
+          operateurcfshift2: operateurcfshift2,
+          objectiveproductionshift2: totalproductionshift2,
+          objectivecslshift2: totalcslshift2,
+          objectivecfshift2: totalcfshift2,
+          objectivecf: totalcf,
+          objectivecsl: totalcsl,
+          nombredemanqueoperateur: nombremanque,
+          start_date: date,
+          end_date: endDate,
+          referenceproduit: selectedReference,
+        };
+  
+        await axios.post("http://localhost:4000/ajouter/plannification", plannificationData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+      setCurrentStep(9);
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddEvent8 = async () => {
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
       const generateWeeklyDates = (start, end) => {
         const dates = [];
         let currentDate = new Date(start);
-      
-        // Ensure the loop includes the end date exactly as selected
         const finalEndDate = new Date(end);
-      
+  
         while (currentDate <= finalEndDate) {
-          // Add the current date in YYYY-MM-DD format
           dates.push(currentDate.toISOString().split("T")[0]);
-      
-          // Increment by 7 days (next week)
           currentDate.setDate(currentDate.getDate() + 7);
         }
-      
+  
         return dates;
       };
-      
-      
   
-      // Generate all weekly dates within the range
       const plannificationDates = generateWeeklyDates(startDate, endDate);
   
-      // Loop through the dates and send plannification requests
       for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
@@ -726,25 +777,27 @@ useEffect(() => {
           objectivecf: totalcf,
           objectivecsl: totalcsl,
           nombredemanqueoperateur: nombremanque,
-          start_date: date,  // Add the plannification date here
-          end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference
+          start_date: date,
+          end_date: endDate,
+          referenceproduit: selectedReference,
         };
   
-        // Send request for each weekly plannification
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+        await axios.post("http://localhost:4000/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
       }
-      message.success("plannification added succesfully")
-      setCurrentStep(9);
-      setIsAddModalVisible(false);
+  
+      // Directly fetch events after successful addition
+      await fetchEvents(startDate, endDate);
+  
+      message.success("Plannification added successfully.");
+      setIsAddModalVisible(false); // Close modal after fetching events
     } catch (error) {
       message.error("Failed to add plannifications.");
-      console.error(error); // Log error for debugging
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -1460,7 +1513,7 @@ transition={{ duration: 0.5 }}
 )}
 
 <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent7()}>Submit </button>
+      <button className="custom-button" onClick={()=>handleAddEvent8()}>Submit </button>
 </div>
 </div>
 )}

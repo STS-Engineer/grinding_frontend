@@ -153,12 +153,29 @@ const MachineDetails = () => {
     <div>
       <h2>Machine Details</h2>
       <div className="machine-list">
-        {machines.map((machine) => (
-          <div key={machine.codemachine} className="machine-card">
+      {machines.map((machine) => (
+          <div key={machine.id} className="machine-card">
             <h3>{machine.nom}</h3>
-            <button className="update-button" onClick={() => showModal(machine)}>
-              Update Machine
-            </button>
+            <div className="button-container" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+
+            <div className="machine-details">
+                    <p><strong>Matricule Utilisateur:</strong> {machine.user_id}</p>
+                    <p><strong>Reference:</strong> {machine.referenceproduit}</p>
+                    <p><strong>Cadence_horaire_production:</strong> {machine.cadence_horaire}</p>
+                    <p><strong>Cadence_horaire_cf:</strong> {machine.cadence_horaire_cf}</p>
+                    <p><strong>Cadence_horaire_csl:</strong> {machine.cadence_horaire_csl}</p>
+                    <p><strong>Date de creation:</strong> {new Date(machine.date).toLocaleDateString()}</p>
+                  </div>
+        </div>
+       <button
+       className="update-button"
+       onClick={() => showModal(machine)}
+      style={{ padding: '10px 20px', margin:"10px 10px", color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px' }}
+       >
+       Update Machine
+     </button>
+
+
           </div>
         ))}
       </div>

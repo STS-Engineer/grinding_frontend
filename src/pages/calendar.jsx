@@ -984,7 +984,7 @@ key={selectedMachine.id}
    )}
    {shift.includes("shift1")  && (
      <div className="input-field">
-    <label>Objective Production</label>
+    <label>Objective Production machine</label>
       <input type="number" value={totalproduction} readOnly />
     </div>
     )}
@@ -1006,7 +1006,7 @@ key={selectedMachine.id}
     {phasechargement.includes("chargement") && (
     <div>
     <div className="operateur-select">
-      <h3>Select Operators</h3>
+      <h3>Select Operateurs</h3>
      
       <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
@@ -1059,7 +1059,7 @@ key={selectedMachine.id}
                  value={phasechargement}
                  onChange={(value)=>setPhasechargement(value[0])}
                >
-                <Checkbox value="reguleur">Phase Reguleur</Checkbox>
+                <Checkbox value="reguleur">Phase Régleurs</Checkbox>
                </Checkbox.Group>
            </div> 
      {phasechargement.includes("reguleur") && (
@@ -1123,6 +1123,7 @@ key={selectedMachine.id}
     <label>Objective CF</label>
       <input type="number" value={totalcf} readOnly />
     </div>
+     <h3>Select Operateurs</h3>  
     <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1181,6 +1182,7 @@ key={selectedMachine.id}
       <label>Objective CSL</label>
       <input type="number" value={totalcsl} readOnly />
       </div>
+         <h3>Select Operateurs</h3>    
       <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1279,7 +1281,7 @@ transition={{ duration: 0.5 }}
 <Input type='number' value={nombre_heure_shift2} onChange={(e)=> setNombre_heure_shift2(e.target.value)}></Input>
 </div>
 <div className="input-field">
-<label>Objective Production</label>
+<label>Objective Production machine</label>
 <input type="number" value={totalproductionshift2} readOnly />
 </div>
 <div className="input-field">
@@ -1296,6 +1298,7 @@ transition={{ duration: 0.5 }}
 
 {phasechargementshif2.includes("Chargementshift2") && (
   <div>
+    <h3>Select Operateurs</h3>   
 <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1346,11 +1349,12 @@ transition={{ duration: 0.5 }}
          value={phasereguleurshif2} // Wrap single value in an array
          onChange={(value) => setPhasereguleurshif2(value)}
        >
-        <Checkbox value="reguleur">Phase Reguleur</Checkbox>
+        <Checkbox value="reguleur">Phase Régleurs</Checkbox>
        </Checkbox.Group>
    </div> 
 {phasereguleurshif2.includes("reguleur") && (
   <div>
+       <h3>Select Operateurs</h3>
     <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1408,6 +1412,7 @@ transition={{ duration: 0.5 }}
   <label>Objective CF</label>
   <input type="number" value={totalcfshift2} readOnly />
   </div>
+       <h3>Select Operateurs</h3>
   <Checkbox.Group
           value={operateurreguleur} // Wrap single value in an array
           onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1467,6 +1472,7 @@ transition={{ duration: 0.5 }}
  <label>Objective CSL</label>
  <input type="number" value={totalcslshift2} readOnly />
  </div>
+  <h3>Select Operateurs</h3>
  <Checkbox.Group
          value={operateurreguleur} // Wrap single value in an array
          onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value

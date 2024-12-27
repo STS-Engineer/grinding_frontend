@@ -1063,12 +1063,7 @@ key={selectedMachine.id}
                </Checkbox.Group>
            </div> 
      {phasechargement.includes("reguleur") && (
-    <div>
-    <div className="input-field">
-    <label>Objective Reguleur</label>
-      <input type="number" value={totalproduction} readOnly />
-    </div>
-             
+    <div>     
   <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value

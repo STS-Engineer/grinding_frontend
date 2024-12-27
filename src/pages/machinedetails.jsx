@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Modal, Form, Input, Button, message } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import "./machinedetails.css";
-import { useNavigate } from "react-router-dom";
 
 const MachineDetails = () => {
   const [machines, setMachines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedMachine, setSelectedMachine] = useState(null);
+  const [formValues, setFormValues] = useState({
+    nom: '',
+    referenceproduit: '',
+    date: '',
+    cadence_horaire: '',
+    nombre_operateur_chargement: '',
+    cadence_horaire_cf: '',
+    cadence_horaire_csl: '',
+    nombre_operateur_cf: '',
+    nombre_operateur_csl: '',
+    tools: [],
+  });
 
+  // Fetch machines from the backend
   const fetchMachines = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -20,106 +35,161 @@ const MachineDetails = () => {
       setMachines(response.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching machines:", error);
       setError("Failed to fetch machine details");
       setLoading(false);
     }
   };
 
+  // Fetch machines when the component mounts
   useEffect(() => {
     fetchMachines();
   }, []);
 
-  const getMachineImage = (machineName) => {
-    let imageName = '';
-
-    switch (machineName.toUpperCase()) {
-      case 'NGG3':
-        imageName = 'NGG3';
-        break;
-     case 'NGG4':
-      imageName = 'NGG4';
-        break;
-      case 'MUD6':
-        imageName = 'MUD6';
-        break;
-      case 'MUD7':
-        imageName = 'MUD7';
-        break;
-      case 'KOJ':
-        imageName = 'KOJ';
-        break;
-      case 'NGG6':
-          imageName = 'NGG6';
-          break;
-      default:
-        imageName = 'default';
-        break;
+  useEffect(() => {
+    if (selectedMachine) {
+      setFormValues({
+        nom: selectedMachine.nom,
+        referenceproduit: selectedMachine.referenceproduit,
+        date: selectedMachine.date,
+        cadence_horaire: selectedMachine.cadence_horaire,
+        nombre_operateur_chargement: selectedMachine.nombre_operateur_chargement,
+        cadence_horaire_cf: selectedMachine.cadence_horaire_cf,
+        cadence_horaire_csl: selectedMachine.cadence_horaire_csl,
+        nombre_operateur_cf: selectedMachine.nombre_operateur_cf,
+        nombre_operateur_csl: selectedMachine.nombre_operateur_csl,
+        // Ensure tools is never undefined
+      });
     }
+  }, [selectedMachine]);
+  
 
-    return `/images/machines/${imageName}.png`;
+  // Update the machine details in the backend
+  const handleUpdate = async (values) => {
+    const updatedMachineData = {
+      nom: values.nom,
+      referenceproduit: values.referenceproduit,
+      date: values.date,
+      cadence_horaire: values.cadence_horaire,
+      nombre_operateur_chargement: values.nombre_operateur_chargement,
+      cadence_horaire_cf: values.cadence_horaire_cf,
+      cadence_horaire_csl: values.cadence_horaire_csl,
+      nombre_operateur_cf: values.nombre_operateur_cf,
+      nombre_operateur_csl: values.nombre_operateur_csl,
+    
+    };
+
+    try {
+      const response = await axios.put(
+        `https://grinding-backend.azurewebsites.net/ajouter/machinee/${selectedMachine.id}`, // Fixed URL
+        updatedMachineData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+    
+        setIsModalVisible(false); // Close modal on success
+        message.success("Machine updated successfully");
+        fetchMachines(); // Refresh the machine list
+      } else {
+        alert("Error updating machine details");
+      }
+    } catch (error) {
+      console.error("Error updating machine:", error);
+      alert("An error occurred while updating the machine");
+    }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
-    navigate('/login');
+  const showModal = (machine) => {
+    setSelectedMachine(machine);
+    setIsModalVisible(true);
   };
 
-  if (loading) {
-    return <div className="loader">Loading...</div>;
-  }
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+  const handleFormChange = (changedValues) => {
+    setFormValues(prevState => ({
+      ...prevState,
+      ...changedValues,
+    }));
+  };
+
+  const onFinish = (values) => {
+    handleUpdate(values); // Pass the updated values to the handler
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
-    <div className="machine-details-container">
-      <nav className="navbar">
-        <div className="navbar-brand">Wheels Time Management</div>
-        <ul className="navbar-links">
-          <li><a href="/home">Acceuil</a></li>
-          <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/machineform">Ajouter un outil</a></li>
-          <li><a href="/details">Détails des machines</a></li>
-          <button className="logout-button" onClick={handleLogout}>Logout</button>
-        </ul>
-      </nav>
-
-      <div className="content-wrapper">
-        <h2 className="machine-title"></h2>
-
-        <div className="machine-container">
-          {machines.length > 0 ? (
-            <div className="machine-cards">
-              {machines.map((machine) => (
-                <div className="machine-card" key={machine.codemachine}>
-                  <div className="machine-card-header">
-                    <h3 className="machine-name">{machine.nom}</h3>
-                    <img
-                      src={getMachineImage(machine.nom)}
-                      alt={`Image of ${machine.nom}`}
-                      className="machine-image"
-                      onError={(e) => e.target.src = '/images/machines/default.png'}
-                    />
-                  </div>
-                  <div className="machine-details">
-                    <p><strong>Matricule Utilisateur:</strong> {machine.user_id}</p>
-                    <p><strong>Reference:</strong> {machine.referenceproduit}</p>
-                    <p><strong>Cadence_horaire_production:</strong> {machine.cadence_horaire}</p>
-                    <p><strong>Cadence_horaire_cf:</strong> {machine.cadence_horaire_cf}</p>
-                    <p><strong>Cadence_horaire_csl:</strong> {machine.cadence_horaire_csl}</p>
-                    <p><strong>Date de creation:</strong> {new Date(machine.date).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-data">No machines found.</div>
-          )}
-        </div>
+    <div>
+      <h2>Machine Details</h2>
+      <div className="machine-list">
+        {machines.map((machine) => (
+          <div key={machine.codemachine} className="machine-card">
+            <h3>{machine.nom}</h3>
+            <button className="update-button" onClick={() => showModal(machine)}>
+              Update Machine
+            </button>
+          </div>
+        ))}
       </div>
+
+      {/* Modal for updating machine */}
+      <Modal
+        title={`Update Machine: ${selectedMachine?.nom}`}
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null} // No footer needed, we handle it manually
+        className="machine-modal"
+      >
+        <Form
+          initialValues={formValues}
+          onFinish={onFinish}
+          onValuesChange={handleFormChange} // Capture form changes
+          className="machine-form"
+        >
+          <Form.Item label="Machine Name" name="nom" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Reference" name="referenceproduit" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Date" name="date" rules={[{ required: true }]}>
+            <Input type="date" />
+          </Form.Item>
+          <Form.Item label="Cadence Horaire" name="cadence_horaire" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Number of Operators" name="nombre_operateur_chargement" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Cadence Horaire CF" name="cadence_horaire_cf" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Cadence Horaire CSL" name="cadence_horaire_csl" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Number of Operators CF" name="nombre_operateur_cf" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Number of Operators CSL" name="nombre_operateur_csl" rules={[{ required: true }]}>
+            <Input type="number" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Update Machine
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -109,6 +109,28 @@ const MachineDetails = () => {
     setIsModalVisible(true);
   };
 
+
+    const handleDelete = async (machineId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(`https://grinding-backend.azurewebsites.net/ajouter/machinee/${machineId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        alert("Machine deleted successfully");
+        fetchMachines(); // Re-fetch the machine list
+      } else {
+        alert("Error deleting machine");
+      }
+    } catch (error) {
+      console.error("Error deleting machine:", error);
+      alert("An error occurred while deleting the machine");
+    }
+  };
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };

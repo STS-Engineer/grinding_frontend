@@ -57,6 +57,12 @@ const Form = () => {
   const [durationcf, setDurationcf] = useState('');
   const [durationcsl, setDurationcsl] = useState('');
   const [plannifications,setPlannifications]= useState([]);
+   const [declarationquantite,setDecalarationquantite] = useState(null);
+  const [declarationdefaut,setDecalarationdefaut] = useState(null);
+  const [declarationquantitecf,setDecalarationquantitecf] = useState(null);
+  const [declarationdefautcf,setDecalarationdefautcf] = useState(null);
+  const [declarationquantitecsl,setDecalarationquantitecsl] = useState(null);
+  const [declarationdefautcsl,setDecalarationdefautcsl] = useState(null);
   const [objectiveProduction, setObjectiveProduction] = useState(null);
   const [objectiveCF, setObjectiveCF] = useState(null);
   const [objectiveCSL, setObjectiveCSL] = useState(null);
@@ -341,7 +347,7 @@ const Form = () => {
    
   const fetchPlannificationByPhase = async (phase, date_creation) => {
     try {
-      const response = await axios.get("http://localhost:4000/ajouter/plannificationss", {
+      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannificationss", {
         params: { phase, date_creation },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

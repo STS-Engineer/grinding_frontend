@@ -57,6 +57,9 @@ const Form = () => {
   const [durationcf, setDurationcf] = useState('');
   const [durationcsl, setDurationcsl] = useState('');
   const [plannifications,setPlannifications]= useState([]);
+  const [objectiveProduction, setObjectiveProduction] = useState(null);
+  const [objectiveCF, setObjectiveCF] = useState(null);
+  const [objectiveCSL, setObjectiveCSL] = useState(null);
   const navigate = useNavigate();
 
   // Function to determine current shift
@@ -186,7 +189,7 @@ const Form = () => {
       "DefautreglageChanfreinage",
       "DefautreglageRayonnage ",  
     ],
-    "CF": [
+    "cf": [
       "DefautEpaisseur Max",
       "DefautEpaisseur min",
       "DefautLargeur",
@@ -196,7 +199,7 @@ const Form = () => {
       "Defaut Blocage",
       "MesureSPC"
     ],
-    "CSL": [
+    "csl": [
       "DefautEpaisseur ",
       "DefautLargeur",
       "DefautChanfrein ",
@@ -335,6 +338,47 @@ const Form = () => {
     }
   };
 
+   
+  const fetchPlannificationByPhase = async (phase, date_creation) => {
+    try {
+      const response = await axios.get("http://localhost:4000/ajouter/plannificationss", {
+        params: { phase, date_creation },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
+      // Extract totalplanifie values from the response data
+      if (response.data && Array.isArray(response.data)) {
+        return response.data.map(record => record.totalplanifie);
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching plannification for phase ${phase} and date ${date_creation}:`, error);
+      return null;
+    }
+  };
+
+
+  
+  const fetchObjectives = async () => {
+    const currentDate = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" format
+    
+    const productionObjective = await fetchPlannificationByPhase("chargement", currentDate);
+    const cfObjective = await fetchPlannificationByPhase("cf", currentDate);
+    const cslObjective = await fetchPlannificationByPhase("csl", currentDate);
+  
+    setObjectiveProduction(productionObjective);
+    setObjectiveCF(cfObjective);
+    setObjectiveCSL(cslObjective);
+  };
+  
+
+  useEffect(() => {
+    fetchObjectives(); 
+  // Automatically fetch objectives on component mount
+  }, []);
+
 
 
   
@@ -351,7 +395,7 @@ const Form = () => {
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/ajouternouvellemachine">Ajouter un machine</a></li>
+          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
           <button className='logout-button' onClick={handleLogout}>logout</button>
@@ -405,22 +449,6 @@ const Form = () => {
         </div>
       )}
 
-<div>
-  <label>Plannification Date</label>
-  <Select
-    style={{ width: "100%", marginBottom: "50px" }}
-    placeholder="Select plannification date"
-    onChange={handleDateChange}  // Make sure the date selection triggers the handleDateChange function
-  >
-    <Option value="">Select plannification date</Option>
-    {plannifications.map((plannification) => (
-      <Option key={plannification.id} value={plannification.date_creation}>
-        {plannification.date_creation}
-      </Option>
-    ))}
-  </Select>
-</div>
-
       {selectedMachine && machineReferences[selectedMachine.nom] && (
         <div className="references-dropdown">
           <label>Ref: PN</label>
@@ -441,9 +469,9 @@ const Form = () => {
       )}
 
           {/* Display Objective Production */}
-      <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
-        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective Production:</label>
-        <span>{totalplanifie !== null ? totalplanifie : "Select a date"}</span>
+          <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
+        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective Production (Chargement):</label>
+        <span>{objectiveProduction !== null ? objectiveProduction : "No data for today"}</span>
       </div>
    
       {nommachine && (
@@ -454,7 +482,7 @@ const Form = () => {
             value={phase}
             onChange={(value) => setPhase(value[0])}
           >
-            <Checkbox value="Production">Production</Checkbox>
+            <Checkbox value="Production"></Checkbox>
           </Checkbox.Group>
         </div>
       )}
@@ -469,112 +497,118 @@ const Form = () => {
           />
         </div>
       )}
-  {phase.includes("Production") && (
+  
 
-  <div>
-      <div>
-        <div className="form-row">
-          <div className="input-field">
-            <label>Type de probléme</label>
-            <Select
-              value={typeproblemeproduction}
-              onChange={(value) => setTypeproblemeproduction(value)}
-            >
-              <Option value="">Select Type de probléme</Option>
-              <Option value="Probléme Electrique">Probléme Electrique</Option>
-              <Option value="Courtcircuit">Court circuit</Option>
-            </Select>
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="input-field">
-            <label htmlFor="start-time">Start Time:</label>
-            <Input
-              id="start-time"
-              type="time"
-              value={startTimeproduction}
-              onChange={(e) => setStartTimeproduction(e.target.value)}
-            />
-          </div>
-          <div className="input-field">
-            <label htmlFor="end-time">End Time:</label>
-            <Input
-              id="end-time"
-              type="time"
-              value={endTimeproduction}
-              onChange={(e) => setEndTimeproduction(e.target.value)}
-            />
-          </div>
-          {durationproduction && (
-            <p style={{ marginTop: '10px' }}>
-              Durée: <strong>{durationproduction}</strong>
-            </p>
-          )}
-        </div>
-
-        <div className="input-field">
-          <label>
-            Commentaires (
-            {parseInt(totalproduit) < parseInt(totalplanifie)
-              ? 'Total produit < Objective'
-              : ''}
-            )
-          </label>
-          <Input.TextArea
-            value={commentaires}
-            onChange={(e) => setCommentaires(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div>
-        <div
-          className="typedefaut-production"
-          style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
-        >
-          {selectedMachine && defectOptions[phase] && (
-            <div className="references-dropdown" style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '5px' }}>
-                Type defaut production
-              </label>
-              <Select
-                value={typedefautproduction}
-                onChange={(value) => setTypedefautproduction(value)}
-                style={{ width: '100%' }}
-                placeholder="Select type defaut de production"
-              >
-                {Array.isArray(defectOptions[phase]) &&
-                  defectOptions[phase].map((defaut, index) => (
-                    <Option key={index} value={defaut}>
-                      {defaut}
-                    </Option>
-                  ))}
-              </Select>
-            </div>
-          )}
-
-          {phase && (
-            <div className="input-field" style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '5px' }}>
-                Total defaut production
-              </label>
-              <Input
-                type="number"
-                value={totaldefautproduction}
-                onChange={(e) => setTotaldefaut(e.target.value)}
-                style={{ width: '100%' }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+  <div style={{marginBottom:'80px'}}>
+    <Checkbox style={{fontWeight:'bold'}} value={declarationquantite} onChange={setDecalarationquantite}>Déclaration quantité produit</Checkbox>
+      {declarationquantite && (
+                <div >
+                <div className="form-row">
+                  <div className="input-field">
+                    <label>Type de probléme</label>
+                    <Select
+                      value={typeproblemeproduction}
+                      onChange={(value) => setTypeproblemeproduction(value)}
+                    >
+                      <Option value="">Select Type de probléme</Option>
+                      <Option value="Probléme Electrique">Probléme Electrique</Option>
+                      <Option value="Courtcircuit">Court circuit</Option>
+                    </Select>
+                  </div>
+                </div>
+        
+                <div className="form-row">
+                  <div className="input-field">
+                    <label htmlFor="start-time">Start Time:</label>
+                    <Input
+                      id="start-time"
+                      type="time"
+                      value={startTimeproduction}
+                      onChange={(e) => setStartTimeproduction(e.target.value)}
+                    />
+                  </div>
+                  <div className="input-field">
+                    <label htmlFor="end-time">End Time:</label>
+                    <Input
+                      id="end-time"
+                      type="time"
+                      value={endTimeproduction}
+                      onChange={(e) => setEndTimeproduction(e.target.value)}
+                    />
+                  </div>
+                  {durationproduction && (
+                    <p style={{ marginTop: '10px' }}>
+                      Durée: <strong>{durationproduction}</strong>
+                    </p>
+                  )}
+                </div>
+        
+                <div className="input-field">
+                  <label>
+                    Commentaires (
+                    {parseInt(totalproduit) < parseInt(totalplanifie)
+                      ? 'Total produit < Objective'
+                      : ''}
+                    )
+                  </label>
+                  <Input.TextArea
+                    value={commentaires}
+                    onChange={(e) => setCommentaires(e.target.value)}
+                  />
+                </div>
+              </div>
+      )}
+   
   </div>
 
-  )}
+  <div>
+  <Checkbox style={{fontWeight:'bold'}} value={declarationdefaut} onChange={setDecalarationdefaut}>Déclaration des defauts Production</Checkbox>
+      {declarationdefaut && (
+             <div
+             className="typedefaut-production"
+             style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
+           >
+             {selectedMachine && defectOptions[phase] && (
+               <div className="references-dropdown" style={{ flex: 1 }}>
+                 <label style={{ display: 'block', marginBottom: '5px',  fontWeight:'bold' }}>
+                   Type defaut production
+                 </label>
+                 <Select
+                   value={typedefautproduction}
+                   onChange={(value) => setTypedefautproduction(value)}
+                   style={{ width: '100%' }}
+                   placeholder="Select type defaut de production"
+                 >
+                   {Array.isArray(defectOptions[phase]) &&
+                     defectOptions[phase].map((defaut, index) => (
+                       <Option key={index} value={defaut}>
+                         {defaut}
+                       </Option>
+                     ))}
+                 </Select>
+               </div>
+             )}
+   
+               <div className="input-field" style={{ flex: 1 }}>
+                 <label style={{ display: 'block', marginBottom: '5px' }}>
+                   Total defaut production
+                 </label>
+                 <Input
+                   type="number"
+                   value={totaldefautproduction}
+                   onChange={(e) => setTotaldefaut(e.target.value)}
+                   style={{ width: '100%' }}
+                 />
+               </div>
+          
+           </div>
+      )}
+  </div>
+
+
     
       <div className="button-step1">
-            <button className="custom-button" onClick={()=>handleSubmitproduction()}>Next</button>
+            <button style={{marginTop:"40px"}} className="custom-button" onClick={()=>handleSubmitproduction()}>Next</button>
           </div>
     </>
   )}
@@ -590,25 +624,11 @@ const Form = () => {
 { currentstep === 2 && (
   <div>
 
-<div>
-  <label>Plannification Date</label>
-  <Select
-    style={{ width: "100%", marginBottom: "50px" }}
-    placeholder="Select plannification date"
-    onChange={handleDateChange}  // Make sure the date selection triggers the handleDateChange function
-  >
-    <Option value="">Select plannification date</Option>
-    {plannifications.map((plannification) => (
-      <Option key={plannification.id} value={plannification.date_creation}>
-        {plannification.date_creation}
-      </Option>
-    ))}
-  </Select>
-</div>
-   <div style={{ display: 'flex', alignItems: 'center' }}>
-  <label style={{ fontWeight: 'bold' }}>Objective CF:</label>
-  <span>{objectivecf}</span>
-  </div>
+
+<div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
+        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CF:</label>
+        <span>{objectiveCF !== null ? objectiveCF : "No data for today"}</span>
+      </div>
 
    
    <div className="input-field">
@@ -622,15 +642,16 @@ const Form = () => {
     </Checkbox.Group>
  </div>
 
-{ phase.includes("cf") && (
+ { phase.includes("cf") &&  (
                  <div className="input-field">
-                 <label>Total produit CSL</label>
-                 <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
+                 <label>Total produit CF</label>
+                 <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
                </div>
-          )
+          )}
+          <div>
+          <Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecf} onChange={setDecalarationquantitecf}>Déclaration de quantité produit CF</Checkbox>
 
-          }
-{phase.includes("cf") && (
+{declarationquantitecf && (
 
 <div>
  <div className='form-row'>
@@ -683,13 +704,58 @@ const Form = () => {
       />
     </div>
 
-
-
-
-
   </div>
 
 )}
+          </div>
+
+
+          <div >
+ <Checkbox style={{fontWeight:'bold', marginBottom:'30px'}} value={declarationdefautcf} onChange={setDecalarationdefautcf}>Déclaration des defauts CF</Checkbox>
+
+ {declarationdefautcf && (
+
+<div className="input-container" style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+<div className="input-field" style={{ flex: 1 }}>
+  <label style={{ display: 'block', marginBottom: '5px' }}>
+    Total defaut CF
+  </label>
+  <Input
+    type="number"
+    value={totaldefautcf}
+    onChange={(e) => setTotaldefautcf(e.target.value)}
+    style={{ width: '100%' }}
+  />
+</div>
+
+{selectedMachine && defectOptions[phase] && (
+  <div className="references-dropdown" style={{ flex: 1,  fontWeight:'bold' }}>
+    <label style={{ display: 'block', marginBottom: '5px' }}>
+      Type defaut CF
+    </label>
+    <Select
+      value={typedefautcf}
+      onChange={(value) => setTypedefautcf(value)}
+      style={{ width: '100%' }}
+      placeholder="Select type defaut de cf"
+    >
+      {Array.isArray(defectOptions[phase]) &&
+        defectOptions[phase].map((defaut, index) => (
+          <Option key={index} value={defaut}>
+            {defaut}
+          </Option>
+        ))}
+    </Select>
+  </div>
+)}
+</div>
+
+
+ )}
+ </div>
+
+
+
 
   <div className="button-step1">
             <button className="custom-button" onClick={()=>handleSubmitcf()}>Next </button>
@@ -708,10 +774,11 @@ const Form = () => {
   transition={{ duration: 0.5 }}>
 { currentstep === 3 && (
   <div>
-    <div style={{ display: 'flex',  alignItems: 'center' }}>
-    <label style={{ fontWeight: 'bold' }}>Objective CSL:</label>
-    <span>{objectivecsl}</span>
-  </div>
+        {/* Display Objective Production */}
+        <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
+        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CSL:</label>
+        <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>
+      </div>
    
    <div className="input-field">
    <label>CSL</label>
@@ -736,7 +803,10 @@ const Form = () => {
 
           }
 
-  {phase.includes("csl") && (
+ 
+<div>
+<Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecsl} onChange={setDecalarationquantitecsl}>Déclaration de quantité produit csl</Checkbox> 
+   {declarationquantitecsl && (
    <div>
    <div className='form-row'>
   <div className='input-field'>
@@ -791,9 +861,55 @@ const Form = () => {
   
     </div>
 
-  )}        
+  )}   
+</div>
+   
 
+<div >
+ <Checkbox style={{fontWeight:'bold', marginBottom:'30px'}} value={declarationdefautcsl} onChange={setDecalarationdefautcsl}>Déclaration des defauts CSL</Checkbox>
 
+ {declarationdefautcsl && (
+  <div style={{ display: 'flex', gap: '60px', alignItems: 'flex-start' }}>
+      <div className="input-field" style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Total defaut CSL
+            </label>
+            <Input
+              type="number"
+              value={totaldefautcsl}
+              onChange={(e) => setTotaldefautcsl(e.target.value)}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div
+        className="typedefaut-csl"
+        style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
+      >
+        {selectedMachine && defectOptions[phase] && (
+          <div className="references-dropdown" style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight:'bold' }}>
+              Type defaut CSL
+            </label>
+            <Select
+              value={typedefautcsl}
+              onChange={(value) => setTypedefautcsl(value)}
+              style={{ width: '100%' }}
+              placeholder="Select type defaut de csl"
+            >
+              {Array.isArray(defectOptions[phase]) &&
+                defectOptions[phase].map((defaut, index) => (
+                  <Option key={index} value={defaut}>
+                    {defaut}
+                  </Option>
+                ))}
+            </Select>
+          </div>
+        )}
+      </div>
+  </div>
+ )}
+ </div>
   <div className="button-step1">
             <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
           </div>

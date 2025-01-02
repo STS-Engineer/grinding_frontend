@@ -214,13 +214,6 @@ const handleMachineSelect = (machine) => {
   };
 
 
-  // Fetch events whenever the start date, end date, or machines change
-  useEffect(() => {
-    if (isMachinesLoaded) {
-      fetchEvents(startDate, endDate);
-    }
-  }, [isMachinesLoaded, startDate, endDate]);
- // Function to fetch events based on the selected date range
 // Fetch events based on the selected machine
   const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
@@ -282,10 +275,13 @@ const handleMachineSelect = (machine) => {
 
 
 
-// Fetch events when the component mounts or when the date range changes
-useEffect(() => {
-  fetchEvents(startDate, endDate);
-}, [startDate, endDate]); // Re-run when startDate or endDate changes
+  // Fetch events whenever the start date, end date, or machines change
+  useEffect(() => {
+    if (isMachinesLoaded) {
+      fetchEvents(startDate, endDate);
+      console.log("fetched succesfully ")
+    }
+  }, [isMachinesLoaded, startDate, endDate]);
 
   
 

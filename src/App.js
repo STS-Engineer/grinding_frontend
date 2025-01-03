@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import PlannificationForm from './pages/Plannification';
 import Ajouternouvellemachine from './pages/Ajouternouvellemachine';
 import Calendar from './pages/calendar';
+import Ajouterregleur from './pages/Ajouterregleur';
 import Ajouteroperateur from './pages/Ajouteroperateur';
 
 
@@ -24,6 +25,7 @@ function App() {
       <Route path="/machineform" element={<MachineForm />} />
       <Route path="/ajouternouvellemachine" element={<Ajouternouvellemachine />} />
       <Route path="/calendar" element={<Calendar />} />
+      <Route path="/ajouterregleur" element={<Ajouterregleur />} />
       <Route path="/ajouteroperateur" element={<Ajouteroperateur />} />
       <Route path="/plannification" element={<PlannificationForm/>} />
       </Routes>

@@ -70,8 +70,7 @@ const Calendar = () => {
     const [operateurcslshift2, setOperateurcslshift2] = useState(null);
     const [phasecfshift2, setPhasecfshift2] = useState('');
     const [operateurcfshift2, setOperateurcfshift2] = useState(null);
-    const [selectedOperators, setSelectedOperators] = useState([]);
-    const [startDate, setStartDate] = useState(new Date(null));
+    const [startDate, setStartDate] = useState(new Date('2024-12-31'));
     const [endDate, setEndDate] = useState(new Date(''));
     const [productionShift1, setproductionShift1] = useState(0);
     const [reguleurShift1, setReguleurShift1] = useState(0); // State for the first input
@@ -82,6 +81,8 @@ const Calendar = () => {
     const [cfShift2, setCfShift2] = useState(0); // State for the second input
     const [cslShift2, setCSLShift2] = useState(0); 
     const [nombremanque,setNombremanque] = useState(0);
+    const [selectedDates, setSelectedDates] = useState([]);
+   
 
     const fetchMachines = async () => {
       try {
@@ -198,80 +199,78 @@ const handleMachineSelect = (machine) => {
   setCurrentStep(2);
   fetchEvents(startDate, endDate, machine.id_machine);  // Fetch events for selected machine
 };
+ // Disable the dates that are already selected in the dropdown
+ const disabledDate = (current) => {
+  // Disable dates that are already selected in the dropdown
+  return selectedDates.some(date => current.isSame(date, 'day'));
+};
 
   
-  const getNotAffectedOperators = () => {
-    // If all operators are selected, show -1
-    if (selectedOperators.length === operateurs.length) {
-      return '-1';
-    }
+const fetchEvents = async (startDate, endDate, machineId = null) => {
+  try {
+    // Format the start and end dates
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
 
-    // Otherwise, return the names of operators that are not affected
-    return operateurs
-      .filter((operator) => !selectedOperators.includes(operator.id))
-      .map((operator) => operator.prenom)
-      .join(', ');
-  };
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+    const today = new Date();
+    const formattedToday = formatDate(today); // Format today's date
 
+    const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
+      params: {
+        start_date: formattedStartDate,
+        end_date: formattedEndDate,
+        machine_id: machineId,
+      },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-// Fetch events based on the selected machine
-  const fetchEvents = async (startDate, endDate, machineId = null) => {
-    try {
-      const formattedStartDate = startDate.toISOString().split("T")[0];
-      const formattedEndDate = endDate.toISOString().split("T")[0];
-      const today = new Date();
-      const formattedToday = today.toISOString().split("T")[0]; // Format today's date
-  
-      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
-        params: {
-          start_date: formattedStartDate,
-          end_date: formattedEndDate,
-          machine_id: machineId,
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-  
-      const eventsData = [];
-  
-      response.data.forEach((event) => {
-        const eventStartDate = new Date(event.start_date).toISOString().split("T")[0];
-        const eventEndDate = new Date(event.end_date).toISOString().split("T")[0];
-  
-        // Skip events occurring on the current date
-        if (eventStartDate === formattedToday || eventEndDate === formattedToday) {
-          return;
-        }
-  
-        const machine = machines.find((m) => m.id_machine === event.id_machine);
-  
-        if (
-          (eventStartDate >= formattedStartDate && eventStartDate <= formattedEndDate) ||
-          (eventEndDate >= formattedStartDate && eventEndDate <= formattedEndDate)
-        ) {
-          eventsData.push({
-            id: event.id,
-            title: event.machine_name || "Unknown Machine",
-            referenceproduit: event.referenceproduit,
-            start: event.start_date,
-            end: event.end_date,
-            extendedProps: {
-              phasechargement: event.phasechargement,
-              shift: event.shift,
-              shift2: event.shift2,
-              start_date: event.start_date,
-              end_date: event.end_date,
-            },
-          });
-        }
-      });
-  
-      setEvents(eventsData);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    }
-  };
+    const eventsData = [];
+
+    response.data.forEach((event) => {
+      // Format event start and end dates
+      const eventStartDate = formatDate(new Date(event.start_date));
+      const eventEndDate = formatDate(new Date(event.end_date));
+
+      // Skip events occurring on the current date
+      if (eventStartDate === formattedToday || eventEndDate === formattedToday) {
+        return;
+      }
+
+      if (
+        (eventStartDate >= formattedStartDate && eventStartDate <= formattedEndDate) ||
+        (eventEndDate >= formattedStartDate && eventEndDate <= formattedEndDate)
+      ) {
+        eventsData.push({
+          id: event.id,
+          title: event.machine_name || "Unknown Machine",
+          referenceproduit: event.referenceproduit,
+          start: eventStartDate, // Only year, month, and date
+          end: eventEndDate,     // Only year, month, and date
+          extendedProps: {
+            phasechargement: event.phasechargement,
+            shift: event.shift,
+            shift2: event.shift2,
+            start_date: eventStartDate,
+            end_date: eventEndDate,
+          },
+        });
+      }
+    });
+
+    setEvents(eventsData); // Update the state with new events
+    console.log(eventsData);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+  }
+};
 
 
 
@@ -282,7 +281,6 @@ const handleMachineSelect = (machine) => {
       console.log("fetched succesfully ")
     }
   }, [isMachinesLoaded, startDate, endDate]);
-
   
 
   const onclose = () => {
@@ -317,17 +315,16 @@ const handleMachineSelect = (machine) => {
   const handleAddEvent = async () => {
     setLoading(true);
   
-    // Ensure startDate and endDate are provided
     if (!startDate || !endDate) {
       message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
       return;
     }
   
     try {
-     
- 
-      
-        const plannificationData = {
+  
+  
+      const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
@@ -340,12 +337,11 @@ const handleMachineSelect = (machine) => {
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
           nombredemanqueoperateur: nombremanque,
-          start_date: date,  // Add the plannification date here
-          end_date: endDate,   // Add end_date field for duplication
+          start_date: date,
+          end_date: endDate,
           referenceproduit: selectedReference
         };
   
-        // Send request for each weekly plannification
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -354,26 +350,27 @@ const handleMachineSelect = (machine) => {
         });
       
 
+  
       setCurrentStep(3);
-    
     } catch (error) {
       message.error("Failed to add plannifications.");
-      console.error(error); // Log error for debugging
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleAddEvent2 = async () => {
     setLoading(true);
   
-    // Ensure startDate and endDate are provided
     if (!startDate || !endDate) {
       message.error("Please select a valid start and end date for plannification.");
       return;
     }
   
     try {
+  
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -381,9 +378,6 @@ const handleMachineSelect = (machine) => {
           phasereguleur: phasereguleur,
           operateurs: operateurreguleur,
           phasecsl: phasecsl,
-          operateur_csl: operateur_csl,
-          phasecf: phasecf,
-          operateur_cf: operateur_cf,
           operateur_chargement: operateurchargement,
           totalplanifie: totalproduction,
           nombre_heure_shift1: nombre_heure_shift1,
@@ -404,12 +398,11 @@ const handleMachineSelect = (machine) => {
           objectivecf: totalcf,
           objectivecsl: totalcsl,
           nombredemanqueoperateur: nombremanque,
-          start_date: date,  // Add the plannification date here
-          end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference
+          start_date: date,
+          end_date: endDate,
+          referenceproduit: selectedReference,
         };
   
-        // Send request for each weekly plannification
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -417,15 +410,20 @@ const handleMachineSelect = (machine) => {
           },
         });
       
+  
+      // Fetch the events immediately after successful plannifications
+      await fetchEvents(startDate, endDate, selectedMachine.id);
+  
       setCurrentStep(4);
-
+  
     } catch (error) {
       message.error("Failed to add plannifications.");
-      console.error(error); // Log error for debugging
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleAddEvent3 = async () => {
     setLoading(true);
@@ -437,6 +435,9 @@ const handleMachineSelect = (machine) => {
     }
   
     try {
+  
+      
+      
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -466,7 +467,7 @@ const handleMachineSelect = (machine) => {
           },
         });
       
-
+  
       setCurrentStep(5);
       
     } catch (error) {
@@ -488,6 +489,7 @@ const handleMachineSelect = (machine) => {
     }
   
     try {
+     
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -516,8 +518,8 @@ const handleMachineSelect = (machine) => {
             "Content-Type": "application/json",
           },
         });
-      
-  
+    
+
       setCurrentStep(6);
     
     } catch (error) {
@@ -538,6 +540,7 @@ const handleMachineSelect = (machine) => {
     }
   
     try {
+
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -580,8 +583,6 @@ const handleMachineSelect = (machine) => {
             "Content-Type": "application/json",
           },
         });
-      
- 
       setCurrentStep(7);
    
     } catch (error) {
@@ -602,6 +603,7 @@ const handleMachineSelect = (machine) => {
     }
   
     try {
+   
         const plannificationData = {
           phase: phasechargement,
           id_machine: selectedMachine.id,
@@ -645,9 +647,8 @@ const handleMachineSelect = (machine) => {
           },
         });
       
-
-      setCurrentStep(8);
-
+  
+      setCurrentStep(8); // Adjust step after success
     } catch (error) {
       message.error("Failed to add plannifications.");
       console.error(error); // Log error for debugging
@@ -655,8 +656,9 @@ const handleMachineSelect = (machine) => {
       setLoading(false);
     }
   };
-
- const handleAddEvent7 = async () => {
+  
+  
+  const handleAddEvent7 = async () => {
     setLoading(true);
   
     if (!startDate || !endDate) {
@@ -742,6 +744,7 @@ const handleMachineSelect = (machine) => {
   
       const plannificationDates = generateWeeklyDates(startDate, endDate);
   
+      // Add the new events to the backend
       for (const date of plannificationDates) {
         const plannificationData = {
           phase: phasechargement,
@@ -785,10 +788,13 @@ const handleMachineSelect = (machine) => {
           },
         });
       }
+  
       message.success("Plannification added successfully.");
       setIsAddModalVisible(false);
+  
       // Directly fetch events after successful addition without page reload
       await fetchEvents(new Date(startDate), new Date(endDate)); // Ensure the dates are passed correctly
+  
     } catch (error) {
       message.error("Failed to add plannifications.");
       console.error(error);
@@ -796,11 +802,18 @@ const handleMachineSelect = (machine) => {
       setLoading(false);
     }
   };
+  
 
-
+  // Handle change event when date range is selected
   const handleDateRangeChange = (dates, dateStrings) => {
-    setStartDate(dateStrings[0]);
-    setEndDate(dateStrings[1]);
+    if (dates) {
+      // Filter out duplicate dates and update the state with unique dates
+      const uniqueDates = Array.from(new Set([...selectedDates, dateStrings[0], dateStrings[1]]));
+      setSelectedDates(uniqueDates); // Update the selected dates with unique values
+
+      setStartDate(dateStrings[0]);
+      setEndDate(dateStrings[1]);
+    }
   };
 
  
@@ -808,14 +821,16 @@ const handleMachineSelect = (machine) => {
 
 
 
+
   return (
     <div>
-
-<div className='navbar'>
+   <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/ajouternouvellemachine">Ajouter un machine</a></li>
+          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
+          <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
        
@@ -831,7 +846,7 @@ const handleMachineSelect = (machine) => {
         dateClick={handleDateClick} // Open modal on date click
       />
       {/* Event Details Modal */}
-     <Modal visible={isModalVisible} onOk={onclose} onCancel={onclose}>
+      <Modal visible={isModalVisible} onOk={onclose} onCancel={onclose}>
         {selectedEvent && (
           <div>
             <h3>Event Details</h3>
@@ -884,14 +899,15 @@ transition={{ duration: 0.5 }}
 <div>  
 
    {/* Plannification Date Range */}
-  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ fontWeight: 'bold' }}>Plannification Date Range:</label>
-                    <RangePicker
-                      onChange={handleDateRangeChange}
-                      format="YYYY-MM-DD"
-                      style={{ width: '100%' }}
-                    />
-  </div>
+   <div style={{ marginBottom: '20px' }}>
+      <label style={{ fontWeight: 'bold' }}>Plannification Date Range:</label>
+      <RangePicker
+        onChange={handleDateRangeChange}
+        format="YYYY-MM-DD"
+        style={{ width: '100%' }}
+        disabledDate={disabledDate} // Disable duplicate dates
+      />
+    </div>
 
  {selectedMachine && (
   <div 
@@ -980,7 +996,7 @@ key={selectedMachine.id}
    )}
    {shift.includes("shift1")  && (
      <div className="input-field">
-    <label>Objective Production machine</label>
+    <label>Objective Production</label>
       <input type="number" value={totalproduction} readOnly />
     </div>
     )}
@@ -1002,7 +1018,7 @@ key={selectedMachine.id}
     {phasechargement.includes("chargement") && (
     <div>
     <div className="operateur-select">
-      <h3>Select Operateurs</h3>
+      <h3>Select Operators</h3>
      
       <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
@@ -1040,9 +1056,11 @@ key={selectedMachine.id}
     </div>
     )}
     
+  
     <div className="button-step1">
       <button className="custom-button" onClick={()=>handleAddEvent()}>Next </button>
     </div>
+    
     </div>
   )}
 
@@ -1059,7 +1077,12 @@ key={selectedMachine.id}
                </Checkbox.Group>
            </div> 
      {phasechargement.includes("reguleur") && (
-    <div>     
+    <div>
+    <div className="input-field">
+    <label>Objective Reguleur</label>
+      <input type="number" value={totalproduction} readOnly />
+    </div>
+             
   <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1091,11 +1114,24 @@ key={selectedMachine.id}
       </Checkbox.Group>
     </div>
      )}
+
+<div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(2)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent2()}
+  >
+    Next
+  </button>
+</div>
+
+    </div>
   
-    <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent2()}>Next </button>
-    </div>
-    </div>
 
     
   )}
@@ -1119,7 +1155,6 @@ key={selectedMachine.id}
     <label>Objective CF</label>
       <input type="number" value={totalcf} readOnly />
     </div>
-     <h3>Select Operateurs</h3>  
     <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1151,11 +1186,20 @@ key={selectedMachine.id}
       </Checkbox.Group>
       </div>
     )}                
- 
-     
-      <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent3()}>Next </button>
-    </div>
+   <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(3)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent3()}
+  >
+    Next
+  </button>
+</div>
     
     </div>
    )}  
@@ -1178,7 +1222,6 @@ key={selectedMachine.id}
       <label>Objective CSL</label>
       <input type="number" value={totalcsl} readOnly />
       </div>
-         <h3>Select Operateurs</h3>    
       <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1211,10 +1254,20 @@ key={selectedMachine.id}
         </div>
         )}
       
-      
-      <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent4()}>Next to plannify shift 2 </button>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(4)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent4()}
+  >
+    Next To plannify shift 2
+  </button>
+</div>
       </div>
      )}
     </div>
@@ -1277,7 +1330,7 @@ transition={{ duration: 0.5 }}
 <Input type='number' value={nombre_heure_shift2} onChange={(e)=> setNombre_heure_shift2(e.target.value)}></Input>
 </div>
 <div className="input-field">
-<label>Objective Production machine</label>
+<label>Objective Production</label>
 <input type="number" value={totalproductionshift2} readOnly />
 </div>
 <div className="input-field">
@@ -1289,12 +1342,12 @@ transition={{ duration: 0.5 }}
         <Checkbox value="Chargementshift2">Phase Chargement</Checkbox> 
        </Checkbox.Group>
    </div> 
+
    </div>
   )}
 
 {phasechargementshif2.includes("Chargementshift2") && (
   <div>
-    <h3>Select Operateurs</h3>   
 <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1327,10 +1380,20 @@ transition={{ duration: 0.5 }}
 )}
 
 
-
-<div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent5()}>Next </button>
-      </div>
+<div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(5)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent5()}
+  >
+    Next
+  </button>
+</div>
  </div>
 
 )}
@@ -1350,7 +1413,6 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("reguleur") && (
   <div>
-       <h3>Select Operateurs</h3>
     <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1382,10 +1444,20 @@ transition={{ duration: 0.5 }}
   </div>
 )}
   
-
-      <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent6()}>Next </button>
-      </div>
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(6)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent6()}
+  >
+    Next
+  </button>
+</div>
   </div>
 )}
 
@@ -1408,7 +1480,6 @@ transition={{ duration: 0.5 }}
   <label>Objective CF</label>
   <input type="number" value={totalcfshift2} readOnly />
   </div>
-       <h3>Select Operateurs</h3>
   <Checkbox.Group
           value={operateurreguleur} // Wrap single value in an array
           onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1440,11 +1511,22 @@ transition={{ duration: 0.5 }}
   
       </div>
   )}
+  
 
-
-    <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent7()}>Next </button>
-      </div>
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(7)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent7()}
+  >
+    Next
+  </button>
+</div>
     </div>
    )}  
 
@@ -1468,7 +1550,6 @@ transition={{ duration: 0.5 }}
  <label>Objective CSL</label>
  <input type="number" value={totalcslshift2} readOnly />
  </div>
-  <h3>Select Operateurs</h3>
  <Checkbox.Group
          value={operateurreguleur} // Wrap single value in an array
          onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
@@ -1506,9 +1587,19 @@ transition={{ duration: 0.5 }}
  
  </div>
 )}
-
-<div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent8()}>Submit </button>
+<div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(8)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleAddEvent8()}
+  >
+    Submit
+  </button>
 </div>
 </div>
 )}

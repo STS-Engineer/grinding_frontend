@@ -29,7 +29,7 @@ const Ajouteroperateur = () => {
       await axios.post(
         "https://grinding-backend.azurewebsites.net/ajouter/addoperateur",
         {
-          matricule: matricule,
+          matricule: matricule,   
           nom: nom, // Replace with actual value from the form
           prenom: prenom, // Replace with actual value from the form
           

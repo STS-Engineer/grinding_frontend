@@ -27,7 +27,7 @@ const Ajouteroperateur = () => {
     try {
       // Sending the request with the correct body format
       await axios.post(
-        "http://localhost:4000/ajouter/addoperateur",
+        "https://grinding-backend.azurewebsites.net/ajouter/addoperateur",
         {
           matricule: matricule,
           nom: nom, // Replace with actual value from the form

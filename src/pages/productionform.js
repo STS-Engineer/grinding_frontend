@@ -394,14 +394,15 @@ const Form = () => {
     navigate('/login');
   };
 
-
   return (
     <div className="body_container">
-    <div className='navbar'>
+   <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
+          <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
           <button className='logout-button' onClick={handleLogout}>logout</button>
@@ -475,10 +476,7 @@ const Form = () => {
       )}
 
           {/* Display Objective Production */}
-          <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
-        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective Production (Chargement):</label>
-        <span>{objectiveProduction !== null ? objectiveProduction : "No data for today"}</span>
-      </div>
+       
    
       {nommachine && (
         <div className="input-field">
@@ -494,14 +492,21 @@ const Form = () => {
       )}
 
       {phase.includes("Production") && (
-        <div className="input-field">
-          <label>Total produit</label>
-          <Input
-            type="text"
-            value={totalproduit}
-            onChange={(e) => setTotalproduit(e.target.value)}
-          />
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Total produit</label>
+      <Input
+        type="text"
+        value={totalproduit}
+        onChange={(e) => setTotalproduit(e.target.value)}
+      />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Objective Production:</label>
+      <span>{objectiveProduction !== null ? objectiveProduction : 'No data for today'}</span>
+    </div>
+  </div>
+  
       )}
   
 
@@ -610,12 +615,9 @@ const Form = () => {
            </div>
       )}
   </div>
-
-
-    
-      <div className="button-step1">
-            <button style={{marginTop:"40px"}} className="custom-button" onClick={()=>handleSubmitproduction()}>Next</button>
-          </div>
+ <div className="button-step1">
+ <button style={{marginTop:"40px"}} className="custom-button" onClick={()=>handleSubmitproduction()}>Next</button>
+</div>
     </>
   )}
 </motion.div> 
@@ -631,12 +633,6 @@ const Form = () => {
   <div>
 
 
-<div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
-        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CF:</label>
-        <span>{objectiveCF !== null ? objectiveCF : "No data for today"}</span>
-      </div>
-
-   
    <div className="input-field">
    <label>CF</label>
      <Checkbox.Group
@@ -649,13 +645,22 @@ const Form = () => {
  </div>
 
  { phase.includes("cf") &&  (
-                 <div className="input-field">
-                 <label>Total produit CF</label>
-                 <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
-               </div>
+  <div  style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
+    <div  style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <label style={{ fontWeight: "bold" }}>Total produit CF</label>
+    <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CF:</label>
+        <span>{objectiveCF !== null ? objectiveCF : "No data for today"}</span>
+    </div>
+  </div>
+               
+                
+               
           )}
-          <div>
-          <Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecf} onChange={setDecalarationquantitecf}>Déclaration de quantité produit CF</Checkbox>
+  <div>
+  <Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecf} onChange={setDecalarationquantitecf}>Déclaration de quantité produit CF</Checkbox>
 
 {declarationquantitecf && (
 
@@ -713,10 +718,9 @@ const Form = () => {
   </div>
 
 )}
-          </div>
+  </div>
 
-
-          <div >
+ <div >
  <Checkbox style={{fontWeight:'bold', marginBottom:'30px'}} value={declarationdefautcf} onChange={setDecalarationdefautcf}>Déclaration des defauts CF</Checkbox>
 
  {declarationdefautcf && (
@@ -780,12 +784,7 @@ const Form = () => {
   transition={{ duration: 0.5 }}>
 { currentstep === 3 && (
   <div>
-        {/* Display Objective Production */}
-        <div style={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
-        <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CSL:</label>
-        <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>
-      </div>
-   
+       
    <div className="input-field">
    <label>CSL</label>
      <Checkbox.Group
@@ -801,15 +800,17 @@ const Form = () => {
 
   
 { phase.includes("csl") && (
-                 <div className="input-field">
-                 <label>Total produit CSL</label>
-                 <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
-               </div>
-          )
-
-          }
-
- 
+  <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }} >
+  <label style={{ fontWeight: "bold" }}>Total produit CSL</label>
+   <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
+  </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CSL:</label>
+    <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>
+    </div>
+  </div>
+)}
 <div>
 <Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecsl} onChange={setDecalarationquantitecsl}>Déclaration de quantité produit csl</Checkbox> 
    {declarationquantitecsl && (
@@ -863,10 +864,7 @@ const Form = () => {
           onChange={(e) => setCommentairecsl(e.target.value)}
         />
       </div>
-  
-  
     </div>
-
   )}   
 </div>
    

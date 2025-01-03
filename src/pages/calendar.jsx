@@ -70,8 +70,8 @@ const Calendar = () => {
     const [operateurcslshift2, setOperateurcslshift2] = useState(null);
     const [phasecfshift2, setPhasecfshift2] = useState('');
     const [operateurcfshift2, setOperateurcfshift2] = useState(null);
-    const [startDate, setStartDate] = useState(new Date('2024-12-31'));
-    const [endDate, setEndDate] = useState(new Date(''));
+    const [startDate, setStartDate] = useState(new Date('2025-01-01'));
+    const [endDate, setEndDate] = useState(new Date('2025-01-30'));
     const [productionShift1, setproductionShift1] = useState(0);
     const [reguleurShift1, setReguleurShift1] = useState(0); // State for the first input
     const [cfShift1, setCfShift1] = useState(0); // State for the second input

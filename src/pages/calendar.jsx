@@ -82,7 +82,7 @@ const Calendar = () => {
     const [cslShift2, setCSLShift2] = useState(0); 
     const [nombremanque,setNombremanque] = useState(0);
     const [selectedDates, setSelectedDates] = useState([]);
-   
+     const [regleurs, setRegleurs]= useState([]);
 
     const fetchMachines = async () => {
       try {

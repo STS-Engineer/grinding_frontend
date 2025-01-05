@@ -114,6 +114,22 @@ const Calendar = () => {
       }
     }
     fetchoperateur();
+    const fetchregleur = async()=>{
+      try{
+
+        const response = await axios.get("http://localhost:4000/ajouter/getregleur", {
+          headers:{
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        console.log(response.data.regleurs);
+        setRegleurs(response.data.regleurs);
+
+      } catch(error){
+        console.error("Error fetching data:", error);
+      }
+    }
+    fetchregleur();
   }, []);
 
     useEffect(() => {
@@ -1079,7 +1095,7 @@ key={selectedMachine.id}
      {phasechargement.includes("reguleur") && (
     <div>
     <div className="input-field">
-    <label>Objective Reguleur</label>
+    <label>Objective Régleur</label>
       <input type="number" value={totalproduction} readOnly />
     </div>
              
@@ -1088,10 +1104,10 @@ key={selectedMachine.id}
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
         style={{ width: '100%' }}
              >
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
+  {regleurs.map((regleur) => (
+    <Row key={regleur.id}>
       <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+        <Checkbox value={regleur.nom}>{regleur.nom}</Checkbox>
       </Col>
     </Row>
   ))}
@@ -1418,10 +1434,10 @@ transition={{ duration: 0.5 }}
         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
         style={{ width: '100%' }}
 >
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
+  {regleurs.map((regleur) => (
+    <Row key={regleur.id}>
       <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+        <Checkbox value={regleur.nom}>{regleur.nom}</Checkbox>
       </Col>
     </Row>
   ))}

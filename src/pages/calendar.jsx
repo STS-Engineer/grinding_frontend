@@ -558,7 +558,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
 
         const plannificationData = {
-          phase: phasechargement,
+          phase: phasechargementshif2,
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -621,7 +621,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
    
         const plannificationData = {
-          phase: phasechargement,
+          phase: phasereguleurshif2,
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -686,7 +686,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
    
         const plannificationData = {
-          phase: phasechargement,
+          phase: phasecfshift2,
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -763,7 +763,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       // Add the new events to the backend
       for (const date of plannificationDates) {
         const plannificationData = {
-          phase: phasechargement,
+          phase: phasecslshift2,
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -1353,16 +1353,16 @@ transition={{ duration: 0.5 }}
     <Checkbox.Group
          style={{ width: '100%'}}
          value={phasechargementshif2}
-         onChange={(value)=>setPhasechargementshif2(value)}
+         onChange={(value)=>setPhasechargementshif2(value[0])}
        >
-        <Checkbox value="Chargementshift2">Phase Chargement</Checkbox> 
+        <Checkbox value="chargement">Phase Chargement</Checkbox> 
        </Checkbox.Group>
    </div> 
 
    </div>
   )}
 
-{phasechargementshif2.includes("Chargementshift2") && (
+{phasechargementshif2.includes("chargement") && (
   <div>
 <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
@@ -1422,12 +1422,12 @@ transition={{ duration: 0.5 }}
     <Checkbox.Group
          style={{ width: '100%'}}
          value={phasereguleurshif2} // Wrap single value in an array
-         onChange={(value) => setPhasereguleurshif2(value)}
+         onChange={(value) => setPhasereguleurshif2(value[0])}
        >
-        <Checkbox value="reguleur">Phase Régleurs</Checkbox>
+        <Checkbox value="regleur">Phase Régleurs</Checkbox>
        </Checkbox.Group>
    </div> 
-{phasereguleurshif2.includes("reguleur") && (
+{phasereguleurshif2.includes("regleur") && (
   <div>
     <Checkbox.Group
         value={operateurreguleur} // Wrap single value in an array
@@ -1484,13 +1484,13 @@ transition={{ duration: 0.5 }}
    <Checkbox.Group
         style={{ width: '100%'}}
         value={phasecfshift2}
-        onChange={(value)=>setPhasecfshift2(value)}
+        onChange={(value)=>setPhasecfshift2(value[0])}
       >
-       <Checkbox value="cfshift2">Phase CF</Checkbox>
+       <Checkbox value="cf">Phase CF</Checkbox>
       </Checkbox.Group>
   </div> 
 
-  {phasecfshift2.includes("cfshift2") && (
+  {phasecfshift2.includes("cf") && (
   <div>
   <div className="input-field">
   <label>Objective CF</label>
@@ -1555,12 +1555,12 @@ transition={{ duration: 0.5 }}
 <Checkbox.Group
      style={{ width: '100%'}}
      value={phasecslshift2}
-     onChange={(value)=>setPhasecslshift2(value)}
+     onChange={(value)=>setPhasecslshift2(value[0])}
    >
-    <Checkbox value="cslshift2">Phase CSL</Checkbox>
+    <Checkbox value="csl">Phase CSL</Checkbox>
    </Checkbox.Group>
 </div> 
-{phasecslshift2.includes("cslshift2") && (
+{phasecslshift2.includes("csl") && (
  <div>
  <div className="input-field">
  <label>Objective CSL</label>

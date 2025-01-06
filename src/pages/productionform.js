@@ -73,8 +73,9 @@ const Form = () => {
     const currentHour = new Date().getHours();
     const shift1Start = 6;
     const shift1End = 14; // 3 PM
-    return currentHour >= shift1Start && currentHour < shift1End ? 'Shift 1' : 'Shift 2';
+    return currentHour >= shift1Start && currentHour < shift1End ? 'shift1' : 'shift2';
   };
+
 
   // Fetch machines and outils on component mount
   useEffect(() => {
@@ -370,11 +371,12 @@ const Form = () => {
   const fetchObjectives = async () => {
     const currentDate = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" format
     
-    const productionObjective = await fetchPlannificationByPhase("chargement", currentDate);
-    const cfObjective = await fetchPlannificationByPhase("cf", currentDate);
-    const cslObjective = await fetchPlannificationByPhase("csl", currentDate);
+    const productionObjective = await fetchPlannificationByPhase("chargement", shift, currentDate);
+    const cfObjective = await fetchPlannificationByPhase("cf", shift, currentDate);
+    const cslObjective = await fetchPlannificationByPhase("csl", shift, currentDate);
   
     setObjectiveProduction(productionObjective);
+    console.log(productionObjective);
     setObjectiveCF(cfObjective);
     setObjectiveCSL(cslObjective);
   };
@@ -383,7 +385,7 @@ const Form = () => {
   useEffect(() => {
     fetchObjectives(); 
   // Automatically fetch objectives on component mount
-  }, []);
+  }, [shift]);
 
 
 

@@ -151,7 +151,18 @@ const MachineDetails = () => {
 
   return (
     <div>
-      <h2>Machine Details</h2>
+       <div className='navbar' style={{marginBottom:'60px'}} >
+        <ul className="navbar-links">
+          <li><a href="/home">Acceuil</a></li>
+          <li><a href="/form">Ajouter Production</a></li>
+          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
+          <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
+          <li><a href="/details">Détails des machines</a></li>
+          <li><a href="/calendar">Plannification</a></li>
+       
+        </ul>
+      </div>
       <div className="machine-list">
       {machines.map((machine) => (
           <div key={machine.id} className="machine-card">

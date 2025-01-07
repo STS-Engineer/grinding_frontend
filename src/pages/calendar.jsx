@@ -846,7 +846,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
 
 
 
-  return (
+return (
     <div>
    <div className='navbar'>
         <ul className="navbar-links">
@@ -1044,22 +1044,19 @@ key={selectedMachine.id}
     <div className="operateur-select">
       <h3>Select Operators</h3>
      
-      <Checkbox.Group
-  value={operateurchargementshift1} // Keep this as an array for storing multiple selected values
-  onChange={(value) => {
-    // Simply update the state with the selected array of values
-    setOperateurchargementshift1(value); // Persist the selected values as an array
-  }}
-  style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-</Checkbox.Group>
+      <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurchargementshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurchargementshift1(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
 
 <Checkbox.Group style={{ width: '100%' }}>
         <Row>
@@ -1103,7 +1100,7 @@ key={selectedMachine.id}
      {phasechargement.includes("regleur") && (
     <div>
     <div className="input-field">
-    <label>Objective Reguleur</label>
+    <label>Objective Regleur</label>
       <input type="number" value={totalproduction} readOnly />
     </div>
              
@@ -1179,22 +1176,19 @@ key={selectedMachine.id}
     <label>Objective CF</label>
       <input type="number" value={totalcf} readOnly />
     </div>
-    <Checkbox.Group
-  value={operateurcfshift1} // Keep this as an array for storing multiple selected values
-  onChange={(value) => {
-    // Simply update the state with the selected array of values
-    setOperateurcfshift1(value); // Persist the selected values as an array
-  }}
-  style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-</Checkbox.Group>
+    <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcfshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurcfshift1(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
 
  <Checkbox.Group style={{ width: '100%' }}>
         <Row>
@@ -1249,22 +1243,19 @@ key={selectedMachine.id}
       <label>Objective CSL</label>
       <input type="number" value={totalcsl} readOnly />
       </div>
-  <Checkbox.Group
-  value={operateurcslshift1} // Keep this as an array for storing multiple selected values
-  onChange={(value) => {
-    // Simply update the state with the selected array of values
-    setOperateurcslshift1(value); // Persist the selected values as an array
-  }}
-  style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-</Checkbox.Group>
+ <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcslshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurcslshift1(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
 
       
       <Checkbox.Group style={{ width: '100%' }}>
@@ -1379,22 +1370,19 @@ transition={{ duration: 0.5 }}
 
 {phasechargementshif2.includes("chargement") && (
   <div>
-    <Checkbox.Group
-  value={operateurchargementshift2} // Keep this as an array for storing multiple selected values
-  onChange={(value) => {
-    // Simply update the state with the selected array of values
-    setOperateurchargementshift2(value); // Persist the selected values as an array
-  }}
-  style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-</Checkbox.Group>
+   <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurchargementshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurchargementshift2(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
 
 
       <Checkbox.Group style={{ width: '100%' }}>
@@ -1515,22 +1503,19 @@ transition={{ duration: 0.5 }}
   <label>Objective CF</label>
   <input type="number" value={totalcfshift2} readOnly />
   </div>
-  <Checkbox.Group
-  value={operateurcfshift2} // Keep this as an array for storing multiple selected values
-  onChange={(value) => {
-    // Simply update the state with the selected array of values
-    setOperateurcfshift2(value); // Persist the selected values as an array
-  }}
-  style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-</Checkbox.Group>
+  <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcfshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurcfshift2(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
 
         <Checkbox.Group style={{ width: '100%' }}>
           <Row>
@@ -1589,22 +1574,19 @@ transition={{ duration: 0.5 }}
  <label>Objective CSL</label>
  <input type="number" value={totalcslshift2} readOnly />
  </div>
- <Checkbox.Group
-  value={operateurcslshift2} // Keep this as an array for storing multiple selected values
-  onChange={(value) => {
-    // Simply update the state with the selected array of values
-    setOperateurcslshift2(value); // Persist the selected values as an array
-  }}
-  style={{ width: '100%' }}
->
-  {operateurs.map((operateur) => (
-    <Row key={operateur.id}>
-      <Col span={8}>
-        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-</Checkbox.Group>
+ <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcslshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurcslshift2(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
 
        <Checkbox.Group style={{ width: '100%' }}>
          <Row>

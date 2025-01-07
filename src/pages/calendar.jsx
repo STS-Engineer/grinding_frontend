@@ -36,6 +36,14 @@ const Calendar = () => {
     const [operateurchargement, setOperateurchargement] = useState(null);
     const [phasereguleur, setPhasereguleur] = useState('');
     const [operateurreguleur, setOperateurreguleur] = useState([]);
+    const [operateurchargementshift1, setOperateurchargementshift1] = useState([]);
+    const [operateurchargementshift2, setOperateurchargementshift2] = useState([]);
+    const [operateurregleurshift1, setOperateurregleurshift1] = useState([]);
+    const [operateurregleurshift2, setOperateurregleurshift2] = useState([]);
+    const [operateurcfshift1, setOperateurcfshift1] = useState([]);
+    const [operateurcfshift2, setOperateurcfshift2] = useState([]);
+    const [operateurcslshift1, setOperateurcslshift1] = useState([]);
+    const [operateurcslshift2, setOperateurcslshift2] = useState([]);
     const [phasecsl, setPhasecsl] = useState('');
     const [operateur_csl, setOperateur_csl] = useState(null)
     const [phasecf, setPhasecf] = useState('');
@@ -63,15 +71,12 @@ const Calendar = () => {
     const [totalcfshift2, setTotalcfshift2] = useState(0);
     const [totalcslshift2, setTotalcslshift2] = useState(0);
     const [phasechargementshif2, setPhasechargementshif2] = useState('');
-    const [operateurchargementshift2, setOperateurchargementshift2] = useState('');
     const [phasereguleurshif2, setPhasereguleurshif2] = useState('');
     const [operateur_reguleurshif2, setOperateur_reguleurshif2] = useState(null);
     const [phasecslshift2, setPhasecslshift2] = useState('');
-    const [operateurcslshift2, setOperateurcslshift2] = useState(null);
     const [phasecfshift2, setPhasecfshift2] = useState('');
-    const [operateurcfshift2, setOperateurcfshift2] = useState(null);
-    const [startDate, setStartDate] = useState(new Date('2025-01-01'));
-    const [endDate, setEndDate] = useState(new Date('2025-01-30'));
+    const [startDate, setStartDate] = useState(new Date('2024-12-31'));
+    const [endDate, setEndDate] = useState(new Date(''));
     const [productionShift1, setproductionShift1] = useState(0);
     const [reguleurShift1, setReguleurShift1] = useState(0); // State for the first input
     const [cfShift1, setCfShift1] = useState(0); // State for the second input
@@ -82,7 +87,9 @@ const Calendar = () => {
     const [cslShift2, setCSLShift2] = useState(0); 
     const [nombremanque,setNombremanque] = useState(0);
     const [selectedDates, setSelectedDates] = useState([]);
-     const [regleurs, setRegleurs]= useState([]);
+    const [regleurs, setRegleurs]= useState([]);
+    
+  
 
     const fetchMachines = async () => {
       try {
@@ -113,11 +120,12 @@ const Calendar = () => {
 
       }
     }
-    fetchoperateur();
+
+
     const fetchregleur = async()=>{
       try{
 
-        const response = await axios.get("http://localhost:4000/ajouter/getregleur", {
+        const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/getregleur", {
           headers:{
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           }
@@ -129,6 +137,7 @@ const Calendar = () => {
         console.error("Error fetching data:", error);
       }
     }
+    fetchoperateur();
     fetchregleur();
   }, []);
 
@@ -327,6 +336,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     setSelectedReference(value);
   };
 
+
+
   // Submit new plannification
   const handleAddEvent = async () => {
     setLoading(true);
@@ -345,7 +356,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurchargementshift1.join(', '),
           phasecsl: phasecsl,
           operateur_chargement: operateurchargement,
           totalplanifie: totalproduction,
@@ -353,7 +364,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
           nombredemanqueoperateur: nombremanque,
-          start_date: date,
+          start_date: date ,
           end_date: endDate,
           referenceproduit: selectedReference
         };
@@ -365,8 +376,6 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           },
         });
       
-
-  
       setCurrentStep(3);
     } catch (error) {
       message.error("Failed to add plannifications.");
@@ -392,7 +401,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurregleurshift1.join(', '),
           phasecsl: phasecsl,
           operateur_chargement: operateurchargement,
           totalplanifie: totalproduction,
@@ -459,7 +468,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurcfshift1.join(', '),
           phasecsl: phasecsl,
           operateur_csl: operateur_csl,
           phasecf: phasecf,
@@ -511,7 +520,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurcslshift1.join(', '),
           phasecsl: phasecsl,
           operateur_csl: operateur_csl,
           phasecf: phasecf,
@@ -562,7 +571,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurchargementshift2.join(', '),
           phasecsl: phasecsl,
           operateur_csl: operateur_csl,
           phasecf: phasecf,
@@ -625,7 +634,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurregleurshift2.join(', '),
           phasecsl: phasecsl,
           operateur_csl: operateur_csl,
           phasecf: phasecf,
@@ -690,7 +699,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurcfshift2.join(', '),
           phasecsl: phasecsl,
           operateur_csl: operateur_csl,
           phasecf: phasecf,
@@ -767,7 +776,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
-          operateurs: operateurreguleur,
+          operateurs: operateurcslshift2.join(', '),
           phasecsl: phasecsl,
           operateur_csl: operateur_csl,
           phasecf: phasecf,
@@ -792,7 +801,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecf: totalcf,
           objectivecsl: totalcsl,
           nombredemanqueoperateur: nombremanque,
-          start_date: date,
+          start_date: startDate,
           end_date: endDate,
           referenceproduit: selectedReference,
         };
@@ -834,7 +843,6 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
 
  
   
-
 
 
 
@@ -1037,9 +1045,12 @@ key={selectedMachine.id}
       <h3>Select Operators</h3>
      
       <Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
+  value={operateurchargementshift1} // Keep this as an array for storing multiple selected values
+  onChange={(value) => {
+    // Simply update the state with the selected array of values
+    setOperateurchargementshift1(value); // Persist the selected values as an array
+  }}
+  style={{ width: '100%' }}
 >
   {operateurs.map((operateur) => (
     <Row key={operateur.id}>
@@ -1048,10 +1059,9 @@ key={selectedMachine.id}
       </Col>
     </Row>
   ))}
-     </Checkbox.Group>
+</Checkbox.Group>
 
-
-      <Checkbox.Group style={{ width: '100%' }}>
+<Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
           <Col span={8}>
@@ -1065,9 +1075,7 @@ key={selectedMachine.id}
             />
           </Col>
         </Row>
-      </Checkbox.Group>
-     
-
+ </Checkbox.Group>
     </div>
     </div>
     )}
@@ -1089,20 +1097,20 @@ key={selectedMachine.id}
                  value={phasechargement}
                  onChange={(value)=>setPhasechargement(value[0])}
                >
-                <Checkbox value="reguleur">Phase Régleurs</Checkbox>
+                <Checkbox value="regleur">Phase Régleurs</Checkbox>
                </Checkbox.Group>
            </div> 
-     {phasechargement.includes("reguleur") && (
+     {phasechargement.includes("regleur") && (
     <div>
     <div className="input-field">
-    <label>Objective Régleur</label>
+    <label>Objective Reguleur</label>
       <input type="number" value={totalproduction} readOnly />
     </div>
              
-     <Select
+    <Select
     mode="multiple" // Enables multi-selection
-    value={operateurreguleur} // Bind the state
-    onChange={(selectedValues) => setOperateurreguleur(selectedValues)} // Update state on selection
+    value={operateurregleurshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurregleurshift1(selectedValues)} // Update state on selection
     placeholder="Select Regleurs"
     style={{ width: '100%' }}
   >
@@ -1112,11 +1120,12 @@ key={selectedMachine.id}
       </Option>
     ))}
   </Select>
+
    
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
           <Col span={8}>
-          Manque(phase reguleur)
+          Manque(phase regleur)
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1171,9 +1180,12 @@ key={selectedMachine.id}
       <input type="number" value={totalcf} readOnly />
     </div>
     <Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
+  value={operateurcfshift1} // Keep this as an array for storing multiple selected values
+  onChange={(value) => {
+    // Simply update the state with the selected array of values
+    setOperateurcfshift1(value); // Persist the selected values as an array
+  }}
+  style={{ width: '100%' }}
 >
   {operateurs.map((operateur) => (
     <Row key={operateur.id}>
@@ -1182,9 +1194,9 @@ key={selectedMachine.id}
       </Col>
     </Row>
   ))}
-    </Checkbox.Group>
+</Checkbox.Group>
 
-      <Checkbox.Group style={{ width: '100%' }}>
+ <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
           <Col span={8}>
@@ -1237,10 +1249,13 @@ key={selectedMachine.id}
       <label>Objective CSL</label>
       <input type="number" value={totalcsl} readOnly />
       </div>
-      <Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
+  <Checkbox.Group
+  value={operateurcslshift1} // Keep this as an array for storing multiple selected values
+  onChange={(value) => {
+    // Simply update the state with the selected array of values
+    setOperateurcslshift1(value); // Persist the selected values as an array
+  }}
+  style={{ width: '100%' }}
 >
   {operateurs.map((operateur) => (
     <Row key={operateur.id}>
@@ -1249,7 +1264,8 @@ key={selectedMachine.id}
       </Col>
     </Row>
   ))}
-     </Checkbox.Group>
+</Checkbox.Group>
+
       
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
@@ -1363,10 +1379,13 @@ transition={{ duration: 0.5 }}
 
 {phasechargementshif2.includes("chargement") && (
   <div>
-<Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
+    <Checkbox.Group
+  value={operateurchargementshift2} // Keep this as an array for storing multiple selected values
+  onChange={(value) => {
+    // Simply update the state with the selected array of values
+    setOperateurchargementshift2(value); // Persist the selected values as an array
+  }}
+  style={{ width: '100%' }}
 >
   {operateurs.map((operateur) => (
     <Row key={operateur.id}>
@@ -1376,6 +1395,7 @@ transition={{ duration: 0.5 }}
     </Row>
   ))}
 </Checkbox.Group>
+
 
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
@@ -1428,10 +1448,10 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("regleur") && (
   <div>
-    <Select
+  <Select
     mode="multiple" // Enables multi-selection
-    value={operateurreguleur} // Bind the state
-    onChange={(selectedValues) => setOperateurreguleur(selectedValues)} // Update state on selection
+    value={operateurregleurshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurregleurshift2(selectedValues)} // Update state on selection
     placeholder="Select Regleurs"
     style={{ width: '100%' }}
   >
@@ -1496,18 +1516,22 @@ transition={{ duration: 0.5 }}
   <input type="number" value={totalcfshift2} readOnly />
   </div>
   <Checkbox.Group
-          value={operateurreguleur} // Wrap single value in an array
-          onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-          style={{ width: '100%' }}
-  >
-    {operateurs.map((operateur) => (
-      <Row key={operateur.id}>
-        <Col span={8}>
-          <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-        </Col>
-      </Row>
-    ))}
-       </Checkbox.Group>
+  value={operateurcfshift2} // Keep this as an array for storing multiple selected values
+  onChange={(value) => {
+    // Simply update the state with the selected array of values
+    setOperateurcfshift2(value); // Persist the selected values as an array
+  }}
+  style={{ width: '100%' }}
+>
+  {operateurs.map((operateur) => (
+    <Row key={operateur.id}>
+      <Col span={8}>
+        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+      </Col>
+    </Row>
+  ))}
+</Checkbox.Group>
+
         <Checkbox.Group style={{ width: '100%' }}>
           <Row>
          
@@ -1566,24 +1590,22 @@ transition={{ duration: 0.5 }}
  <input type="number" value={totalcslshift2} readOnly />
  </div>
  <Checkbox.Group
-         value={operateurreguleur} // Wrap single value in an array
-         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-         style={{ width: '100%' }}
- >
- <Checkbox.Group
-         value={operateurreguleur} // Wrap single value in an array
-         onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-         style={{ width: '100%' }}
- >
-   {operateurs.map((operateur) => (
-     <Row key={operateur.id}>
-       <Col span={8}>
-         <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
-       </Col>
-     </Row>
-   ))}
-      </Checkbox.Group>
- </Checkbox.Group>
+  value={operateurcslshift2} // Keep this as an array for storing multiple selected values
+  onChange={(value) => {
+    // Simply update the state with the selected array of values
+    setOperateurcslshift2(value); // Persist the selected values as an array
+  }}
+  style={{ width: '100%' }}
+>
+  {operateurs.map((operateur) => (
+    <Row key={operateur.id}>
+      <Col span={8}>
+        <Checkbox value={operateur.nom}>{operateur.nom}</Checkbox>
+      </Col>
+    </Row>
+  ))}
+</Checkbox.Group>
+
        <Checkbox.Group style={{ width: '100%' }}>
          <Row>
         

@@ -6,7 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
 import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker, InputNumber  } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import {moment} from 'moment';
+import { MultiSelect } from 'react-multi-select-component';
 import './calendar.css'
 
 const { Option } = Select;
@@ -1099,20 +1099,19 @@ key={selectedMachine.id}
       <input type="number" value={totalproduction} readOnly />
     </div>
              
-  <Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
-             >
-  {regleurs.map((regleur) => (
-    <Row key={regleur.id}>
-      <Col span={8}>
-        <Checkbox value={regleur.nom}>{regleur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-  </Checkbox.Group>
-
+     <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurreguleur} // Bind the state
+    onChange={(selectedValues) => setOperateurreguleur(selectedValues)} // Update state on selection
+    placeholder="Select Regleurs"
+    style={{ width: '100%' }}
+  >
+    {regleurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
    
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
@@ -1429,19 +1428,19 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("regleur") && (
   <div>
-    <Checkbox.Group
-        value={operateurreguleur} // Wrap single value in an array
-        onChange={(value) => setOperateurreguleur(value)} // Persist only the first selected value
-        style={{ width: '100%' }}
->
-  {regleurs.map((regleur) => (
-    <Row key={regleur.id}>
-      <Col span={8}>
-        <Checkbox value={regleur.nom}>{regleur.nom}</Checkbox>
-      </Col>
-    </Row>
-  ))}
-     </Checkbox.Group>
+    <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurreguleur} // Bind the state
+    onChange={(selectedValues) => setOperateurreguleur(selectedValues)} // Update state on selection
+    placeholder="Select Regleurs"
+    style={{ width: '100%' }}
+  >
+    {regleurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        

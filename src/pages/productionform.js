@@ -57,11 +57,8 @@ const Form = () => {
   const [durationcf, setDurationcf] = useState('');
   const [durationcsl, setDurationcsl] = useState('');
   const [plannifications,setPlannifications]= useState([]);
-   const [declarationquantite,setDecalarationquantite] = useState(null);
   const [declarationdefaut,setDecalarationdefaut] = useState(null);
-  const [declarationquantitecf,setDecalarationquantitecf] = useState(null);
   const [declarationdefautcf,setDecalarationdefautcf] = useState(null);
-  const [declarationquantitecsl,setDecalarationquantitecsl] = useState(null);
   const [declarationdefautcsl,setDecalarationdefautcsl] = useState(null);
   const [objectiveProduction, setObjectiveProduction] = useState(null);
   const [objectiveCF, setObjectiveCF] = useState(null);
@@ -396,7 +393,7 @@ const Form = () => {
     navigate('/login');
   };
 
-  return (
+   return (
     <div className="body_container">
    <div className='navbar'>
         <ul className="navbar-links">
@@ -480,9 +477,14 @@ const Form = () => {
           {/* Display Objective Production */}
        
    
-      {nommachine && (
-        <div className="input-field">
-          <label>Production</label>
+
+
+  
+  
+
+  <div style={{marginBottom:'80px'}}>
+  <div className="input-field">
+          <label>Déclaration du quantité produit</label>
           <Checkbox.Group
             style={{ width: '100%' }}
             value={phase}
@@ -491,9 +493,8 @@ const Form = () => {
             <Checkbox value="Production"></Checkbox>
           </Checkbox.Group>
         </div>
-      )}
-
       {phase.includes("Production") && (
+    <div >
     <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <label style={{ fontWeight: 'bold' }}>Total produit</label>
@@ -507,15 +508,23 @@ const Form = () => {
       <label style={{ fontWeight: 'bold' }}>Objective Production:</label>
       <span>{objectiveProduction !== null ? objectiveProduction : 'No data for today'}</span>
     </div>
+
+    
   </div>
   
-      )}
-  
-
-  <div style={{marginBottom:'80px'}}>
-    <Checkbox style={{fontWeight:'bold'}} value={declarationquantite} onChange={setDecalarationquantite}>Déclaration quantité produit</Checkbox>
-      {declarationquantite && (
-                <div >
+  <div className="input-field">
+                  <label>
+                    Commentaires (
+                    {parseInt(totalproduit) < parseInt(objectiveProduction)
+                      ? 'Total produit < Objective'
+                      : ''}
+                    )
+                  </label>
+                  <Input.TextArea
+                    value={commentaires}
+                    onChange={(e) => setCommentaires(e.target.value)}
+                  />
+                </div>
                 <div className="form-row">
                   <div className="input-field">
                     <label>Type de probléme</label>
@@ -529,46 +538,37 @@ const Form = () => {
                     </Select>
                   </div>
                 </div>
+          {typeproblemeproduction && (
+                 <div className="form-row">
+                 <div className="input-field">
+                   <label htmlFor="start-time">Start Time:</label>
+                   <Input
+                     id="start-time"
+                     type="time"
+                     value={startTimeproduction}
+                     onChange={(e) => setStartTimeproduction(e.target.value)}
+                   />
+                 </div>
+                 <div className="input-field">
+                   <label htmlFor="end-time">End Time:</label>
+                   <Input
+                     id="end-time"
+                     type="time"
+                     value={endTimeproduction}
+                     onChange={(e) => setEndTimeproduction(e.target.value)}
+                   />
+                 </div>
+                 {durationproduction && (
+                   <p style={{ marginTop: '10px' }}>
+                     Durée: <strong>{durationproduction}</strong>
+                   </p>
+                 )}
+               </div>
+          )
+
+          }
+         
         
-                <div className="form-row">
-                  <div className="input-field">
-                    <label htmlFor="start-time">Start Time:</label>
-                    <Input
-                      id="start-time"
-                      type="time"
-                      value={startTimeproduction}
-                      onChange={(e) => setStartTimeproduction(e.target.value)}
-                    />
-                  </div>
-                  <div className="input-field">
-                    <label htmlFor="end-time">End Time:</label>
-                    <Input
-                      id="end-time"
-                      type="time"
-                      value={endTimeproduction}
-                      onChange={(e) => setEndTimeproduction(e.target.value)}
-                    />
-                  </div>
-                  {durationproduction && (
-                    <p style={{ marginTop: '10px' }}>
-                      Durée: <strong>{durationproduction}</strong>
-                    </p>
-                  )}
-                </div>
-        
-                <div className="input-field">
-                  <label>
-                    Commentaires (
-                    {parseInt(totalproduit) < parseInt(totalplanifie)
-                      ? 'Total produit < Objective'
-                      : ''}
-                    )
-                  </label>
-                  <Input.TextArea
-                    value={commentaires}
-                    onChange={(e) => setCommentaires(e.target.value)}
-                  />
-                </div>
               </div>
       )}
    
@@ -633,10 +633,9 @@ const Form = () => {
   transition={{ duration: 0.5 }}>
 { currentstep === 2 && (
   <div>
-
-
-   <div className="input-field">
-   <label>CF</label>
+  <div>
+  <div className="input-field">
+   <label>Déclaration du quantité produit CF</label>
      <Checkbox.Group
       style={{ width: '100%' }}
       value={phase}
@@ -646,8 +645,9 @@ const Form = () => {
     </Checkbox.Group>
  </div>
 
- { phase.includes("cf") &&  (
-  <div  style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
+{phase.includes("cf") &&  (
+<div>
+<div  style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
     <div  style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold" }}>Total produit CF</label>
     <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
@@ -657,20 +657,36 @@ const Form = () => {
         <span>{objectiveCF !== null ? objectiveCF : "No data for today"}</span>
     </div>
   </div>
-               
-                
-               
-          )}
-  <div>
-  <Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecf} onChange={setDecalarationquantitecf}>Déclaration de quantité produit CF</Checkbox>
-
-{declarationquantitecf && (
-
-<div>
+  <div className="input-field" >
+        <label>
+          Commentaires  (
+          {parseInt(totalproduitcsl) < parseInt(objectivecsl)
+            ? 'Total produit  < Objective'
+            : ''}
+          )
+        </label>
+        <Input.TextArea
+          value={commentairescsl}
+          onChange={(e) => setCommentairecsl(e.target.value)}
+        />
+      </div>
+  <div className="input-field" >
+      <label>
+        Commentaires  (
+        {parseInt(totalproduitcf) < parseInt(objectivecf)
+          ? 'Total produit  < Objective'
+          : ''}
+        )
+      </label>
+      <Input.TextArea
+        value={commentairescsl}
+        onChange={(e) => setCommentairecsl(e.target.value)}
+      />
+    </div>
  <div className='form-row'>
 <div className='input-field'>
 <label>Type de probléme</label>
-<Select value={typeproblemecsl} onChange={(value)=>setTypeproblemecsl(value)}>
+<Select value={typeproblemecf} onChange={(value)=>setTypeproblemecf(value)}>
  <Option value=''>select Type de probléme</Option>
  <Option  value="problemmeelectrique">Probléme Electrique</Option>
  <Option value="courtcircuit">Court circuit</Option>
@@ -678,8 +694,9 @@ const Form = () => {
 </div >
 </div>
 <div className="form-row">
-
-<div className="input-field">
+{ typeproblemecf && (
+  <div>
+   <div className="input-field">
             <label htmlFor="start-time">Start Time:</label>
             <Input
               id="start-time"
@@ -697,32 +714,19 @@ const Form = () => {
               onChange={(e) => setEndTimecf(e.target.value)}
             />
           </div>
-          {durationcf && (
+             {durationcf && (
             <p style={{ marginTop: '10px' }}>
               Durée: <strong>{durationcf}</strong>
             </p>
           )}
-</div>
-<div className="input-field" >
-      <label>
-        Commentaires  (
-        {parseInt(totalproduitcsl) < parseInt(objectivecsl)
-          ? 'Total produit  < Objective'
-          : ''}
-        )
-      </label>
-      <Input.TextArea
-        value={commentairescsl}
-        onChange={(e) => setCommentairecsl(e.target.value)}
-      />
-    </div>
-
   </div>
-
+)}   
+</div>
+</div>
 )}
   </div>
 
- <div >
+ <div>
  <Checkbox style={{fontWeight:'bold', marginBottom:'30px'}} value={declarationdefautcf} onChange={setDecalarationdefautcf}>Déclaration des defauts CF</Checkbox>
 
  {declarationdefautcf && (
@@ -766,12 +770,9 @@ const Form = () => {
  )}
  </div>
 
-
-
-
   <div className="button-step1">
-            <button className="custom-button" onClick={()=>handleSubmitcf()}>Next </button>
-          </div>
+  <button className="custom-button" onClick={()=>handleSubmitcf()}>Next </button>
+ </div>
             
  </div>
 )}
@@ -785,9 +786,9 @@ const Form = () => {
   exit={{ opacity: 0, y: -20 }}
   transition={{ duration: 0.5 }}>
 { currentstep === 3 && (
-  <div>
-       
-   <div className="input-field">
+ <div>
+<div>
+<div className="input-field">
    <label>CSL</label>
      <Checkbox.Group
       style={{ width: '100%' }}
@@ -798,11 +799,9 @@ const Form = () => {
    
     </Checkbox.Group>
  </div>
-
-
-  
-{ phase.includes("csl") && (
-  <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
+   {phase.includes("csl") && (
+   <div>
+     <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }} >
   <label style={{ fontWeight: "bold" }}>Total produit CSL</label>
    <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
@@ -812,11 +811,7 @@ const Form = () => {
     <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>
     </div>
   </div>
-)}
-<div>
-<Checkbox style={{fontWeight:'bold', marginBottom:'80px'}} value={declarationquantitecsl} onChange={setDecalarationquantitecsl}>Déclaration de quantité produit csl</Checkbox> 
-   {declarationquantitecsl && (
-   <div>
+
    <div className='form-row'>
   <div className='input-field'>
   <label>Type de probléme</label>
@@ -827,45 +822,34 @@ const Form = () => {
   </Select>
   </div >
   </div>
-  <div className='form-row'>
-  <div className="input-field">
-              <label htmlFor="start-time">Start Time:</label>
-              <Input
-                id="start-time"
-                type="time"
-                value={startTimecsl}
-                onChange={(e) => setStartTimecsl(e.target.value)}
-              />
-            </div>
-            <div className="input-field">
-              <label htmlFor="end-time">End Time:</label>
-              <Input
-                id="end-time"
-                type="time"
-                value={endTimecsl}
-                onChange={(e) => setEndTimecsl(e.target.value)}
-              />
-            </div>
-            {durationcsl && (
-              <p style={{ marginTop: '10px' }}>
-                Durée: <strong>{durationcsl}</strong>
-              </p>
-            )}
-            </div>
-  
-  <div className="input-field" >
-        <label>
-          Commentaires  (
-          {parseInt(totalproduitcsl) < parseInt(objectivecsl)
-            ? 'Total produit  < Objective'
-            : ''}
-          )
-        </label>
-        <Input.TextArea
-          value={commentairescsl}
-          onChange={(e) => setCommentairecsl(e.target.value)}
-        />
-      </div>
+
+  {typeproblemecsl && (
+      <div className='form-row'>
+      <div className="input-field">
+                  <label htmlFor="start-time">Start Time:</label>
+                  <Input
+                    id="start-time"
+                    type="time"
+                    value={startTimecsl}
+                    onChange={(e) => setStartTimecsl(e.target.value)}
+                  />
+                </div>
+                <div className="input-field">
+                  <label htmlFor="end-time">End Time:</label>
+                  <Input
+                    id="end-time"
+                    type="time"
+                    value={endTimecsl}
+                    onChange={(e) => setEndTimecsl(e.target.value)}
+                  />
+                </div>
+                {durationcsl && (
+                  <p style={{ marginTop: '10px' }}>
+                    Durée: <strong>{durationcsl}</strong>
+                  </p>
+                )}
+                </div>
+  )}
     </div>
   )}   
 </div>

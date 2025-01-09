@@ -343,46 +343,63 @@ const Form = () => {
   };
 
    
-  const fetchPlannificationByPhase = async (phase, date_creation) => {
+ 
+  const fetchPlannificationByPhase = async (phase, shift, date_creation, id_machine) => {
+    console.log("Request Params:", { phase, shift, date_creation, id_machine });
+  
     try {
       const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannificationss", {
-        params: { phase, date_creation },
+        params: { phase, shift, date_creation, id_machine },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      console.log("Response Data:", response.data);
   
-      // Extract totalplanifie values from the response data
+      // Extract totalplanifie values
       if (response.data && Array.isArray(response.data)) {
         return response.data.map(record => record.totalplanifie);
       }
       return null;
     } catch (error) {
-      console.error(`Error fetching plannification for phase ${phase} and date ${date_creation}:`, error);
+      console.error(`Error fetching plannification for phase ${phase}:`, error);
       return null;
     }
   };
-
-
   
+
+
   const fetchObjectives = async () => {
-    const currentDate = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" format
-    
-    const productionObjective = await fetchPlannificationByPhase("chargement", shift, currentDate);
-    const cfObjective = await fetchPlannificationByPhase("cf", shift, currentDate);
-    const cslObjective = await fetchPlannificationByPhase("csl", shift, currentDate);
+ 
+   const currentDate = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" format
   
-    setObjectiveProduction(productionObjective);
-    console.log(productionObjective);
-    setObjectiveCF(cfObjective);
-    setObjectiveCSL(cslObjective);
+    try {
+      const [productionObjective, cfObjective, cslObjective] = await Promise.all([
+        fetchPlannificationByPhase("chargement", shift, currentDate, selectedMachine.id),
+        fetchPlannificationByPhase("cf", shift, currentDate, selectedMachine.id),
+        fetchPlannificationByPhase("csl", shift, currentDate, selectedMachine.id),
+      ]);
+  
+      setObjectiveProduction(productionObjective);
+      setObjectiveCF(cfObjective);
+      setObjectiveCSL(cslObjective);
+  
+      console.log("Production Objective:", productionObjective);
+      console.log("CF Objective:", cfObjective);
+      console.log("CSL Objective:", cslObjective);
+    } catch (error) {
+      console.error("Error fetching objectives:", error);
+    }
   };
+  
   
 
   useEffect(() => {
-    fetchObjectives(); 
-  // Automatically fetch objectives on component mount
-  }, [shift]);
+    if (selectedMachine && selectedMachine.id) {
+      fetchObjectives();
+    }
+  }, [selectedMachine]);
+  
 
 
 

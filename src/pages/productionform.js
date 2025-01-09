@@ -546,6 +546,7 @@ const Form = () => {
                   <div className="input-field">
                     <label>Type de probléme</label>
                     <Select
+                      mode='multiple'
                       value={typeproblemeproduction}
                       onChange={(value) => setTypeproblemeproduction(value)}
                     >
@@ -604,6 +605,7 @@ const Form = () => {
                    Type defaut production
                  </label>
                  <Select
+                   mode='multiple'
                    value={typedefautproduction}
                    onChange={(value) => setTypedefautproduction(value)}
                    style={{ width: '100%' }}
@@ -690,7 +692,7 @@ const Form = () => {
  <div className='form-row'>
 <div className='input-field'>
 <label>Type de probléme</label>
-<Select value={typeproblemecf} onChange={(value)=>setTypeproblemecf(value)}>
+<Select mode='multiple' value={typeproblemecf} onChange={(value)=>setTypeproblemecf(value)}>
  <Option value=''>select Type de probléme</Option>
  <Option  value="problemmeelectrique">Probléme Electrique</Option>
  <Option value="courtcircuit">Court circuit</Option>
@@ -754,6 +756,7 @@ const Form = () => {
       Type defaut CF
     </label>
     <Select
+      mode='multiple'
       value={typedefautcf}
       onChange={(value) => setTypedefautcf(value)}
       style={{ width: '100%' }}
@@ -819,7 +822,7 @@ const Form = () => {
    <div className='form-row'>
   <div className='input-field'>
   <label>Type de probléme</label>
-  <Select value={typeproblemecsl} onChange={(value)=>setTypeproblemecsl(value)}>
+  <Select mode='multiple' value={typeproblemecsl} onChange={(value)=>setTypeproblemecsl(value)}>
    <Option value=''>select Type de probléme</Option>
    <Option  value="problemmeelectrique">Probléme Electrique</Option>
    <Option value="courtcircuit">Court circuit</Option>
@@ -886,6 +889,7 @@ const Form = () => {
               Type defaut CSL
             </label>
             <Select
+              mode='multiple'
               value={typedefautcsl}
               onChange={(value) => setTypedefautcsl(value)}
               style={{ width: '100%' }}

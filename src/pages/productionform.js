@@ -658,19 +658,6 @@ const Form = () => {
     </div>
   </div>
   <div className="input-field" >
-        <label>
-          Commentaires  (
-          {parseInt(totalproduitcsl) < parseInt(objectivecsl)
-            ? 'Total produit  < Objective'
-            : ''}
-          )
-        </label>
-        <Input.TextArea
-          value={commentairescsl}
-          onChange={(e) => setCommentairecsl(e.target.value)}
-        />
-      </div>
-  <div className="input-field" >
       <label>
         Commentaires  (
         {parseInt(totalproduitcf) < parseInt(objectivecf)

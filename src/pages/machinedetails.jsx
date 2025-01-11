@@ -146,6 +146,16 @@ const MachineDetails = () => {
     handleUpdate(values); // Pass the updated values to the handler
   };
 
+   const machineImages = {
+    NGG3: '/images/machines/NNG3.png',
+    NGG4: '/images/machines/NGG4.png',
+    KOJ: '/images/machines/KOJ.png',
+    MUD6: '/images/machines/MUD6.png',
+    MUD7: '/images/machines/MUD7.png',
+    NGG6: '/images/machines/NGG6.png'
+  };
+
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
@@ -163,32 +173,58 @@ const MachineDetails = () => {
        
         </ul>
       </div>
-      <div className="machine-list">
-      {machines.map((machine) => (
-          <div key={machine.id} className="machine-card">
-            <h3>{machine.nom}</h3>
-            <div className="button-container" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-
-            <div className="machine-details">
-                    <p><strong>Matricule Utilisateur:</strong> {machine.user_id}</p>
-                    <p><strong>Reference:</strong> {machine.referenceproduit}</p>
-                    <p><strong>Cadence_horaire_production:</strong> {machine.cadence_horaire}</p>
-                    <p><strong>Cadence_horaire_cf:</strong> {machine.cadence_horaire_cf}</p>
-                    <p><strong>Cadence_horaire_csl:</strong> {machine.cadence_horaire_csl}</p>
-                    <p><strong>Date de creation:</strong> {new Date(machine.date).toLocaleDateString()}</p>
-                  </div>
-        </div>
-       <button
-       className="update-button"
-       onClick={() => showModal(machine)}
-      style={{ padding: '10px 20px', margin:"10px 10px", color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px' }}
-       >
-       Update Machine
-     </button>
-
-
-          </div>
-        ))}
+           <div className="machine-list">
+        {machines.map((machine) => {
+          const machineImage = machineImages[machine.nom]; // Get the image based on machine name
+  
+          return (
+            <div key={machine.id} className="machine-card">
+              <h3>{machine.nom}</h3>
+              
+              {/* Render the image if it exists */}
+              {machineImage && (
+                <img
+                  src={machineImage}
+                  alt={`Machine ${machine.nom}`}
+                  style={{
+                    width: '150px',
+                    height: '150px',
+                    objectFit: 'cover',
+                    borderRadius: '5px',
+                    marginBottom: '10px',
+                  }}
+                />
+              )}
+  
+              <div className="button-container" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <div className="machine-details">
+                  <p><strong>Matricule Utilisateur:</strong> {machine.user_id}</p>
+                  <p><strong>Reference:</strong> {machine.referenceproduit}</p>
+                  <p><strong>Cadence_horaire_production:</strong> {machine.cadence_horaire}</p>
+                  <p><strong>Cadence_horaire_cf:</strong> {machine.cadence_horaire_cf}</p>
+                  <p><strong>Cadence_horaire_csl:</strong> {machine.cadence_horaire_csl}</p>
+                  <p><strong>Date de creation:</strong> {new Date(machine.date).toLocaleDateString()}</p>
+                </div>
+              </div>
+  
+              <button
+                className="update-button"
+                onClick={() => showModal(machine)}
+                style={{
+                  padding: '10px 20px',
+                  margin: '10px 10px',
+                  backgroundColor: '#4caf50',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                Update Machine
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Modal for updating machine */}

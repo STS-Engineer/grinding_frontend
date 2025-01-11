@@ -88,6 +88,14 @@ const Calendar = () => {
     const [nombremanque,setNombremanque] = useState(0);
     const [selectedDates, setSelectedDates] = useState([]);
     const [regleurs, setRegleurs]= useState([]);
+    const [manquechrgementshift1, setManquechargementshift1] = useState(0);
+    const [manqueregleurshift1, setManqueregleurshift1] = useState(0);
+    const [manquecfshift1, setManquecfshift1] = useState(0);
+    const [manquecslshift1, setManquecslshift1] = useState(0);
+    const [manquechargementshift2, setManquechargementshift2] = useState(0);
+    const [manqueregleurshift2, setManqueregleurshift2] = useState(0);
+    const [manquecfshift2, setManquecfshift2] = useState(0);
+    const [manquecslshift2, setManquecslshift2] = useState(0);
     
   
 
@@ -363,7 +371,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombre_heure_shift1: nombre_heure_shift1,
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manquechrgementshift1,
           start_date: date ,
           end_date: endDate,
           referenceproduit: selectedReference
@@ -422,7 +430,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecfshift2: totalcfshift2,
           objectivecf: totalcf,
           objectivecsl: totalcsl,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manqueregleurshift1,
           start_date: date,
           end_date: endDate,
           referenceproduit: selectedReference,
@@ -478,7 +486,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombre_heure_shift1: nombre_heure_shift1,
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manquecfshift1,
           start_date: date,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
@@ -530,7 +538,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombre_heure_shift1: nombre_heure_shift1,
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manquecslshift1,
           start_date: date,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
@@ -595,7 +603,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecfshift2: totalcfshift2,
           objectivecf: totalcf,
           objectivecsl: totalcsl,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manquechargementshift2,
           start_date: date,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
@@ -658,7 +666,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecfshift2: totalcfshift2,
           objectivecf: totalcf,
           objectivecsl: totalcsl,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manqueregleurshift2,
           start_date: date,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
@@ -723,7 +731,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecfshift2: totalcfshift2,
           objectivecf: totalcf,
           objectivecsl: totalcsl,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manquecfshift2,
           start_date: date,
           end_date: endDate,
           referenceproduit: selectedReference,
@@ -800,7 +808,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecfshift2: totalcfshift2,
           objectivecf: totalcf,
           objectivecsl: totalcsl,
-          nombredemanqueoperateur: nombremanque,
+          nombredemanqueoperateur: manquecslshift2,
           start_date: startDate,
           end_date: endDate,
           referenceproduit: selectedReference,
@@ -1063,12 +1071,12 @@ key={selectedMachine.id}
        
           <Col span={8}>
           Manque(phase chargement)
-            <InputNumber
+          <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
+              value={manquechrgementshift1}
+              onChange={(value) => setManquechargementshift1(value)}
             />
           </Col>
         </Row>
@@ -1122,13 +1130,13 @@ key={selectedMachine.id}
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
           <Col span={8}>
-          Manque(phase regleur)
-            <InputNumber
+          Manque(phase régleur)
+           <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
+              value={manqueregleurshift1}
+              onChange={(value) => setManqueregleurshift1(value)}
             />
           </Col>
         </Row>
@@ -1199,8 +1207,8 @@ key={selectedMachine.id}
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
+              value={manquecfshift1}
+              onChange={(value) => setManquecfshift1(value)}
             />
           </Col>
         </Row>
@@ -1263,12 +1271,12 @@ key={selectedMachine.id}
        
           <Col span={8}>
           Manque(phase CSL)
-            <InputNumber
+           <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
+              value={manquecslshift1}
+              onChange={(value) => setManquecslshift1(value)}
             />
           </Col>
         </Row>
@@ -1389,12 +1397,12 @@ transition={{ duration: 0.5 }}
         <Row>
           <Col span={8}>
           Manque(phase Chargement)
-            <InputNumber
+           <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
+              value={manquechargementshift2}
+              onChange={(value) => setManquechargementshift2(value)}
             />
           </Col>
         </Row>
@@ -1453,13 +1461,13 @@ transition={{ duration: 0.5 }}
         <Row>
        
           <Col span={8}>
-          Manque(phase reguleur)
-            <InputNumber
+          Manque(phase régleur)
+             <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
-              value={nombremanque}
-              onChange={(value) => setNombremanque(value)}
+              value={manqueregleurshift2}
+              onChange={(value) => setManqueregleurshift2(value)}
             />
           </Col>
         </Row>
@@ -1522,12 +1530,12 @@ transition={{ duration: 0.5 }}
          
             <Col span={8}>
             Manque(phase CF)
-              <InputNumber
+             <InputNumber
                 min={0}
                 placeholder="Enter a number"
                 style={{ marginLeft: 10 }}
-                value={nombremanque}
-                onChange={(value) => setNombremanque(value)}
+                value={manquecfshift2}
+                onChange={(value) => setManquecfshift2(value)}
               />
             </Col>
           </Row>
@@ -1597,8 +1605,8 @@ transition={{ duration: 0.5 }}
                min={0}
                placeholder="Enter a number"
                style={{ marginLeft: 10 }}
-               value={nombremanque}
-               onChange={(value) => setNombremanque(value)}
+               value={manquecslshift2}
+               onChange={(value) => setManquecslshift2(value)}
              />
            </Col>
          </Row>

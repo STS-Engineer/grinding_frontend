@@ -110,7 +110,7 @@ const MachineDetails = () => {
   };
 
 
-    const handleDelete = async (machineId) => {
+  const handleDelete = async (machineId) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.delete(`https://grinding-backend.azurewebsites.net/ajouter/machinee/${machineId}`, {
@@ -119,8 +119,9 @@ const MachineDetails = () => {
         },
       });
 
+      console.log(response.data.nom);
       if (response.status === 200) {
-        alert("Machine deleted successfully");
+        alert('Are you sure you want to delete this machine');
         fetchMachines(); // Re-fetch the machine list
       } else {
         alert("Error deleting machine");
@@ -207,21 +208,40 @@ const MachineDetails = () => {
                 </div>
               </div>
   
-              <button
-                className="update-button"
-                onClick={() => showModal(machine)}
-                style={{
-                  padding: '10px 20px',
-                  margin: '10px 10px',
-                  backgroundColor: '#4caf50',
-                  color: 'white',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                }}
-              >
-                Update Machine
-              </button>
+                <div style={{ display: 'flex', gap: '30px', marginTop: '20px' }}>
+          <button
+            className="update-button"
+           onClick={() => showModal(machine)}
+           style={{
+           padding: '10px 10px',
+           backgroundColor: '#3e7da1',
+           color: 'white',
+           border: 'none',
+           cursor: 'pointer',
+           fontSize: '14px',
+           fontWeight:'bold',
+           whiteSpace: 'nowrap', // Prevents text wrapping
+            }}
+  >
+           Update Machine
+        </button>
+        <button
+        className="delete-button"
+        onClick={() => handleDelete(machine.id)}
+        style={{
+        padding: '10px 10px',
+        backgroundColor: '#f44336',
+        color: 'white',
+       border: 'none',
+       cursor: 'pointer',
+       fontSize: '14px',
+       fontWeight:'bold',
+       whiteSpace: 'nowrap', 
+      }}
+       >
+      Delete Machine
+     </button>
+           </div>
             </div>
           );
         })}

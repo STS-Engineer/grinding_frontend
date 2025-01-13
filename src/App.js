@@ -9,7 +9,8 @@ import PlannificationForm from './pages/Plannification';
 import Ajouternouvellemachine from './pages/Ajouternouvellemachine';
 import Calendar from './pages/calendar';
 import Ajouterregleur from './pages/Ajouterregleur';
-import Ajouteroperateur from './pages/Ajouteroperateur';     
+import Ajouteroperateur from './pages/Ajouteroperateur';  
+import Ajouterprobleme from './pages/ajouterprobleme';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
       <Route path="/ajouterregleur" element={<Ajouterregleur />} />
       <Route path="/ajouteroperateur" element={<Ajouteroperateur />} />
       <Route path="/plannification" element={<PlannificationForm/>} />
+      <Route path="/ajouterprobleme" element={<Ajouterprobleme/>} />
       </Routes>
      </Router>
     </div>

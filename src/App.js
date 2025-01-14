@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import PlannificationForm from './pages/Plannification';
 import Ajouternouvellemachine from './pages/Ajouternouvellemachine';
 import Calendar from './pages/calendar';
-import Ajouterregleur from './pages/Ajouterregleur';
+import Ajouterregleur from './pages/Ajouterregleur';  
 import Ajouteroperateur from './pages/Ajouteroperateur';  
 import Ajouterprobleme from './pages/ajouterprobleme';
 

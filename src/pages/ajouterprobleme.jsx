@@ -38,7 +38,7 @@ const Ajouterprobleme = () => {
           },
         }
       );
-      message.success("Régleur added successfully!");
+      message.success("Technical Problem added successfully!");
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to add machine.");

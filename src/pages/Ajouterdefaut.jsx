@@ -67,7 +67,7 @@ const Ajouterdefaut = () => {
       </div>
   
       <div className="machine-form-container">
-        <h2>Ajouter des Problémes Techniques</h2>
+        <h2>Ajouter les Défauts</h2>
         
         <Form
           form={form}
@@ -75,9 +75,9 @@ const Ajouterdefaut = () => {
         
         >
           <Form.Item
-            name="probleme"
-            label="probleme"
-            rules={[{ required: true, message: 'Veuillez entrer le probléme technique!' }]}
+            name="defaut"
+            label="Défaut"
+            rules={[{ required: true, message: 'Veuillez entrer le défaut!' }]}
           >
          <Input
            type="text"

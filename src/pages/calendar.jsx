@@ -27,7 +27,7 @@ const Calendar = () => {
     shift2: '',
   });
 
-  const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(1);
     const [selectedMachine, setSelectedMachine] = useState(null);
     const [operateurs, setOperateurs] = useState([]);
     const [shift, setShift] = useState('');
@@ -85,9 +85,9 @@ const Calendar = () => {
     const [reguleurShift2, setReguleurShift2] = useState(0); // State for the first input
     const [cfShift2, setCfShift2] = useState(0); // State for the second input
     const [cslShift2, setCSLShift2] = useState(0); 
-    const [nombremanque,setNombremanque] = useState(0);
     const [selectedDates, setSelectedDates] = useState([]);
     const [regleurs, setRegleurs]= useState([]);
+    const [disabledRegleurs, setDisabledRegleurs] = useState([]); // Tracks disabled regleurs and their ranges
     const [manquechrgementshift1, setManquechargementshift1] = useState(0);
     const [manqueregleurshift1, setManqueregleurshift1] = useState(0);
     const [manquecfshift1, setManquecfshift1] = useState(0);
@@ -96,10 +96,18 @@ const Calendar = () => {
     const [manqueregleurshift2, setManqueregleurshift2] = useState(0);
     const [manquecfshift2, setManquecfshift2] = useState(0);
     const [manquecslshift2, setManquecslshift2] = useState(0);
+    const [hasFetched, setHasFetched] = useState(false);
+    const [shouldFetchEvents, setShouldFetchEvents] = useState(() => {
+      const storedValue = localStorage.getItem("shouldevent1");
+      return storedValue === null ? true : JSON.parse(storedValue); // Default to true if not found
+    });
     
+    
+
+
   
 
-    const fetchMachines = async () => {
+  const fetchMachines = async () => {
       try {
         const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/machines', {
           headers: {
@@ -237,84 +245,86 @@ const handleMachineSelect = (machine) => {
   // Disable dates that are already selected in the dropdown
   return selectedDates.some(date => current.isSame(date, 'day'));
 };
+useEffect(() => {
+  // Only fetch events if the machines are loaded and shouldFetchEvents is true
+  if (isMachinesLoaded && shouldFetchEvents) {
+    // Pass machineId to fetch one event, you can adjust this as needed
+    const machineId = selectedMachine?.id || null;
+    fetchEvents(startDate, endDate, machineId);  // Fetch events based on machineId and dates
+    console.log("Fetching one event as shouldFetchEvents is ", shouldFetchEvents);
+    
+    // After fetching, set shouldFetchEvents to false to avoid repeated fetches
+    setShouldFetchEvents(false);
+  } else {
+    console.log("Skipping fetch because shouldFetchEvents is false");
+  }
+}, [isMachinesLoaded, startDate, endDate, shouldFetchEvents]);
+useEffect(() => {
+  // Only fetch events if shouldFetchEvents is true
+  if (shouldFetchEvents) {
+    const fetchNewEvents = async () => {
+      try {
+        // Fetch events using the new start and end date
+        await fetchEvents(new Date(startDate), new Date(endDate));
+        setShouldFetchEvents(false); // Reset after fetching
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
 
-  
+    fetchNewEvents();
+  }
+}, [shouldFetchEvents]); // Trigger effect when shouldFetchEvents changes
+
+
 const fetchEvents = async (startDate, endDate, machineId = null) => {
   try {
-    // Format the start and end dates
     const formatDate = (date) => {
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     };
 
     const formattedStartDate = formatDate(startDate);
     const formattedEndDate = formatDate(endDate);
-    const today = new Date();
-    const formattedToday = formatDate(today); // Format today's date
 
+    // If machineId is provided, fetch only events for that machine
     const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
       params: {
         start_date: formattedStartDate,
         end_date: formattedEndDate,
-        machine_id: machineId,
+        machine_id: machineId,  // This filters events based on the selected machine
       },
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
-    const eventsData = [];
+    // Assuming the API returns an array of events for the specified machine and date range
+    const eventsData = response.data.map((event) => ({
+      id: event.id,
+      title: event.machine_name || "Unknown Machine",
+      referenceproduit: event.referenceproduit,
+      start: formatDate(new Date(event.start_date)),
+      end: formatDate(new Date(event.end_date)),
+      extendedProps: {
+        phasechargement: event.phasechargement,
+        shift: event.shift,
+        shift2: event.shift2,
+      },
+    }));
 
-    response.data.forEach((event) => {
-      // Format event start and end dates
-      const eventStartDate = formatDate(new Date(event.start_date));
-      const eventEndDate = formatDate(new Date(event.end_date));
-
-      // Skip events occurring on the current date
-      if (eventStartDate === formattedToday || eventEndDate === formattedToday) {
-        return;
-      }
-
-      if (
-        (eventStartDate >= formattedStartDate && eventStartDate <= formattedEndDate) ||
-        (eventEndDate >= formattedStartDate && eventEndDate <= formattedEndDate)
-      ) {
-        eventsData.push({
-          id: event.id,
-          title: event.machine_name || "Unknown Machine",
-          referenceproduit: event.referenceproduit,
-          start: eventStartDate, // Only year, month, and date
-          end: eventEndDate,     // Only year, month, and date
-          extendedProps: {
-            phasechargement: event.phasechargement,
-            shift: event.shift,
-            shift2: event.shift2,
-            start_date: eventStartDate,
-            end_date: eventEndDate,
-          },
-        });
-      }
-    });
-
-    setEvents(eventsData); // Update the state with new events
+    // Assuming you want to update the calendar with only the new event(s)
+    setEvents(eventsData);  // This will overwrite the existing events
+    setShouldFetchEvents(true);
     console.log(eventsData);
+    
   } catch (error) {
     console.error("Error fetching events:", error);
   }
 };
 
-
-
-  // Fetch events whenever the start date, end date, or machines change
-  useEffect(() => {
-    if (isMachinesLoaded) {
-      fetchEvents(startDate, endDate);
-      console.log("fetched succesfully ")
-    }
-  }, [isMachinesLoaded, startDate, endDate]);
-  
 
   const onclose = () => {
     setIsModalvisible(false);
@@ -345,9 +355,10 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
   };
 
 
-
-  // Submit new plannification
+ 
   const handleAddEvent = async () => {
+    console.log("handleAddEvent triggered");
+  
     setLoading(true);
   
     if (!startDate || !endDate) {
@@ -357,43 +368,54 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     }
   
     try {
-  
-  
       const plannificationData = {
-          phase: phasechargement,
-          id_machine: selectedMachine.id,
-          id_operateur: operateurs.id,
-          phasereguleur: phasereguleur,
-          operateurs: operateurchargementshift1.join(', '),
-          phasecsl: phasecsl,
-          operateur_chargement: operateurchargement,
-          totalplanifie: totalproduction,
-          nombre_heure_shift1: nombre_heure_shift1,
-          nombre_heure_shift2: nombre_heure_shift2,
-          shift: shift,
-          nombredemanqueoperateur: manquechrgementshift1,
-          start_date: date ,
-          end_date: endDate,
-          referenceproduit: selectedReference
-        };
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
   
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        });
-      
-      setCurrentStep(3);
+      const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      console.log("Event added successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
     } catch (error) {
       message.error("Failed to add plannifications.");
-      console.error(error);
+      console.error("Error adding event:", error);
     } finally {
       setLoading(false);
+      console.log("handleAddEvent finished.");
     }
   };
   
-
+  
   const handleAddEvent2 = async () => {
     setLoading(true);
   
@@ -403,50 +425,60 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     }
   
     try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurregleurshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        shift2: shift2,
+        phasechargementshif2: phasechargementshif2,
+        operateurchargementshift2: operateurchargementshift2,
+        phasereguleurshif2: phasereguleurshif2,
+        operateur_reguleurshif2: operateur_reguleurshif2,
+        phasecslshift2: phasecslshift2,
+        operateurcslshift2: operateurcslshift2,
+        phasecfshift2: phasecfshift2,
+        operateurcfshift2: operateurcfshift2,
+        objectiveproductionshift2: totalproductionshift2,
+        objectivecslshift2: totalcslshift2,
+        objectivecfshift2: totalcfshift2,
+        objectivecf: totalcf,
+        objectivecsl: totalcsl,
+        nombredemanqueoperateur: manqueregleurshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
   
-        const plannificationData = {
-          phase: phasechargement,
-          id_machine: selectedMachine.id,
-          id_operateur: operateurs.id,
-          phasereguleur: phasereguleur,
-          operateurs: operateurregleurshift1.join(', '),
-          phasecsl: phasecsl,
-          operateur_chargement: operateurchargement,
-          totalplanifie: totalproduction,
-          nombre_heure_shift1: nombre_heure_shift1,
-          nombre_heure_shift2: nombre_heure_shift2,
-          shift: shift,
-          shift2: shift2,
-          phasechargementshif2: phasechargementshif2,
-          operateurchargementshift2: operateurchargementshift2,
-          phasereguleurshif2: phasereguleurshif2,
-          operateur_reguleurshif2: operateur_reguleurshif2,
-          phasecslshift2: phasecslshift2,
-          operateurcslshift2: operateurcslshift2,
-          phasecfshift2: phasecfshift2,
-          operateurcfshift2: operateurcfshift2,
-          objectiveproductionshift2: totalproductionshift2,
-          objectivecslshift2: totalcslshift2,
-          objectivecfshift2: totalcfshift2,
-          objectivecf: totalcf,
-          objectivecsl: totalcsl,
-          nombredemanqueoperateur: manqueregleurshift1,
-          start_date: date,
-          end_date: endDate,
-          referenceproduit: selectedReference,
-        };
+      await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
   
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        });
-      
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
   
-      // Fetch the events immediately after successful plannifications
-      await fetchEvents(startDate, endDate, selectedMachine.id);
-  
+      // Update disabled regleurs after successful submission
+      const newDisabledEntries = operateurregleurshift1.map((regleur) => ({
+        regleur,
+        startDate,
+        endDate,
+      }));
+      setDisabledRegleurs([...disabledRegleurs, ...newDisabledEntries]);
+      setOperateurregleurshift1([]);
+      setShouldFetchEvents(false);  // Stop fetching events
       setCurrentStep(4);
   
     } catch (error) {
@@ -456,6 +488,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setLoading(false);
     }
   };
+  
   
 
   const handleAddEvent3 = async () => {
@@ -487,7 +520,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
           nombredemanqueoperateur: manquecfshift1,
-          start_date: date,  // Add the plannification date here
+          start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
         };
@@ -500,7 +533,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           },
         });
       
-  
+      setShouldFetchEvents(false);
       setCurrentStep(5);
       
     } catch (error) {
@@ -539,7 +572,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombre_heure_shift2: nombre_heure_shift2,
           shift: shift,
           nombredemanqueoperateur: manquecslshift1,
-          start_date: date,  // Add the plannification date here
+          start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
         };
@@ -551,8 +584,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
             "Content-Type": "application/json",
           },
         });
-    
-
+      setShouldFetchEvents(false);
       setCurrentStep(6);
     
     } catch (error) {
@@ -604,7 +636,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecf: totalcf,
           objectivecsl: totalcsl,
           nombredemanqueoperateur: manquechargementshift2,
-          start_date: date,  // Add the plannification date here
+          start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
         };
@@ -616,6 +648,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
             "Content-Type": "application/json",
           },
         });
+      setShouldFetchEvents(false);
       setCurrentStep(7);
    
     } catch (error) {
@@ -667,7 +700,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecf: totalcf,
           objectivecsl: totalcsl,
           nombredemanqueoperateur: manqueregleurshift2,
-          start_date: date,  // Add the plannification date here
+          start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
           referenceproduit: selectedReference
         };
@@ -680,7 +713,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           },
         });
       
-  
+      setShouldFetchEvents(false);
       setCurrentStep(8); // Adjust step after success
     } catch (error) {
       message.error("Failed to add plannifications.");
@@ -743,6 +776,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
             "Content-Type": "application/json",
           },
         });
+      setShouldFetchEvents(false);
       setCurrentStep(9);
     } catch (error) {
       message.error("Failed to add plannifications.");
@@ -809,7 +843,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           objectivecf: totalcf,
           objectivecsl: totalcsl,
           nombredemanqueoperateur: manquecslshift2,
-          start_date: startDate,
+          start_date: date,
           end_date: endDate,
           referenceproduit: selectedReference,
         };
@@ -824,9 +858,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
   
       message.success("Plannification added successfully.");
       setIsAddModalVisible(false);
-  
-      // Directly fetch events after successful addition without page reload
-      await fetchEvents(new Date(startDate), new Date(endDate)); // Ensure the dates are passed correctly
+      setShouldFetchEvents(true); // Trigger event fetch
+      localStorage.setItem("shouldevent1", true); 
   
     } catch (error) {
       message.error("Failed to add plannifications.");
@@ -835,6 +868,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setLoading(false);
     }
   };
+  
+  
   
 
   // Handle change event when date range is selected
@@ -849,12 +884,56 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     }
   };
 
- 
+
+    // Disable selected regleur in the same date range after submission
+    useEffect(() => {
+      const checkAllRegleurs = async () => {
+        const unavailableRegleurs = [];
   
+        for (let regleur of regleurs) {
+          const isUnavailable = await checkRegleurAvailability(regleur.nom, startDate, endDate);
+          if (isUnavailable) {
+            unavailableRegleurs.push(regleur.nom);
+          }
+        }
+  
+        setDisabledRegleurs(unavailableRegleurs); // Set the list of unavailable regleurs
+      };
+  
+      if (startDate && endDate) {
+        checkAllRegleurs(); // Check all regleurs if dates are selected
+      }
+    }, [startDate, endDate, regleurs]); // Re-run when dates or regleurs change
+    // Function to check if a regleur is available in the date range
+    const checkRegleurAvailability = async (regleur, startDate, endDate) => {
+      try {
+        const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/check/plannification', {
+          params: {
+            id_machine: selectedMachine.id, // Pass machine ID
+            operateurs: regleur,
+            start_date: startDate,
+            end_date: endDate
+          },
+        });
+  
+        return response.data.exists; // True if unavailable (disabled)
+      } catch (error) {
+        console.error('Error checking regleur availability:', error);
+        return false;
+      }
+    };
 
+ // Handle regleur selection
+ const handleRegleurChange = async (selectedValues) => {
+  setOperateurregleurshift1(selectedValues);
+};
 
+ // Function to filter regleurs based on availability in the date range
+ const isRegleurAvailable = (regleur) => {
+  return !disabledRegleurs.includes(regleur);
+};
 
-return (
+  return (
     <div>
    <div className='navbar'>
         <ul className="navbar-links">
@@ -872,7 +951,6 @@ return (
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         events={events}
-        editable={true}
         selectable={true}
         eventClick={handleEventClick}
         dateClick={handleDateClick} // Open modal on date click
@@ -884,6 +962,8 @@ return (
             <h3>Event Details</h3>
             <p><strong>Title:</strong> {selectedEvent.title}</p>
             <p><strong>referenceproduit:</strong> {selectedEvent.referenceproduit}</p>
+         
+           
           </div>
         )}
       </Modal>
@@ -1052,7 +1132,7 @@ key={selectedMachine.id}
     <div className="operateur-select">
       <h3>Select Operators</h3>
      
-      <Select
+   <Select
     mode="multiple" // Enables multi-selection
     value={operateurchargementshift1} // Bind the state
     onChange={(selectedValues) => setOperateurchargementshift1(selectedValues)} // Update state on selection
@@ -1071,7 +1151,7 @@ key={selectedMachine.id}
        
           <Col span={8}>
           Manque(phase chargement)
-          <InputNumber
+            <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
@@ -1113,25 +1193,27 @@ key={selectedMachine.id}
     </div>
              
     <Select
-    mode="multiple" // Enables multi-selection
-    value={operateurregleurshift1} // Bind the state
-    onChange={(selectedValues) => setOperateurregleurshift1(selectedValues)} // Update state on selection
-    placeholder="Select Regleurs"
-    style={{ width: '100%' }}
-  >
-    {regleurs.map((regleur) => (
-      <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
-      </Option>
-    ))}
-  </Select>
+      mode="multiple"
+      value={operateurregleurshift1}
+      onChange={handleRegleurChange}
+      placeholder="Select Regleurs"
+      style={{ width: '100%' }}
+    >
+      {regleurs
+        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
+        .map((regleur) => (
+          <Option key={regleur.id} value={regleur.nom}>
+            {regleur.nom}
+          </Option>
+        ))}
+    </Select>
 
-   
+
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
           <Col span={8}>
-          Manque(phase régleur)
-           <InputNumber
+          Manque(phase regleur)
+            <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
@@ -1266,12 +1348,12 @@ key={selectedMachine.id}
   </Select>
 
       
-      <Checkbox.Group style={{ width: '100%' }}>
+  <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
           <Col span={8}>
           Manque(phase CSL)
-           <InputNumber
+            <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
@@ -1397,7 +1479,7 @@ transition={{ duration: 0.5 }}
         <Row>
           <Col span={8}>
           Manque(phase Chargement)
-           <InputNumber
+            <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
@@ -1444,25 +1526,27 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("regleur") && (
   <div>
-  <Select
-    mode="multiple" // Enables multi-selection
-    value={operateurregleurshift2} // Bind the state
-    onChange={(selectedValues) => setOperateurregleurshift2(selectedValues)} // Update state on selection
-    placeholder="Select Regleurs"
-    style={{ width: '100%' }}
-  >
-    {regleurs.map((regleur) => (
-      <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
-      </Option>
-    ))}
-  </Select>
+   <Select
+      mode="multiple"
+      value={operateurregleurshift2}
+      onChange={handleRegleurChange}
+      placeholder="Select Regleurs"
+      style={{ width: '100%' }}
+    >
+      {regleurs
+        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
+        .map((regleur) => (
+          <Option key={regleur.id} value={regleur.nom}>
+            {regleur.nom}
+          </Option>
+        ))}
+    </Select>
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
           <Col span={8}>
-          Manque(phase régleur)
-             <InputNumber
+          Manque(phase reguleur)
+            <InputNumber
               min={0}
               placeholder="Enter a number"
               style={{ marginLeft: 10 }}
@@ -1530,7 +1614,7 @@ transition={{ duration: 0.5 }}
          
             <Col span={8}>
             Manque(phase CF)
-             <InputNumber
+              <InputNumber
                 min={0}
                 placeholder="Enter a number"
                 style={{ marginLeft: 10 }}

@@ -9,6 +9,7 @@ const { Option } = Select;
 
 const Form = () => {
   const [machines, setMachines] = useState([]);
+  const [problemes, setProblemes] = useState([]);
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [phase, setPhase] = useState('');
   const [phasecf, setPhasecf] = useState('');
@@ -65,6 +66,28 @@ const Form = () => {
   const [objectiveCSL, setObjectiveCSL] = useState(null);
   const navigate = useNavigate();
 
+    const fetchProbleme = async () => {
+    try {
+      const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/getproblemes', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setProblemes(response.data.operateurs);
+      console.log("problemes", response.data.operateurs);
+     
+    } catch (error) {
+      console.error('Error fetching machines:', error);
+    }
+  };
+  useEffect(()=>{
+    try{
+      fetchProbleme();
+
+    } catch(error){
+      console.error("internal error")
+    }
+  })
   // Function to determine current shift
   const getCurrentShift = () => {
     const currentHour = new Date().getHours();
@@ -250,7 +273,7 @@ const Form = () => {
         phase: phase,
         typedefautproduction: typedefautproduction,
         totaldefautproduction: totaldefautproduction || 0,
-        typedeproblemeproduction: typeproblemeproduction,
+        typedeproblemeproduction: typeproblemeproduction.join(','),
         commentaires: commentaires,
         totalrealise: totalproduit || 0,
         machine_id: machineId,
@@ -285,7 +308,7 @@ const Form = () => {
         phase: phase,
         typedefautcf: typedefautcf,
         totaldefautcf: totaldefautcf || 0,
-        typedeproblemecf: typeproblemecf,
+        typedeproblemecf: typeproblemecf.join(','),
         totalrealise: totalproduit || 0,
         machine_id: machineId,
         dureedeproblemecf: durationcf,
@@ -319,7 +342,7 @@ const Form = () => {
         phase: phase,
         typedefautcsl: typedefautcsl,
         totaldefautcsl: totaldefautcsl || 0,
-        typedeproblemecsl: typeproblemecsl,
+        typedeproblemecsl: typeproblemecsl.join(','),
         totalrealise: totalproduit || 0,
         machine_id: machineId,
         dureedeproblemecsl: durationcsl,
@@ -491,14 +514,7 @@ const Form = () => {
         </div>
       )}
 
-          {/* Display Objective Production */}
-       
-   
-
-
-  
-  
-
+     {/* Display Objective Production */}
   <div style={{marginBottom:'80px'}}>
   <div className="input-field">
           <label>Déclaration du quantité produit</label>
@@ -538,24 +554,28 @@ const Form = () => {
                     )
                   </label>
                   <Input.TextArea
-                    value={commentaires}
-                    onChange={(e) => setCommentaires(e.target.value)}
+                  value={commentaires}
+                  onChange={(e) => setCommentaires(e.target.value)}
                   />
-                </div>
-                <div className="form-row">
-                  <div className="input-field">
-                    <label>Type de probléme</label>
-                    <Select
-                      mode='multiple'
-                      value={typeproblemeproduction}
-                      onChange={(value) => setTypeproblemeproduction(value)}
-                    >
-                      <Option value="">Select Type de probléme</Option>
-                      <Option value="Probléme Electrique">Probléme Electrique</Option>
-                      <Option value="Courtcircuit">Court circuit</Option>
-                    </Select>
-                  </div>
-                </div>
+              </div>
+             <div className="form-row">
+            <div className="input-field">
+             <label>Type de probléme</label>
+              <Select
+             mode="multiple"
+             value={typeproblemeproduction}
+             onChange={(value) => setTypeproblemeproduction(value)}
+            placeholder="Select Type de probléme"
+            style={{ width: '100%' }}
+             >
+           {problemes.map((problemeObj) => (
+           <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
+            {problemeObj.probleme}
+           </Option>
+           ))}
+          </Select>
+         </div>
+         </div>
           {typeproblemeproduction && (
                  <div className="form-row">
                  <div className="input-field">
@@ -585,13 +605,9 @@ const Form = () => {
           )
 
           }
-         
-        
-              </div>
-      )}
-   
-  </div>
-
+         </div>
+         )}  
+         </div>
   <div>
   <Checkbox style={{fontWeight:'bold'}} value={declarationdefaut} onChange={setDecalarationdefaut}>Déclaration des defauts Production</Checkbox>
       {declarationdefaut && (
@@ -690,14 +706,22 @@ const Form = () => {
       />
     </div>
  <div className='form-row'>
-<div className='input-field'>
-<label>Type de probléme</label>
-<Select mode='multiple' value={typeproblemecf} onChange={(value)=>setTypeproblemecf(value)}>
- <Option value=''>select Type de probléme</Option>
- <Option  value="problemmeelectrique">Probléme Electrique</Option>
- <Option value="courtcircuit">Court circuit</Option>
-</Select>
-</div >
+      <div className="input-field">
+             <label>Type de probléme</label>
+              <Select
+             mode="multiple"
+             value={typeproblemecf}
+             onChange={(value) => setTypeproblemecf(value)}
+            placeholder="Select Type de probléme"
+            style={{ width: '100%' }}
+             >
+           {problemes.map((problemeObj) => (
+           <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
+            {problemeObj.probleme}
+           </Option>
+           ))}
+          </Select>
+         </div>
 </div>
 <div className="form-row">
 { typeproblemecf && (
@@ -820,14 +844,22 @@ const Form = () => {
   </div>
 
    <div className='form-row'>
-  <div className='input-field'>
-  <label>Type de probléme</label>
-  <Select mode='multiple' value={typeproblemecsl} onChange={(value)=>setTypeproblemecsl(value)}>
-   <Option value=''>select Type de probléme</Option>
-   <Option  value="problemmeelectrique">Probléme Electrique</Option>
-   <Option value="courtcircuit">Court circuit</Option>
-  </Select>
-  </div >
+     <div className="input-field">
+     <label>Type de probléme</label>
+              <Select
+             mode="multiple"
+             value={typeproblemecsl}
+             onChange={(value) => setTypeproblemecsl(value)}
+            placeholder="Select Type de probléme"
+            style={{ width: '100%' }}
+             >
+           {problemes.map((problemeObj) => (
+           <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
+            {problemeObj.probleme}
+           </Option>
+           ))}
+          </Select>
+      </div>
   </div>
 
   {typeproblemecsl && (

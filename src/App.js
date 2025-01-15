@@ -11,6 +11,7 @@ import Calendar from './pages/calendar';
 import Ajouterregleur from './pages/Ajouterregleur';  
 import Ajouteroperateur from './pages/Ajouteroperateur';  
 import Ajouterprobleme from './pages/ajouterprobleme';
+import Ajouterdefaut from './pages/Ajouterdefaut';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       <Route path="/ajouteroperateur" element={<Ajouteroperateur />} />
       <Route path="/plannification" element={<PlannificationForm/>} />
       <Route path="/ajouterprobleme" element={<Ajouterprobleme/>} />
+      <Route path="/ajouterdefaut" element={<Ajouterdefaut/>} />
       </Routes>
      </Router>
     </div>

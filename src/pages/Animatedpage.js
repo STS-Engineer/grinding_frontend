@@ -30,6 +30,7 @@ const AnimatedPage = () => {
           <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
           <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
           <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
+          <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
           <button className='logout-button' onClick={handleLogout}>logout</button>

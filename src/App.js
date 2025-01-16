@@ -13,6 +13,7 @@ import Ajouteroperateur from './pages/Ajouteroperateur';
 import Ajouterprobleme from './pages/ajouterprobleme';
 import Ajouterdefaut from './pages/Ajouterdefaut';
 import Listregleur from './pages/List de regleurs';
+import Listoperateur from './pages/Listoperateurs';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
       <Route path="/plannification" element={<PlannificationForm/>} />
       <Route path="/ajouterprobleme" element={<Ajouterprobleme/>} />
       <Route path="/ajouterdefaut" element={<Ajouterdefaut/>} />
+      <Route path="/listoperateur" element={<Listoperateur/>} />
       <Route path="/listregleur" element={<Listregleur/>} />
       </Routes>
      </Router>

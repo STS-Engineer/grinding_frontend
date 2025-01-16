@@ -119,7 +119,7 @@ const Ajoutermachine = () => {
           referenceproduit: reference, // Replace with actual value from the form
           date: date, // Replace with actual value from the form
           cadence_horaire: cadence_horaire, // Replace with actual value from the form
-          nombre_operateur_chargement: nombre_operateur_chargement, // Replace with actual value from the form
+          nombre_operateur_chargement: nombre_operateur_chargement || 0, // Replace with actual value from the form
           cadence_horaire_cf: cadence_horaire_cf, // Replace with actual value from the form
           cadence_horaire_csl: cadence_horaire_csl, // Replace with actual value from the form
           phase1chargement: phase1chargement, // Replace with actual value from the form

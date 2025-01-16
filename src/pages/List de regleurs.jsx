@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Ajouterregleur.css';
 import { Modal, message, Table, Button, Input } from 'antd'; // Import necessary Ant Design components
 import { useNavigate } from 'react-router-dom';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'; // Import Delete and Edit icons

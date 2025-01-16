@@ -10,6 +10,7 @@ const { Option } = Select;
 const Form = () => {
   const [machines, setMachines] = useState([]);
   const [problemes, setProblemes] = useState([]);
+  const [problemespostecontrole, setProblemespostecontrole] = useState([]);
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [phase, setPhase] = useState('');
   const [phasecf, setPhasecf] = useState('');
@@ -80,10 +81,25 @@ const Form = () => {
       console.error('Error fetching machines:', error);
     }
   };
+
+    const fetchProblemepostecontrole = async () => {
+    try {
+      const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/getproblemespostedecontrole', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setProblemespostecontrole(response.data.operateurs);
+      console.log("problemes", response.data.operateurs);
+     
+    } catch (error) {
+      console.error('Error fetching machines:', error);
+    }
+  };
   useEffect(()=>{
     try{
       fetchProbleme();
-
+      fetchProblemepostecontrole();
     } catch(error){
       console.error("internal error")
     }
@@ -433,7 +449,7 @@ const Form = () => {
     navigate('/login');
   };
 
-   return (
+    return (
     <div className="body_container">
       <div className='navbar'>
         <ul className="navbar-links">
@@ -720,17 +736,17 @@ const Form = () => {
  
  <div className='form-row'>
  <div className="input-field">
-  <label>Type de probléme</label>
-     <Select
-       mode="multiple"
-       value={typeproblemecf}
-       onChange={(value) => setTypeproblemecf(value)}
-       placeholder="Select Type de probléme"
-        style={{ width: '100%' }}
+               <label>Type de probléme</label>
+               <Select
+              mode="multiple"
+             value={typeproblemecf}
+             onChange={(value) => setTypeproblemecf(value)}
+            placeholder="Select Type de probléme"
+            style={{ width: '100%' }}
              >
-         {problemes.map((problemeObj) => (
-         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
-         {problemeObj.probleme}
+         {problemespostecontrole.map((problemeObj) => (
+         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.problemecontrole}`}>
+         {problemeObj.problemecontrole}
          </Option>
          ))}
        </Select>
@@ -879,9 +895,9 @@ const Form = () => {
        placeholder="Select Type de probléme"
         style={{ width: '100%' }}
              >
-         {problemes.map((problemeObj) => (
-         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
-         {problemeObj.probleme}
+         {problemespostecontrole.map((problemeObj) => (
+         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.problemecontrole}`}>
+         {problemeObj.problemecontrole}
          </Option>
          ))}
        </Select>
@@ -967,8 +983,8 @@ const Form = () => {
  )}
  </div>
   <div className="button-step1">
-   <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
-  </div>
+            <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
+          </div>
             
  </div>
 )}

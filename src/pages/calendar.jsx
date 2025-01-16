@@ -934,7 +934,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
 };
 
   return (
-    <div>
+  <div>
    <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
@@ -1120,7 +1120,7 @@ key={selectedMachine.id}
                  value={phasechargement}
                  onChange={(value)=>setPhasechargement(value[0])}
                >
-                <Checkbox value="chargement">Phase Chargement</Checkbox>
+                <Checkbox value="chargement">Sélectionner les opérateurs de production</Checkbox>
                  
                 
                </Checkbox.Group>
@@ -1130,7 +1130,7 @@ key={selectedMachine.id}
     {phasechargement.includes("chargement") && (
     <div>
     <div className="operateur-select">
-      <h3>Select Operators</h3>
+   
      
    <Select
     mode="multiple" // Enables multi-selection
@@ -1150,7 +1150,7 @@ key={selectedMachine.id}
         <Row>
        
           <Col span={8}>
-          Manque(phase chargement)
+          Manque des opérateurs
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1182,16 +1182,12 @@ key={selectedMachine.id}
                  value={phasechargement}
                  onChange={(value)=>setPhasechargement(value[0])}
                >
-                <Checkbox value="regleur">Phase Régleurs</Checkbox>
+                <Checkbox value="regleur">Sélectionner les régleurs</Checkbox>
                </Checkbox.Group>
            </div> 
      {phasechargement.includes("regleur") && (
     <div>
-    <div className="input-field">
-    <label>Objective Regleur</label>
-      <input type="number" value={totalproduction} readOnly />
-    </div>
-             
+     
     <Select
       mode="multiple"
       value={operateurregleurshift1}
@@ -1212,7 +1208,7 @@ key={selectedMachine.id}
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
           <Col span={8}>
-          Manque(phase regleur)
+          Manque des régleurs
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1284,7 +1280,7 @@ key={selectedMachine.id}
         <Row>
        
           <Col span={8}>
-          Manque(phase CF)
+          Manque des opérateurs
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1352,7 +1348,7 @@ key={selectedMachine.id}
         <Row>
        
           <Col span={8}>
-          Manque(phase CSL)
+          Manque des opérateurs
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1451,7 +1447,7 @@ transition={{ duration: 0.5 }}
          value={phasechargementshif2}
          onChange={(value)=>setPhasechargementshif2(value[0])}
        >
-        <Checkbox value="chargement">Phase Chargement</Checkbox> 
+        <Checkbox value="chargement">Sélectionner les opérateurs</Checkbox> 
        </Checkbox.Group>
    </div> 
 
@@ -1478,7 +1474,7 @@ transition={{ duration: 0.5 }}
       <Checkbox.Group style={{ width: '100%' }}>
         <Row>
           <Col span={8}>
-          Manque(phase Chargement)
+          Manque des opérateurs
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1521,7 +1517,7 @@ transition={{ duration: 0.5 }}
          value={phasereguleurshif2} // Wrap single value in an array
          onChange={(value) => setPhasereguleurshif2(value[0])}
        >
-        <Checkbox value="regleur">Phase Régleurs</Checkbox>
+        <Checkbox value="regleur">Sélectionner les régleurs</Checkbox>
        </Checkbox.Group>
    </div> 
 {phasereguleurshif2.includes("regleur") && (
@@ -1545,7 +1541,7 @@ transition={{ duration: 0.5 }}
         <Row>
        
           <Col span={8}>
-          Manque(phase reguleur)
+          Manque des régleurs
             <InputNumber
               min={0}
               placeholder="Enter a number"
@@ -1613,7 +1609,7 @@ transition={{ duration: 0.5 }}
           <Row>
          
             <Col span={8}>
-            Manque(phase CF)
+            Manque des opérateurs
               <InputNumber
                 min={0}
                 placeholder="Enter a number"
@@ -1684,7 +1680,7 @@ transition={{ duration: 0.5 }}
          <Row>
         
            <Col span={8}>
-           Manque(phase CSL)
+           Manque des opérateurs
              <InputNumber
                min={0}
                placeholder="Enter a number"

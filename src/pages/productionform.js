@@ -435,13 +435,17 @@ const Form = () => {
 
    return (
     <div className="body_container">
-   <div className='navbar'>
+      <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
           <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
+          <li><a href="/listoperateur">List des Opérateurs</a></li>
           <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
+          <li><a href="/listregleur">List des régleurs</a></li>
+          <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
+          <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
           <button className='logout-button' onClick={handleLogout}>logout</button>
@@ -514,7 +518,9 @@ const Form = () => {
         </div>
       )}
 
-     {/* Display Objective Production */}
+          {/* Display Objective Production */}
+       
+  
   <div style={{marginBottom:'80px'}}>
   <div className="input-field">
           <label>Déclaration du quantité produit</label>
@@ -544,38 +550,41 @@ const Form = () => {
 
     
   </div>
-  
+  { parseInt(totalproduit) < parseInt(objectiveProduction) && (
   <div className="input-field">
-                  <label>
-                    Commentaires (
-                    {parseInt(totalproduit) < parseInt(objectiveProduction)
-                      ? 'Total produit < Objective'
-                      : ''}
-                    )
-                  </label>
-                  <Input.TextArea
-                  value={commentaires}
-                  onChange={(e) => setCommentaires(e.target.value)}
-                  />
-              </div>
-             <div className="form-row">
-            <div className="input-field">
-             <label>Type de probléme</label>
-              <Select
-             mode="multiple"
+  <label>
+    Commentaires (
+    {parseInt(totalproduit) < parseInt(objectiveProduction)
+      ? 'Total produit < Objective'
+      : ''}
+    )
+  </label>
+  <Input.TextArea
+    value={commentaires}
+    onChange={(e) => setCommentaires(e.target.value)}
+  />
+</div>
+  )}
+ 
+                <div className="form-row">
+                <div className="input-field">
+               <label>Type de probléme</label>
+               <Select
+              mode="multiple"
              value={typeproblemeproduction}
              onChange={(value) => setTypeproblemeproduction(value)}
             placeholder="Select Type de probléme"
             style={{ width: '100%' }}
              >
-           {problemes.map((problemeObj) => (
-           <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
-            {problemeObj.probleme}
-           </Option>
-           ))}
-          </Select>
-         </div>
-         </div>
+         {problemes.map((problemeObj) => (
+         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
+         {problemeObj.probleme}
+         </Option>
+         ))}
+       </Select>
+       </div>
+
+          </div>
           {typeproblemeproduction && (
                  <div className="form-row">
                  <div className="input-field">
@@ -602,12 +611,12 @@ const Form = () => {
                    </p>
                  )}
                </div>
-          )
+                )}
+              </div>
+              )}
+   
+            </div>
 
-          }
-         </div>
-         )}  
-         </div>
   <div>
   <Checkbox style={{fontWeight:'bold'}} value={declarationdefaut} onChange={setDecalarationdefaut}>Déclaration des defauts Production</Checkbox>
       {declarationdefaut && (
@@ -692,36 +701,40 @@ const Form = () => {
         <span>{objectiveCF !== null ? objectiveCF : "No data for today"}</span>
     </div>
   </div>
-  <div className="input-field" >
-      <label>
-        Commentaires  (
-        {parseInt(totalproduitcf) < parseInt(objectivecf)
-          ? 'Total produit  < Objective'
-          : ''}
-        )
-      </label>
-      <Input.TextArea
-        value={commentairescsl}
-        onChange={(e) => setCommentairecsl(e.target.value)}
-      />
-    </div>
+
+      {parseInt(totalproduitcf) < parseInt(objectivecf) && (
+       <div className="input-field" >
+       <label>
+         Commentaires  (
+         {parseInt(totalproduitcf) < parseInt(objectivecf)
+           ? 'Total produit  < Objective'
+           : ''}
+         )
+       </label>
+       <Input.TextArea
+         value={commentairescsl}
+         onChange={(e) => setCommentairecsl(e.target.value)}
+       />
+     </div>
+      )}
+ 
  <div className='form-row'>
-      <div className="input-field">
-             <label>Type de probléme</label>
-              <Select
-             mode="multiple"
-             value={typeproblemecf}
-             onChange={(value) => setTypeproblemecf(value)}
-            placeholder="Select Type de probléme"
-            style={{ width: '100%' }}
+ <div className="input-field">
+  <label>Type de probléme</label>
+     <Select
+       mode="multiple"
+       value={typeproblemecf}
+       onChange={(value) => setTypeproblemecf(value)}
+       placeholder="Select Type de probléme"
+        style={{ width: '100%' }}
              >
-           {problemes.map((problemeObj) => (
-           <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
-            {problemeObj.probleme}
-           </Option>
-           ))}
-          </Select>
-         </div>
+         {problemes.map((problemeObj) => (
+         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
+         {problemeObj.probleme}
+         </Option>
+         ))}
+       </Select>
+       </div>
 </div>
 <div className="form-row">
 { typeproblemecf && (
@@ -780,7 +793,6 @@ const Form = () => {
       Type defaut CF
     </label>
     <Select
-      mode='multiple'
       value={typedefautcf}
       onChange={(value) => setTypedefautcf(value)}
       style={{ width: '100%' }}
@@ -832,7 +844,7 @@ const Form = () => {
  </div>
    {phase.includes("csl") && (
    <div>
-     <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
+  <div style={{ display: 'flex', flexDirection: 'row', gap: '40px' }}>
   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }} >
   <label style={{ fontWeight: "bold" }}>Total produit CSL</label>
    <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
@@ -843,23 +855,37 @@ const Form = () => {
     </div>
   </div>
 
-   <div className='form-row'>
-     <div className="input-field">
-     <label>Type de probléme</label>
-              <Select
-             mode="multiple"
-             value={typeproblemecsl}
-             onChange={(value) => setTypeproblemecsl(value)}
-            placeholder="Select Type de probléme"
-            style={{ width: '100%' }}
-             >
-           {problemes.map((problemeObj) => (
-           <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
-            {problemeObj.probleme}
-           </Option>
-           ))}
-          </Select>
+  <div className="input-field" >
+        <label>
+          Commentaires  (
+          {parseInt(totalproduitcsl) < parseInt(objectivecsl)
+            ? 'Total produit  < Objective'
+            : ''}
+          )
+        </label>
+        <Input.TextArea
+          value={commentairescsl}
+          onChange={(e) => setCommentairecsl(e.target.value)}
+        />
       </div>
+
+   <div className='form-row'>
+   <div className="input-field">
+  <label>Type de probléme</label>
+     <Select
+       mode="multiple"
+       value={typeproblemecsl}
+       onChange={(value) => setTypeproblemecsl(value)}
+       placeholder="Select Type de probléme"
+        style={{ width: '100%' }}
+             >
+         {problemes.map((problemeObj) => (
+         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
+         {problemeObj.probleme}
+         </Option>
+         ))}
+       </Select>
+       </div>
   </div>
 
   {typeproblemecsl && (
@@ -921,7 +947,7 @@ const Form = () => {
               Type defaut CSL
             </label>
             <Select
-              mode='multiple'
+             mode='multiple'
               value={typedefautcsl}
               onChange={(value) => setTypedefautcsl(value)}
               style={{ width: '100%' }}
@@ -941,8 +967,8 @@ const Form = () => {
  )}
  </div>
   <div className="button-step1">
-            <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
-          </div>
+   <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
+  </div>
             
  </div>
 )}

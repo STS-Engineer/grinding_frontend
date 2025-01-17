@@ -161,36 +161,43 @@ const Ajouternouvellemachine = () => {
         phase: 'Chargement',
         nom_outil: getToolName(selectedToolName),  // Convert to string
         dureedevie: dureevierefroueoutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagehauteur',
         nom_outil: getToolName(selectedToolNamehauteur),  // Convert to string
         dureedevie: dureevierefmeulehauteuroutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagelargeur',
         nom_outil: getToolName(selectedToolNamelargeur), // Convert to string
         dureedevie: dureevierefmeulelargeuroutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagechanfreins',
         nom_outil: getToolName(selectedToolNamechanfreins),  // Convert to string
         dureedevie: dureevierefmeulechanfrein, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagrainure',
         nom_outil: getToolName(selectedToolNamerainure),  // Convert to string
         dureedevie: dureevieoutillageusinagerainureoutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagerayonnage',
         nom_outil: getToolName(selectedToolNamerayonnage), // Convert to string
         dureedevie: dureevierefmeulerayonnageoutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagetete',
         nom_outil: getToolName(selectedToolNametete),  // Convert to string
         dureedevie: dureevieusinagetete, // Replace with your actual form value
+        referenceproduit: reference 
       }
     ];
   
@@ -231,36 +238,43 @@ const Ajouternouvellemachine = () => {
         phase: 'Chargement',
         nom_outil: getToolName(selectedToolName),  // Convert to string
         dureedevie: dureevierefroueoutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagehauteur',
         nom_outil: getToolName(selectedToolNamehauteur),  // Convert to string
         dureedevie: dureevierefmeulehauteuroutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagelargeur',
         nom_outil: getToolName(selectedToolNamelargeur), // Convert to string
         dureedevie: dureevierefmeulelargeuroutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagechanfreins',
         nom_outil: getToolName(selectedToolNamechanfreins),  // Convert to string
         dureedevie: dureevierefmeulechanfrein, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagrainure',
         nom_outil: getToolName(selectedToolNamerainure),  // Convert to string
         dureedevie: dureevieoutillageusinagerainureoutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagerayonnage',
         nom_outil: getToolName(selectedToolNamerayonnage), // Convert to string
         dureedevie: dureevierefmeulerayonnageoutil, // Replace with your actual form value
+        referenceproduit: reference 
       },
       {
         phase: 'Usinagetete',
         nom_outil: getToolName(selectedToolNametete),  // Convert to string
         dureedevie: dureevieusinagetete, // Replace with your actual form value
+        referenceproduit: reference 
       }
     ];
   

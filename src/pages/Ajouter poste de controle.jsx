@@ -32,7 +32,7 @@ const Ajouterposte = () => {
           },
         }
       );
-      message.success("Régleur added successfully!");
+      message.success("Probléme de poste de controle à été ajouté avec succés!");
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to add machine.");

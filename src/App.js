@@ -19,7 +19,7 @@ import Ajouteroutil from './pages/Ajouter outil';
 import ActionHistory from './pages/ActionHistory ';
 
 
-function App() {
+function App() {    
   return (
     <div className="App">
      <Router>

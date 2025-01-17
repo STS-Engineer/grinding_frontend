@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Outil.css';
 import { Modal, Input, message, Select, Checkbox, Form, Button } from 'antd'; // Import Ant Design components
 import { useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const { Option } = Select;
 
@@ -44,6 +45,8 @@ const Ajoutermachine = () => {
   const [nombre_operateur_cf, setNombre_operateur_cf] = useState('');
   const [phase6inspectioncsl, setPhase6inspectioncslf] = useState('');
   const [nombre_operateur_csl, setnombre_operateur_csl] = useState('');
+  const [currentstep, setCurrentstep] = useState(0);
+  
   
   // Form data state
   const [form] = Form.useForm();

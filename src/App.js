@@ -15,6 +15,7 @@ import Ajouterdefaut from './pages/Ajouterdefaut';
 import Listregleur from './pages/List de regleurs';
 import Listoperateur from './pages/Listoperateurs';
 import Ajouterposte from './pages/Ajouter poste de controle';
+import Ajouteroutil from './pages/Ajouter outil';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
       <Route path="/listoperateur" element={<Listoperateur/>} />
       <Route path="/listregleur" element={<Listregleur/>} />
       <Route path="/Ajouterproblemepostedecontrole" element={<Ajouterposte/>} />
+      <Route path="/Ajouteroutil" element={<Ajouteroutil/>} />
       </Routes>
      </Router>
     </div>

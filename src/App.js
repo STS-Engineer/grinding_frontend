@@ -16,7 +16,7 @@ import Listregleur from './pages/List de regleurs';
 import Listoperateur from './pages/Listoperateurs';
 import Ajouterposte from './pages/Ajouter poste de controle';
 import Ajouteroutil from './pages/Ajouter outil';
-import ActionHistory from './pages/ActionHistory ';
+import ActionHistory from './pages/ActionHistory';
 
 
 

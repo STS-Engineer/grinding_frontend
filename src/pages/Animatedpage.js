@@ -22,18 +22,23 @@ const AnimatedPage = () => {
   
   return (
     <div className="animated-page">
-      <div className='navbar'>
+   <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
           <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
+          <li><a href="/listoperateur">List des Opérateurs</a></li>
           <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
+          <li><a href="/listregleur">List des régleurs</a></li>
           <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
+          <li><a href="/Ajouterproblemepostedecontrole">Ajouter des problémes de poste de controle </a></li>
           <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
-          <button className='logout-button' onClick={handleLogout}>logout</button>
+          <li><a href="/history">Historique</a></li>
+          <button className='logout-button' onClick={handleLogout}>logout</button>  
         </ul>
       </div>
   

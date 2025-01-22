@@ -4,9 +4,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
-import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker, InputNumber  } from 'antd';
+import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker, InputNumber, Button  } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MultiSelect } from 'react-multi-select-component';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './calendar.css'
 
 const { Option } = Select;
@@ -19,6 +19,7 @@ const Calendar = () => {
   const [machines, setMachines] = useState([]);
   const [isMachinesLoaded, setIsMachinesLoaded] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false); // Modal for adding events
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // Modal for adding events
   const [newEventData, setNewEventData] = useState({
     id_machine: '',
     date_creation: '',
@@ -35,7 +36,7 @@ const Calendar = () => {
     const [phasechargement, setPhasechargement] = useState('');
     const [operateurchargement, setOperateurchargement] = useState(null);
     const [phasereguleur, setPhasereguleur] = useState('');
-    const [operateurreguleur, setOperateurreguleur] = useState([]);
+
     const [operateurchargementshift1, setOperateurchargementshift1] = useState([]);
     const [operateurchargementshift2, setOperateurchargementshift2] = useState([]);
     const [operateurregleurshift1, setOperateurregleurshift1] = useState([]);
@@ -101,11 +102,15 @@ const Calendar = () => {
       const storedValue = localStorage.getItem("shouldevent1");
       return storedValue === null ? true : JSON.parse(storedValue); // Default to true if not found
     });
-    
-    
+    const [updatedEvent, setUpdatedEvent] = useState(null);
+    const [selectedPlannification, setSelectedPlannification] = useState(null); // For editing
 
+    useEffect(() => {
+      if (selectedEvent) {
+        setUpdatedEvent(selectedEvent); // Pre-fill the form with the selected event data
+      }
+    }, [selectedEvent]);
 
-  
 
   const fetchMachines = async () => {
       try {
@@ -120,6 +125,55 @@ const Calendar = () => {
         console.error('Error fetching machines:', error);
       }
     };
+
+// Fetching plannification by id
+const fetchPlannificationById = async (id) => {
+  // Ensure that the ID is valid before proceeding
+  if (!id) {
+    console.error("ID is missing");
+    return;
+  }
+
+  try {
+    // Make the GET request to fetch the plannification by ID
+    const response = await axios.get(`https://grinding-backend.azurewebsites.net/ajouter/plannifications/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,  // Add token if necessary
+      },
+    });
+
+    // Handle the fetched plannification
+    const plannification = response.data;
+    setSelectedPlannification(plannification); // Store the response data in state
+
+    // Set form field states with the fetched data
+    setPhasechargement(plannification.phase);
+    setSelectedMachine({ id: plannification.id_machine });
+    setOperateurs({ id: plannification.id_operateur });
+    setPhasereguleur(plannification.phasereguleur);
+    setOperateurchargementshift1(plannification.operateurs.split(', '));
+    setPhasecsl(plannification.phasecsl);
+    setOperateurchargement(plannification.operateur_chargement);
+    setTotalproduction(plannification.totalplanifie);
+    setNombre_heure_shift1(plannification.nombre_heure_shift1);
+    setNombre_heure_shift2(plannification.nombre_heure_shift2);
+    setShift(plannification.shift);
+    setStartDate(plannification.start_date);
+    setEndDate(plannification.end_date);
+    setSelectedReference(plannification.referenceproduit);
+
+    console.log('Plannification fetched:', plannification);  // Log the fetched data
+
+  } catch (error) {
+    // Handle any errors during the fetch process
+    console.error('Error fetching plannification:', error);
+    message.error('Failed to fetch plannification details.');
+  }
+};
+useEffect(()=>{
+  fetchPlannificationById();
+})
+
   // Fetch machines on mount
   useEffect(() => {
 
@@ -234,12 +288,22 @@ const Calendar = () => {
 
   
  // Handling machine selection
+// Handling machine selection and fetching corresponding plannification
 const handleMachineSelect = (machine) => {
   setSelectedMachine(machine);
-  console.log('Selected Machine:', machine); // Debugging
-  setCurrentStep(2);
-  fetchEvents(startDate, endDate, machine.id_machine);  // Fetch events for selected machine
+  console.log("Selected Machine:", machine);
+
+  setCurrentStep(2);  // Go to the next step
+  fetchEvents(startDate, endDate, machine.id_machine);  // Fetch events for the selected machine
+
+  // Fetch plannification based on the selected machine's id_machine
+  if (machine && machine.id_machine) {
+    fetchPlannificationById(machine.id_machine).then(() => {
+      console.log("Plannification fetched successfully.");
+    });
+  }
 };
+
  // Disable the dates that are already selected in the dropdown
  const disabledDate = (current) => {
   // Disable dates that are already selected in the dropdown
@@ -289,6 +353,9 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     const formattedStartDate = formatDate(startDate);
     const formattedEndDate = formatDate(endDate);
 
+     // Retrieve hidden events from localStorage
+     const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+
     // If machineId is provided, fetch only events for that machine
     const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications", {
       params: {
@@ -301,19 +368,22 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       },
     });
 
-    // Assuming the API returns an array of events for the specified machine and date range
-    const eventsData = response.data.map((event) => ({
-      id: event.id,
-      title: event.machine_name || "Unknown Machine",
-      referenceproduit: event.referenceproduit,
-      start: formatDate(new Date(event.start_date)),
-      end: formatDate(new Date(event.end_date)),
-      extendedProps: {
-        phasechargement: event.phasechargement,
-        shift: event.shift,
-        shift2: event.shift2,
-      },
-    }));
+     // Filter out hidden events
+     const eventsData = response.data
+     .filter((event) => !hiddenEvents.includes(event.id)) // Exclude hidden events
+     .map((event) => ({
+       id: event.id,
+       title: event.machine_name || "Unknown Machine",
+       referenceproduit: event.referenceproduit,
+       start: formatDate(new Date(event.start_date)),
+       end: formatDate(new Date(event.end_date)),
+       extendedProps: {
+         phasechargement: event.phasechargement,
+         shift: event.shift,
+         shift2: event.shift2,
+       },
+     }));
+
 
     // Assuming you want to update the calendar with only the new event(s)
     setEvents(eventsData);  // This will overwrite the existing events
@@ -330,23 +400,35 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     setIsModalvisible(false);
   };
 
-  const handleEventClick = (clickInfo) => {
+  const handleEventClick = async (clickInfo) => {
     const { id, title } = clickInfo.event;
     const { referenceproduit } = clickInfo.event.extendedProps;
-
+  
+    // Set the selected event data for use in the modal
     setSelectedEvent({
       id,
       title,
-      referenceproduit
-    
+      referenceproduit,
     });
-    setIsModalvisible(true);
+  
+    try {
+     
+  
+      // Open the modal to edit the event
+      setIsModalvisible(true);
+  
+    } catch (error) {
+      console.error("Error fetching event details:", error);
+      message.error("Failed to fetch event details.");
+    }
   };
+  
 
   // Open modal to add a new plannification
   const handleDateClick = (info) => {
     setNewEventData((prev) => ({ ...prev, date_creation: info.dateStr }));
     setIsAddModalVisible(true);
+    setIsEditModalVisible(true);
   };
 
    // Handle reference selection
@@ -393,13 +475,13 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         },
       });
   
-      console.log("Event added successfully:", response.data);
+      console.log("Event added successfully:", response.data.plannification);
   
-      // Store the added event ID in localStorage to avoid fetching it again
-      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
-      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
-      addedEvents.push(eventId);
-      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+      // Save event ID to hiddenEvents in localStorage
+      const eventId = response.data.plannification.id; // Assuming response contains the event ID
+      const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+      hiddenEvents.push(eventId);
+      localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
   
       // Update state to stop fetching events
       setShouldFetchEvents(false);  // Stop fetching events
@@ -457,18 +539,18 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         referenceproduit: selectedReference,
       };
   
-      await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+    const response=  await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
       });
   
-      // Store the added event ID in localStorage to avoid fetching it again
-      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
-      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
-      addedEvents.push(eventId);
-      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+       // Save event ID to hiddenEvents in localStorage
+       const eventId = response.data.plannification.id; // Assuming response contains the event ID
+       const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+       hiddenEvents.push(eventId);
+       localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
   
       // Update disabled regleurs after successful submission
       const newDisabledEntries = operateurregleurshift1.map((regleur) => ({
@@ -526,13 +608,17 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         };
   
         // Send request for each weekly plannification
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+       const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
-      
+             // Save event ID to hiddenEvents in localStorage
+             const eventId = response.data.plannification.id; // Assuming response contains the event ID
+             const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+             hiddenEvents.push(eventId);
+             localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
       setShouldFetchEvents(false);
       setCurrentStep(5);
       
@@ -578,12 +664,18 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         };
   
         // Send request for each weekly plannification
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+     const response=   await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
+
+               // Save event ID to hiddenEvents in localStorage
+               const eventId = response.data.plannification.id; // Assuming response contains the event ID
+               const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+               hiddenEvents.push(eventId);
+               localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
       setShouldFetchEvents(false);
       setCurrentStep(6);
     
@@ -642,12 +734,17 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         };
   
         // Send request for each weekly plannification
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+    const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
+               // Save event ID to hiddenEvents in localStorage
+               const eventId = response.data.plannification.id; // Assuming response contains the event ID
+               const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+               hiddenEvents.push(eventId);
+               localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
       setShouldFetchEvents(false);
       setCurrentStep(7);
    
@@ -706,12 +803,17 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         };
   
         // Send request for each weekly plannification
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+    const response= await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
+               // Save event ID to hiddenEvents in localStorage
+               const eventId = response.data.plannification.id; // Assuming response contains the event ID
+               const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+               hiddenEvents.push(eventId);
+               localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
       
       setShouldFetchEvents(false);
       setCurrentStep(8); // Adjust step after success
@@ -770,12 +872,18 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           referenceproduit: selectedReference,
         };
   
-        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+     const response =   await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         });
+
+        // Save event ID to hiddenEvents in localStorage
+       const eventId = response.data.plannification.id; // Assuming response contains the event ID
+       const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
+       hiddenEvents.push(eventId);
+      localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
       setShouldFetchEvents(false);
       setCurrentStep(9);
     } catch (error) {
@@ -868,9 +976,506 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setLoading(false);
     }
   };
+
+
+  const handleUpdateEvent = async (plannificationId) => {
+    console.log("handleUpdateEvent triggered");
   
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
   
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
   
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+         message.success("Step 1 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(plannificationId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to the next step after updating event
+  
+    } catch (error) {
+      message.error("Failed to update plannifications.");
+      console.error("Error updating plannification:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleUpdateEvent finished.");
+    }
+  };
+  
+  const handleUpdateEvent2 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 2 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to update plannifications.");
+      console.error("Error updating event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
+  
+
+  const handleUpdateEvent3 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 3 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to update plannifications.");
+      console.error("Error updating event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
+
+  const handleUpdateEvent4 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 4 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to update plannifications.");
+      console.error("Error updating event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
+
+  const handleUpdateEvent5 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 5 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error("Error adding event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
+
+
+  const handleUpdateEvent6 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 6 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error("Error adding event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
+
+
+  const handleUpdateEvent7 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 7 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+  
+      // Update state to stop fetching events
+      setShouldFetchEvents(false);  // Stop fetching events
+      setIsEditModalVisible(false); // Close modal
+      setCurrentStep(3);  // Move to next step after adding event
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error("Error adding event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
+
+
+  const handleUpdateEvent8 = async () => {
+    console.log("handleAddEvent triggered");
+  
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const plannificationData = {
+        phase: phasechargement,
+        id_machine: selectedMachine.id,
+        id_operateur: operateurs.id,
+        phasereguleur: phasereguleur,
+        operateurs: operateurchargementshift1.join(', '),
+        phasecsl: phasecsl,
+        operateur_chargement: operateurchargement,
+        totalplanifie: totalproduction,
+        nombre_heure_shift1: nombre_heure_shift1,
+        nombre_heure_shift2: nombre_heure_shift2,
+        shift: shift,
+        nombredemanqueoperateur: manquechrgementshift1,
+        start_date: startDate,
+        end_date: endDate,
+        referenceproduit: selectedReference,
+      };
+  
+    
+      const plannificationId = selectedEvent.id;
+      console.log("plannification id", plannificationId);
+  
+      const response = await axios.put(`https://grinding-backend.azurewebsites.net/ajouter/updateplannification/${plannificationId}`, plannificationData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      message.success("Step 8 is updated Succesfully");
+      console.log("Plannification updated successfully:", response.data);
+  
+      // Store the added event ID in localStorage to avoid fetching it again
+      const eventId = selectedMachine.id;  // You can use the machine ID or any unique identifier for the event
+      const addedEvents = JSON.parse(localStorage.getItem('addedEvents')) || [];
+      addedEvents.push(eventId);
+      localStorage.setItem('addedEvents', JSON.stringify(addedEvents));
+      setIsModalvisible(false); // Close modal
+      console.log("Event added successfully. No fetch triggered.");
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error("Error adding event:", error);
+    } finally {
+      setLoading(false);
+      console.log("handleAddEvent finished.");
+    }
+  };
 
   // Handle change event when date range is selected
   const handleDateRangeChange = (dates, dateStrings) => {
@@ -932,19 +1537,96 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
  const isRegleurAvailable = (regleur) => {
   return !disabledRegleurs.includes(regleur);
 };
+ // Delete an event by ID
+  // Delete an event by ID
+  const handleDeleteEvent = async (eventId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this plannification ?");
+    if (confirmDelete) {
+      try {
+        // Call API to delete the event
+        const response = await axios.delete(`https://grinding-backend.azurewebsites.net/ajouter/plannifications/${eventId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+  
+        if (response.status === 200) {
+          // Success message
+          message.success("Plannification has been deleted ");
+  
+          // Get current date range or calendar view date range (you can modify this as per your calendar's current view)
+          const startDate = new Date(); // You can modify this to the start date of the current calendar view
+          const endDate = new Date();   // You can modify this to the end date of the current calendar view
+  
+          // Call fetchEvents to update events on the calendar
+          fetchEvents(startDate, endDate); // Fetch updated events after deletion
+  
+        
+        }
+      } catch (error) {
+        console.error("Error deleting event:", error);
+        message.error("Failed to delete event.");
+      }
+    }
+  };
+  
+  const handleDeleteButton = (e, eventId) => {
+    e.stopPropagation(); // Prevent the event click handler from triggering
+    handleDeleteEvent(eventId); // Call your delete function
+  };
+  
 
+
+  // Render the delete button on each event
+  // Render the delete button and make event title smaller
+  const renderEventContent = (eventInfo) => {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        <span
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "70px",
+          }}
+          title={eventInfo.event.title} // Tooltip on hover
+        >
+          {eventInfo.event.title}
+        </span>
+        <button
+          onClick={(e) => handleDeleteButton(e, eventInfo.event.id)}
+          style={{
+            background: "none",
+            border: "none",
+            color: "red",
+            cursor: "pointer",
+            fontSize: "12px",
+          }}
+        >
+          🗑️
+        </button>
+      </div>
+    );
+  };
+  
   return (
   <div>
-   <div className='navbar'>
+    <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
           <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
+          <li><a href="/listoperateur">List des Opérateurs</a></li>
           <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
+          <li><a href="/listregleur">List des régleurs</a></li>
+          <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
+          <li><a href="/Ajouterproblemepostedecontrole">Ajouter des problémes de poste de controle </a></li>
+          <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
-       
+    
         </ul>
       </div>
      <FullCalendar
@@ -954,7 +1636,10 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         selectable={true}
         eventClick={handleEventClick}
         dateClick={handleDateClick} // Open modal on date click
+        eventContent={(eventInfo) => renderEventContent(eventInfo)}
       />
+
+      
       {/* Event Details Modal */}
       <Modal visible={isModalVisible} onOk={onclose} onCancel={onclose}>
         {selectedEvent && (
@@ -962,14 +1647,766 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
             <h3>Event Details</h3>
             <p><strong>Title:</strong> {selectedEvent.title}</p>
             <p><strong>referenceproduit:</strong> {selectedEvent.referenceproduit}</p>
-         
-           
           </div>
         )}
       </Modal>
 
-      {/* Add Plannification Modal */}
-      <Modal
+
+    
+{/* Update Event Modal */}
+<Modal
+visible={isModalVisible} onOk={onclose} onCancel={onclose}
+      title="Update Plannification"
+        // Make sure this is the correct state
+      confirmLoading={loading}
+       // Ensure this matches the correct state setter
+      footer={null}  // This removes the OK and Cancel buttons
+      >
+
+<motion.div
+key="step1"
+initial={{ opacity: 0, y: -20 }}
+animate={{ opacity: 3, y: 0 }}
+exit={{ opacity: 0, y: -20 }}
+transition={{ duration: 0.5 }}
+>
+  {currentStep === 1 && (
+ <div className="machine-buttons">
+{machines.map((machine)=>(
+  <button key={machine.id_machine} onClick={() => handleMachineSelect(machine)}>
+  {machine.nom}
+  {machine.referenceproduit}
+</button>
+))}
+</div> 
+
+  )}
+  
+</motion.div>
+
+{selectedMachine && (
+
+<AnimatePresence mode="wait">
+<motion.div
+key="step2"
+initial={{ opacity: 0, y: 20 }}
+animate={{ opacity: 1, y: 0 }}
+exit={{ opacity: 0, y: -20 }}
+transition={{ duration: 0.5 }}
+>  
+
+<div>  
+
+   {/* Plannification Date Range */}
+   <div style={{ marginBottom: '20px' }}>
+      <label style={{ fontWeight: 'bold' }}>Plannification Date Range:</label>
+      <RangePicker
+        onChange={handleDateRangeChange}
+        format="YYYY-MM-DD"
+        style={{ width: '100%' }}
+        disabledDate={disabledDate} // Disable duplicate dates
+      />
+    </div>
+
+ {selectedMachine && (
+  <div 
+ style={{ 
+ marginTop: '10px', 
+ display: 'flex', 
+ flexDirection: 'row', // Ensure the items are in a row
+ justifyContent: 'space-between', // Distribute the items evenly
+ width: '100%', // Ensure the container takes full width
+ paddingBottom: '10px', // Space below the section
+ }} 
+key={selectedMachine.id}
+ >
+{/* Cadence Horaire */}
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '20px' }}>
+<label style={{ fontWeight: 'bold' }}>Cadence horaire_Production:</label>
+<span>{selectedMachine.cadence_horaire}</span>
+</div>
+
+{/* Cadence Horaire CF */}
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '20px' }}>
+<label style={{ fontWeight: 'bold' }}>Cadence horaire_CF:</label>
+<span>{selectedMachine.cadence_horaire_cf}</span>
+</div>
+
+{/* Cadence Horaire CSL */}
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+<label style={{ fontWeight: 'bold' }}>Cadence horaire_CSL:</label>
+<span>{selectedMachine.cadence_horaire_csl}</span>
+</div>
+</div>
+)}  
+
+  
+<div className="form-container">
+
+  {currentStep === 2 && (
+    <div>
+
+<h1 style={{fontSize:'20px', fontWeight:"bold", display:'flex', justifyContent:'center', alignItems:'center'}}>Shift 1 Plannification</h1>
+
+
+<div className="input-field">
+        <Checkbox.Group
+         style={{ width: '100%' }}
+         value={shift}
+         onChange={(value)=>setShift(value[0])}
+       >
+         <Checkbox value="shift1">Shift1</Checkbox>
+     
+        
+       </Checkbox.Group>
+    </div>
+
+{shift.includes("shift1") && (
+ <div style={{marginBottom:'30px'}}>
+ {selectedMachine && machineReferences[selectedMachine.nom] && (
+ <div className="references-dropdown">
+ <label>References</label>
+ <Select
+   value={selectedReference}
+   onChange={handleReferenceSelect}
+   style={{ width: '100%' }}   
+   placeholder="Select reference"
+ >
+   {/* Check if references are an array before mapping */}
+   {Array.isArray(machineReferences[selectedMachine.nom]) && 
+     machineReferences[selectedMachine.nom].map((reference, index) => (
+       <Option key={index} value={reference}>
+         {reference}
+       </Option>
+     ))
+   }
+ </Select>
+ </div>
+ )}
+ 
+ </div>
+)}
+
+{shift.includes("shift1")  && (
+  <div>
+  <label>Nombre d'heure shift 1</label>
+  <Input type='number' value={nombre_heure_shift1} onChange={(e)=> setNombre_heure_shift1(e.target.value)}></Input>
+  </div>
+   )}
+   {shift.includes("shift1")  && (
+     <div className="input-field">
+    <label>Objective Production</label>
+      <input type="number" value={totalproduction} readOnly />
+    </div>
+    )}
+    
+    {shift.includes("shift1")  && (
+            <div className="input-field">
+            <Checkbox.Group
+                 style={{ width: '100%'}}
+                 value={phasechargement}
+                 onChange={(value)=>setPhasechargement(value[0])}
+               >
+                <Checkbox value="chargement">Sélectionner les opérateurs de production</Checkbox>
+                 
+                
+               </Checkbox.Group>
+           </div> 
+      )}
+    
+    {phasechargement.includes("chargement") && (
+    <div>
+    <div className="operateur-select">
+   
+     
+   <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurchargementshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurchargementshift1(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
+
+<Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque des opérateurs
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={manquechrgementshift1}
+              onChange={(value) => setManquechargementshift1(value)}
+            />
+          </Col>
+        </Row>
+ </Checkbox.Group>
+    </div>
+    </div>
+    )}
+    
+  
+    <div className="button-step1">
+      <button className="custom-button" onClick={()=>handleUpdateEvent(selectedEvent.id)}>Next </button>
+    </div>
+    
+    </div>
+  )}
+
+  
+  {currentStep === 3 && (
+    <div>
+         <div className="input-field">
+            <Checkbox.Group
+                 style={{ width: '100%'}}
+                 value={phasechargement}
+                 onChange={(value)=>setPhasechargement(value[0])}
+               >
+                <Checkbox value="regleur">Sélectionner les régleurs</Checkbox>
+               </Checkbox.Group>
+           </div> 
+     {phasechargement.includes("regleur") && (
+    <div>
+     
+    <Select
+      mode="multiple"
+      value={operateurregleurshift1}
+      onChange={handleRegleurChange}
+      placeholder="Select Regleurs"
+      style={{ width: '100%' }}
+    >
+      {regleurs
+        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
+        .map((regleur) => (
+          <Option key={regleur.id} value={regleur.nom}>
+            {regleur.nom}
+          </Option>
+        ))}
+    </Select>
+
+
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+          <Col span={8}>
+          Manque des régleurs
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={manqueregleurshift1}
+              onChange={(value) => setManqueregleurshift1(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+    </div>
+     )}
+
+<div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(2)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent2()}
+  >
+    Next
+  </button>
+</div>
+
+    </div>
+  
+
+    
+  )}
+       
+   {currentStep === 4 && (
+    <div>
+          <div className="input-field">
+           <Checkbox.Group
+                style={{ width: '100%'}}
+                value={phasechargement}
+                onChange={(value)=>setPhasechargement(value[0])}
+              >
+               <Checkbox value="cf">Phase CF</Checkbox>
+              </Checkbox.Group>
+          </div> 
+
+     
+    {phasechargement.includes("cf") && (
+      <div>
+          <div className="input-field">
+    <label>Objective CF</label>
+      <input type="number" value={totalcf} readOnly />
+    </div>
+    <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcfshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurcfshift1(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
+
+ <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque des opérateurs
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={manquecfshift1}
+              onChange={(value) => setManquecfshift1(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+      </div>
+    )}                
+   <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(3)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent3()}
+  >
+    Next
+  </button>
+</div>
+    
+    </div>
+   )}  
+      
+  {currentStep === 5 && (
+      <div>
+         <div className="input-field">
+        <Checkbox.Group
+             style={{ width: '100%'}}
+             value={phasechargement}
+             onChange={(value)=>setPhasechargement(value[0])}
+           >
+            <Checkbox value="csl">Phase CSL</Checkbox>
+           </Checkbox.Group>
+       </div> 
+    
+        {phasechargement.includes("csl") && (
+        <div>
+       <div className="input-field">
+      <label>Objective CSL</label>
+      <input type="number" value={totalcsl} readOnly />
+      </div>
+ <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcslshift1} // Bind the state
+    onChange={(selectedValues) => setOperateurcslshift1(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
+
+      
+  <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque des opérateurs
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={manquecslshift1}
+              onChange={(value) => setManquecslshift1(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+        </div>
+        )}
+      
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(4)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent4()}
+  >
+    Next To plannify shift 2
+  </button>
+</div>
+      </div>
+     )}
+    </div>
+    </div>
+  </motion.div>
+
+
+
+<motion.div
+key="step3"
+initial={{ opacity: 0, y: -20 }}
+animate={{ opacity: 3, y: 0 }}
+exit={{ opacity: 0, y: -20 }}
+transition={{ duration: 0.5 }}
+>        
+
+<div className="form-container">
+
+{ currentStep === 6 && (
+ <div>
+<h1 style={{fontSize: '20px',fontWeight:'bold', display:'flex', alignItems:'center', justifyContent:'center'}}>Shift 2 Plannification</h1> 
+
+<div className="input-field">
+        <Checkbox.Group
+         style={{ width: '100%' }}
+         value={shift}
+         onChange={(value)=>setShift(value[0])}
+       >
+         <Checkbox value="shift2">Shift2</Checkbox>
+     
+        
+       </Checkbox.Group>
+    </div>
+
+  {shift.includes("shift2") && (
+   <div>
+    {selectedMachine && machineReferences[selectedMachine.nom] && (
+<div className="references-dropdown">
+<label>References</label>
+<Select
+  value={selectedReference}
+  onChange={handleReferenceSelect}
+  style={{ width: '100%' }}
+  placeholder="Select reference"
+>
+  {/* Check if references are an array before mapping */}
+  {Array.isArray(machineReferences[selectedMachine.nom]) && 
+    machineReferences[selectedMachine.nom].map((reference, index) => (
+      <Option key={index} value={reference}>
+        {reference}
+      </Option>
+    ))
+  }
+</Select>
+</div>
+)}
+
+<div>
+<label>Nombre d'heure shift 2</label>
+<Input type='number' value={nombre_heure_shift2} onChange={(e)=> setNombre_heure_shift2(e.target.value)}></Input>
+</div>
+<div className="input-field">
+<label>Objective Production</label>
+<input type="number" value={totalproductionshift2} readOnly />
+</div>
+<div className="input-field">
+    <Checkbox.Group
+         style={{ width: '100%'}}
+         value={phasechargementshif2}
+         onChange={(value)=>setPhasechargementshif2(value[0])}
+       >
+        <Checkbox value="chargement">Sélectionner les opérateurs</Checkbox> 
+       </Checkbox.Group>
+   </div> 
+
+   </div>
+  )}
+
+{phasechargementshif2.includes("chargement") && (
+  <div>
+   <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurchargementshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurchargementshift2(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
+
+
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+          <Col span={8}>
+          Manque des opérateurs
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={manquechargementshift2}
+              onChange={(value) => setManquechargementshift2(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+  </div>
+)}
+
+
+<div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(5)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent5()}
+  >
+    Next
+  </button>
+</div>
+ </div>
+
+)}
+
+
+
+{currentStep === 7 && (
+  <div>
+      <div className="input-field">
+    <Checkbox.Group
+         style={{ width: '100%'}}
+         value={phasereguleurshif2} // Wrap single value in an array
+         onChange={(value) => setPhasereguleurshif2(value[0])}
+       >
+        <Checkbox value="regleur">Sélectionner les régleurs</Checkbox>
+       </Checkbox.Group>
+   </div> 
+{phasereguleurshif2.includes("regleur") && (
+  <div>
+   <Select
+      mode="multiple"
+      value={operateurregleurshift2}
+      onChange={handleRegleurChange}
+      placeholder="Select Regleurs"
+      style={{ width: '100%' }}
+    >
+      {regleurs
+        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
+        .map((regleur) => (
+          <Option key={regleur.id} value={regleur.nom}>
+            {regleur.nom}
+          </Option>
+        ))}
+    </Select>
+      <Checkbox.Group style={{ width: '100%' }}>
+        <Row>
+       
+          <Col span={8}>
+          Manque des régleurs
+            <InputNumber
+              min={0}
+              placeholder="Enter a number"
+              style={{ marginLeft: 10 }}
+              value={manqueregleurshift2}
+              onChange={(value) => setManqueregleurshift2(value)}
+            />
+          </Col>
+        </Row>
+      </Checkbox.Group>
+  </div>
+)}
+  
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(6)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent6()}
+  >
+    Next
+  </button>
+</div>
+  </div>
+)}
+
+
+   {currentStep === 8  && (
+    <div>
+       <div className="input-field">
+   <Checkbox.Group
+        style={{ width: '100%'}}
+        value={phasecfshift2}
+        onChange={(value)=>setPhasecfshift2(value[0])}
+      >
+       <Checkbox value="cf">Phase CF</Checkbox>
+      </Checkbox.Group>
+  </div> 
+
+  {phasecfshift2.includes("cf") && (
+  <div>
+  <div className="input-field">
+  <label>Objective CF</label>
+  <input type="number" value={totalcfshift2} readOnly />
+  </div>
+  <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcfshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurcfshift2(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
+
+        <Checkbox.Group style={{ width: '100%' }}>
+          <Row>
+         
+            <Col span={8}>
+            Manque des opérateurs
+              <InputNumber
+                min={0}
+                placeholder="Enter a number"
+                style={{ marginLeft: 10 }}
+                value={manquecfshift2}
+                onChange={(value) => setManquecfshift2(value)}
+              />
+            </Col>
+          </Row>
+        </Checkbox.Group>
+  
+      </div>
+  )}
+  
+
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(7)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent7()}
+  >
+    Next
+  </button>
+</div>
+    </div>
+   )}  
+
+ 
+
+
+{currentStep === 9 && (
+  <div>
+   <div className="input-field">
+<Checkbox.Group
+     style={{ width: '100%'}}
+     value={phasecslshift2}
+     onChange={(value)=>setPhasecslshift2(value[0])}
+   >
+    <Checkbox value="csl">Phase CSL</Checkbox>
+   </Checkbox.Group>
+</div> 
+{phasecslshift2.includes("csl") && (
+ <div>
+ <div className="input-field">
+ <label>Objective CSL</label>
+ <input type="number" value={totalcslshift2} readOnly />
+ </div>
+ <Select
+    mode="multiple" // Enables multi-selection
+    value={operateurcslshift2} // Bind the state
+    onChange={(selectedValues) => setOperateurcslshift2(selectedValues)} // Update state on selection
+    placeholder="Select Operateurs"
+    style={{ width: '100%' }}
+  >
+    {operateurs.map((regleur) => (
+      <Option key={regleur.id} value={regleur.nom}>
+        {regleur.nom}
+      </Option>
+    ))}
+  </Select>
+
+       <Checkbox.Group style={{ width: '100%' }}>
+         <Row>
+        
+           <Col span={8}>
+           Manque des opérateurs
+             <InputNumber
+               min={0}
+               placeholder="Enter a number"
+               style={{ marginLeft: 10 }}
+               value={manquecslshift2}
+               onChange={(value) => setManquecslshift2(value)}
+             />
+           </Col>
+         </Row>
+       </Checkbox.Group>
+ 
+ </div>
+)}
+<div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => setCurrentStep(8)}
+  >
+    Back
+  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handleUpdateEvent8()}
+  >
+    Submit
+  </button>
+</div>
+</div>
+)}
+</div>
+ </motion.div>
+  </AnimatePresence>  
+  )} 
+  <div>
+ </div>
+ </Modal>
+
+{/* Add Plannification Modal */}
+ <Modal
       title="Add Plannification"
       visible={isAddModalVisible}  // Make sure this is the correct state
       confirmLoading={loading}
@@ -988,7 +2425,8 @@ transition={{ duration: 0.5 }}
  <div className="machine-buttons">
 {machines.map((machine)=>(
   <button key={machine.id_machine} onClick={() => handleMachineSelect(machine)}>
-  {machine.nom}
+   Machine: {machine.nom} <br/>
+   Réference: {machine.referenceproduit}
 </button>
 ))}
 </div> 
@@ -1717,6 +3155,7 @@ transition={{ duration: 0.5 }}
   <div>
  </div>
  </Modal>
+ 
  </div>
   );
 };

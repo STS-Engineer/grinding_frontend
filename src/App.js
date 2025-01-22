@@ -17,6 +17,7 @@ import Listoperateur from './pages/Listoperateurs';
 import Ajouterposte from './pages/Ajouter poste de controle';
 import Ajouteroutil from './pages/Ajouter outil';
 import ActionHistory from './pages/ActionHistory';
+import Actualisationoutil from './pages/Actualisationoutil';
 
 
 
@@ -43,6 +44,7 @@ function App() {
       <Route path="/Ajouterproblemepostedecontrole" element={<Ajouterposte/>} />
       <Route path="/Ajouteroutil" element={<Ajouteroutil/>} />
       <Route path="/history" element={<ActionHistory/>} />
+      <Route path="/actualisation" element={<Actualisationoutil/>} />
    
       </Routes>
      </Router>

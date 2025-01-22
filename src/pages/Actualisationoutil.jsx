@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { message } from 'antd'; // Import only the required Ant Design components
+import { message, Modal } from 'antd'; // Import only the required Ant Design components
 import { useNavigate } from 'react-router-dom';
 
 const Actualisationoutil = () => {

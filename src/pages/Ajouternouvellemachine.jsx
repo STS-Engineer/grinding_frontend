@@ -138,9 +138,7 @@ const Ajouternouvellemachine = () => {
     setDate(today);
   }, []);   
 
-  useEffect(() => {
-    setReferenece('');
-}, [reference]);
+
   const navigate = useNavigate();
   const userID = localStorage.getItem("userID")
   console.log(userID);
@@ -160,44 +158,52 @@ const Ajouternouvellemachine = () => {
       {
         phase: 'Chargement',
         nom_outil: getToolName(selectedToolName),  // Convert to string
-        dureedevie: dureevierefroueoutil, // Replace with your actual form value
-        referenceproduit: reference 
+        dureedevie: dureevierefroueoutil,
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefroueoutil
+        
       },
       {
         phase: 'Usinagehauteur',
         nom_outil: getToolName(selectedToolNamehauteur),  // Convert to string
         dureedevie: dureevierefmeulehauteuroutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulehauteuroutil 
       },
       {
         phase: 'Usinagelargeur',
         nom_outil: getToolName(selectedToolNamelargeur), // Convert to string
         dureedevie: dureevierefmeulelargeuroutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulelargeuroutil  
       },
       {
         phase: 'Usinagechanfreins',
         nom_outil: getToolName(selectedToolNamechanfreins),  // Convert to string
         dureedevie: dureevierefmeulechanfrein, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulechanfrein   
       },
       {
         phase: 'Usinagrainure',
         nom_outil: getToolName(selectedToolNamerainure),  // Convert to string
         dureedevie: dureevieoutillageusinagerainureoutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevieoutillageusinagerainureoutil 
       },
       {
         phase: 'Usinagerayonnage',
         nom_outil: getToolName(selectedToolNamerayonnage), // Convert to string
         dureedevie: dureevierefmeulerayonnageoutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulerayonnageoutil  
       },
       {
         phase: 'Usinagetete',
         nom_outil: getToolName(selectedToolNametete),  // Convert to string
         dureedevie: dureevieusinagetete, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevieusinagetete   
       }
     ];
   
@@ -237,44 +243,52 @@ const Ajouternouvellemachine = () => {
       {
         phase: 'Chargement',
         nom_outil: getToolName(selectedToolName),  // Convert to string
-        dureedevie: dureevierefroueoutil, // Replace with your actual form value
-        referenceproduit: reference 
+        dureedevie: dureevierefroueoutil,
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefroueoutil
+        
       },
       {
         phase: 'Usinagehauteur',
         nom_outil: getToolName(selectedToolNamehauteur),  // Convert to string
         dureedevie: dureevierefmeulehauteuroutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulehauteuroutil 
       },
       {
         phase: 'Usinagelargeur',
         nom_outil: getToolName(selectedToolNamelargeur), // Convert to string
         dureedevie: dureevierefmeulelargeuroutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulelargeuroutil  
       },
       {
         phase: 'Usinagechanfreins',
         nom_outil: getToolName(selectedToolNamechanfreins),  // Convert to string
         dureedevie: dureevierefmeulechanfrein, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulechanfrein   
       },
       {
         phase: 'Usinagrainure',
         nom_outil: getToolName(selectedToolNamerainure),  // Convert to string
         dureedevie: dureevieoutillageusinagerainureoutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevieoutillageusinagerainureoutil 
       },
       {
         phase: 'Usinagerayonnage',
         nom_outil: getToolName(selectedToolNamerayonnage), // Convert to string
         dureedevie: dureevierefmeulerayonnageoutil, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevierefmeulerayonnageoutil  
       },
       {
         phase: 'Usinagetete',
         nom_outil: getToolName(selectedToolNametete),  // Convert to string
         dureedevie: dureevieusinagetete, // Replace with your actual form value
-        referenceproduit: reference 
+        referenceproduit: reference,
+        dureedeviepointeur: dureevieusinagetete   
       }
     ];
   
@@ -300,9 +314,9 @@ const Ajouternouvellemachine = () => {
           },
         }
       );
-       // Reset the reference state
-       setReferenece('');  
-    message.success("Machine Added Succesfully")
+       
+        console.log("reference",reference);
+        message.success("Machine Added Successfully");
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to add machine.");
@@ -327,15 +341,17 @@ const Ajouternouvellemachine = () => {
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
           <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
           <li><a href="/listoperateur">List des Opérateurs</a></li>
           <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
           <li><a href="/listregleur">List des régleurs</a></li>
           <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
+          <li><a href="/Ajouterproblemepostedecontrole">Ajouter des problémes de poste de controle </a></li>
           <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
-          <button className='logout-button' onClick={handleLogout}>logout</button>
+          <button className='logout-button' onClick={handleLogout}>logout</button>  
         </ul>
       </div>
    <div className="machine-form-container">

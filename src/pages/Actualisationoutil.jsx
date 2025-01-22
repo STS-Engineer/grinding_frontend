@@ -122,7 +122,9 @@ const Actualisationoutil = () => {
                 cursor: "pointer",
               }}
             >
-              {machine.nom_outil}
+              Machine: {machine.nom_outil} <br/>
+             Duré de vie: {machine.dureedeviepointeur} <br/>
+             Réference: {machine.referenceproduit} <br/>
             </button>
           ))}
         </div>

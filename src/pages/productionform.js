@@ -15,23 +15,24 @@ const Form = () => {
   const [phase, setPhase] = useState('');
   const [phasecf, setPhasecf] = useState('');
   const [phasecsl, setPhasecsl] = useState('');
-  const [outil, setOutil] = useState('');    
+  const [outil, setOutil] = useState('');
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [refprod, setRefprod] = useState('');
   const [shift, setShift] = useState('');
-  const [typedefautproduction, setTypedefautproduction] = useState('');
+  const [typedefautproduction, setTypedefautproduction] = useState([]);
   const [totaldefautproduction, setTotaldefaut] = useState('');
-  const [typeproblemeproduction, setTypeproblemeproduction] = useState('');
+  const [typeproblemeproduction, setTypeproblemeproduction] = useState([]);
   const [dateproblemeproduction, setDateproblemeproduction] = useState('');
   const [typedefautcf, setTypedefautcf] = useState('');
   const [totaldefautcf, setTotaldefautcf] = useState('');
-  const [typeproblemecf, setTypeproblemecf] = useState('');
+  const [typeproblemecf, setTypeproblemecf] = useState([]);
   const [dateproblemecf, setDateproblemecf] = useState('');
-  const [typedefautcsl, setTypedefautcsl] = useState('');
+  const [typedefautcsl, setTypedefautcsl] = useState([]);
+
   const [totaldefautcsl, setTotaldefautcsl] = useState('');
-  const [typeproblemecsl, setTypeproblemecsl] = useState('');
+  const [typeproblemecsl, setTypeproblemecsl] = useState([]);
   const [dateproblemecsl, setdateproblemecsl] = useState('');
   const [commentaires, setCommentaires] = useState('');
   const [totalproduit, setTotalproduit] = useState('');
@@ -65,9 +66,16 @@ const Form = () => {
   const [objectiveProduction, setObjectiveProduction] = useState(null);
   const [objectiveCF, setObjectiveCF] = useState(null);
   const [objectiveCSL, setObjectiveCSL] = useState(null);
+  const [defautinspection, setDefautinspection] = useState([]);
+  const [defautproduction, setDefautproduction] = useState([]);
+
+
   const navigate = useNavigate();
 
-    const fetchProbleme = async () => {
+
+
+
+  const fetchProbleme = async () => {
     try {
       const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/getproblemes', {
         headers: {
@@ -96,14 +104,37 @@ const Form = () => {
       console.error('Error fetching machines:', error);
     }
   };
-  useEffect(()=>{
-    try{
-      fetchProbleme();
-      fetchProblemepostecontrole();
-    } catch(error){
-      console.error("internal error")
+
+  const fetchdefautproduction = async () => {
+    try {
+      const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/getdefauts', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setDefautproduction(response.data.operateurs);
+      console.log("problemes", response.data.operateurs);
+     
+    } catch (error) {
+      console.error('Error fetching machines:', error);
     }
-  })
+  };
+
+
+  const fetchinspectiondefaut = async () => {
+    try {
+      const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/getdefautsinspection', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      console.log("inspection", response.data);
+      setDefautinspection(response.data.operateurs);
+     
+    } catch (error) {
+      console.error('Error fetching machines:', error);
+    }
+  };
   // Function to determine current shift
   const getCurrentShift = () => {
     const currentHour = new Date().getHours();
@@ -111,7 +142,6 @@ const Form = () => {
     const shift1End = 14; // 3 PM
     return currentHour >= shift1Start && currentHour < shift1End ? 'shift1' : 'shift2';
   };
-
 
   // Fetch machines and outils on component mount
   useEffect(() => {
@@ -126,8 +156,10 @@ const Form = () => {
       }
     };
     fetchData();
-
-
+    fetchProbleme();
+    fetchProblemepostecontrole();
+    fetchinspectiondefaut();
+    fetchdefautproduction();
     // Automatically set the default date to today's date
     const today = new Date().toISOString().split('T')[0]; // Formats date as YYYY-MM-DD
     setDate(today);
@@ -159,43 +191,7 @@ const Form = () => {
     fetchPlannifications();
   }, []);
 
-  const handleDateChange = (value) => {
-    // Convert the selected value (date) to a comparable format (YYYY-MM-DD)
-    const selectedDate = new Date(value).toISOString().split("T")[0]; // Get just the date part
-  
-    // Find the plannification that matches the selected date and selected machine
-    const selectedPlannification = plannifications.find(
-      (plannification) =>
-        plannification.date_creation.split("T")[0] === selectedDate && 
-        plannification.id_machine === selectedMachine.id // Match selected machine
-    );
-  
-    // If a matching plannification is found
-    if (selectedPlannification) {
-      // Check for the "chargement" phase
-      if (selectedPlannification.phase === "chargement") {
-        const totalPlanifie = selectedPlannification.totalplanifie; // Retrieve totalplanifie for "chargement"
-        setTotalplanifie(totalPlanifie); // Update the state for totalplanifie
-      }
-  
-      // Check for the "cf" phase
-      if (selectedPlannification.phase === "cf") {
-        const objectiveCf = selectedPlannification.totalplanifie; // Retrieve totalplanifie for "cf"
-        setObjectivecf(objectiveCf); // Update the state for objectivecf
-      }
-
-       // Check for the "cf" phase
-       if (selectedPlannification.phase === "csl") {
-        const objectivecsl = selectedPlannification.totalplanifie; // Retrieve totalplanifie for "cf"
-        setObjectivecsl(objectivecsl); // Update the state for objectivecf
-      }
-    } else {
-      // Default to 0 if no matching plannification or if phases don't match
-      setTotalplanifie(0);
-      setObjectivecf(0);
-      setObjectivecsl(0);
-    }
-  };
+ 
   
   
   const calculateDuration = (start, end) => {
@@ -288,7 +284,7 @@ const Form = () => {
         shift: shift,
         phase: phase,
         totalplanifie: objectiveProduction.join(','),
-        typedefautproduction: typedefautproduction,
+        typedefautproduction: typedefautproduction.join(','),
         totaldefautproduction: totaldefautproduction || 0,
         typedeproblemeproduction: typeproblemeproduction.join(','),
         commentaires: commentaires,
@@ -326,7 +322,7 @@ const Form = () => {
         totalplanifie: objectiveCF.join(','),
         typedefautcf: typedefautcf,
         totaldefautcf: totaldefautcf || 0,
-        typedeproblemecf: typeproblemecf.join(','),
+        typedeproblemecf: typeproblemecf,
         totalrealise: totalproduit || 0,
         machine_id: machineId,
         dureedeproblemecf: durationcf,
@@ -359,7 +355,7 @@ const Form = () => {
         shift: shift,
         phase: phase,
         totalplanifie: objectiveCSL.join(','),
-        typedefautcsl: typedefautcsl,
+        typedefautcsl: typedefautcsl.join(','),
         totaldefautcsl: totaldefautcsl || 0,
         typedeproblemecsl: typeproblemecsl.join(','),
         totalrealise: totalproduit || 0,
@@ -384,7 +380,6 @@ const Form = () => {
     }
   };
 
-   
  
   const fetchPlannificationByPhase = async (phase, shift, date_creation, id_machine) => {
     console.log("Request Params:", { phase, shift, date_creation, id_machine });
@@ -409,12 +404,9 @@ const Form = () => {
     }
   };
   
-
-
   const fetchObjectives = async () => {
- 
+
    const currentDate = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" format
-  
     try {
       const [productionObjective, cfObjective, cslObjective] = await Promise.all([
         fetchPlannificationByPhase("chargement", shift, currentDate, selectedMachine.id),
@@ -434,40 +426,36 @@ const Form = () => {
     }
   };
   
-  
-
   useEffect(() => {
     if (selectedMachine && selectedMachine.id) {
       fetchObjectives();
     }
   }, [selectedMachine]);
   
-
-
-
-  
-
   // Logout handler
   const handleLogout = () => {
     navigate('/login');
   };
 
-    return (
+
+  return (
     <div className="body_container">
-      <div className='navbar'>
+       <div className='navbar'>
         <ul className="navbar-links">
           <li><a href="/home">Acceuil</a></li>
           <li><a href="/form">Ajouter Production</a></li>
           <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
           <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
           <li><a href="/listoperateur">List des Opérateurs</a></li>
           <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
           <li><a href="/listregleur">List des régleurs</a></li>
           <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
+          <li><a href="/Ajouterproblemepostedecontrole">Ajouter des problémes de poste de controle </a></li>
           <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
-          <button className='logout-button' onClick={handleLogout}>logout</button>
+          <button className='logout-button' onClick={handleLogout}>logout</button>  
         </ul>
       </div>
 
@@ -482,7 +470,8 @@ const Form = () => {
               className="machine-button"
               onClick={() => handleMachineSelect(machine)}
             >
-              {machine.nom}
+             Machine:  {machine.nom} <br/>
+             Réference: {machine.referenceproduit}
             </button>
           ))}
         </div>
@@ -569,72 +558,74 @@ const Form = () => {
 
     
   </div>
-  { parseInt(totalproduit) < parseInt(objectiveProduction) && (
-  <div className="input-field">
-  <label>
-    Commentaires (
-    {parseInt(totalproduit) < parseInt(objectiveProduction)
-      ? 'Total produit < Objective'
-      : ''}
-    )
-  </label>
-  <Input.TextArea
-    value={commentaires}
-    onChange={(e) => setCommentaires(e.target.value)}
-  />
-</div>
-  )}
- 
-                <div className="form-row">
-                <div className="input-field">
-               <label>Type de probléme</label>
-               <Select
-              mode="multiple"
-             value={typeproblemeproduction}
-             onChange={(value) => setTypeproblemeproduction(value)}
-            placeholder="Select Type de probléme"
-            style={{ width: '100%' }}
-             >
-         {problemes.map((problemeObj) => (
-         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.probleme}`}>
-         {problemeObj.probleme}
-         </Option>
-         ))}
-       </Select>
-       </div>
+  {parseInt(totalproduit) < parseInt(objectiveProduction) && (
+  <div>
+    <div className="input-field">
+      <label>
+        Commentaires (
+        {parseInt(totalproduit) < parseInt(objectiveProduction)
+          ? "Total produit < Objective"
+          : ""}
+        )
+      </label>
+      <Input.TextArea
+        value={commentaires}
+        onChange={(e) => setCommentaires(e.target.value)}
+      />
+    </div>
 
-          </div>
-          {typeproblemeproduction && (
-                 <div className="form-row">
-                 <div className="input-field">
-                   <label htmlFor="start-time">Start Time:</label>
-                   <Input
-                     id="start-time"
-                     type="time"
-                     value={startTimeproduction}
-                     onChange={(e) => setStartTimeproduction(e.target.value)}
-                   />
-                 </div>
-                 <div className="input-field">
-                   <label htmlFor="end-time">End Time:</label>
-                   <Input
-                     id="end-time"
-                     type="time"
-                     value={endTimeproduction}
-                     onChange={(e) => setEndTimeproduction(e.target.value)}
-                   />
-                 </div>
-                 {durationproduction && (
-                   <p style={{ marginTop: '10px' }}>
-                     Durée: <strong>{durationproduction}</strong>
-                   </p>
-                 )}
-               </div>
-                )}
-              </div>
-              )}
-   
-            </div>
+    <div className="input-field">
+      <label>Type de probléme</label>
+      <Select
+        mode="multiple"
+        value={typeproblemeproduction}
+        onChange={(value) => setTypeproblemeproduction(value)}
+        placeholder="Select Type de probléme"
+        style={{ width: "100%" }}
+      >
+        {problemes.map((problemeObj) => (
+          <Option
+            key={problemeObj.id}
+            value={`${problemeObj.id}-${problemeObj.probleme}`}
+          >
+            {problemeObj.probleme}
+          </Option>
+        ))}
+      </Select>
+    </div>
+
+    {typeproblemeproduction.length > 0 && (
+      <div className="form-row">
+        <div className="input-field">
+          <label htmlFor="start-time">Start Time:</label>
+          <Input
+            id="start-time"
+            type="time"
+            value={startTimeproduction}
+            onChange={(e) => setStartTimeproduction(e.target.value)}
+          />
+        </div>
+        <div className="input-field">
+          <label htmlFor="end-time">End Time:</label>
+          <Input
+            id="end-time"
+            type="time"
+            value={endTimeproduction}
+            onChange={(e) => setEndTimeproduction(e.target.value)}
+          />
+        </div>
+        {durationproduction && (
+          <p style={{ marginTop: "10px" }}>
+            Durée: <strong>{durationproduction}</strong>
+          </p>
+        )}
+      </div>
+    )}
+  </div>
+)}
+</div>
+    )}
+   </div>
 
   <div>
   <Checkbox style={{fontWeight:'bold'}} value={declarationdefaut} onChange={setDecalarationdefaut}>Déclaration des defauts Production</Checkbox>
@@ -643,27 +634,28 @@ const Form = () => {
              className="typedefaut-production"
              style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
            >
-             {selectedMachine && defectOptions[phase] && (
-               <div className="references-dropdown" style={{ flex: 1 }}>
-                 <label style={{ display: 'block', marginBottom: '5px',  fontWeight:'bold' }}>
-                   Type defaut production
-                 </label>
-                 <Select
-                   mode='multiple'
-                   value={typedefautproduction}
-                   onChange={(value) => setTypedefautproduction(value)}
-                   style={{ width: '100%' }}
-                   placeholder="Select type defaut de production"
-                 >
-                   {Array.isArray(defectOptions[phase]) &&
-                     defectOptions[phase].map((defaut, index) => (
-                       <Option key={index} value={defaut}>
-                         {defaut}
-                       </Option>
-                     ))}
-                 </Select>
-               </div>
-             )}
+     
+     <div className="input-field" style={{ flex: 1 }}>
+  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+    Type defaut production
+  </label>
+  <Select
+    mode="multiple"
+    value={typedefautproduction}
+    onChange={(value) => setTypedefautproduction(value)}
+    style={{ width: '100%' }}
+    placeholder="Select type defaut de production"
+  >
+    {Array.isArray(defautproduction) &&
+      defautproduction.map((defaut) => (
+        <Option key={defaut.id} value={defaut.id}>
+          {defaut.defaut}
+        </Option>
+      ))}
+  </Select>
+</div>
+
+          
    
                <div className="input-field" style={{ flex: 1 }}>
                  <label style={{ display: 'block', marginBottom: '5px' }}>
@@ -680,8 +672,28 @@ const Form = () => {
            </div>
       )}
   </div>
- <div className="button-step1">
- <button style={{marginTop:"40px"}} className="custom-button" onClick={()=>handleSubmitproduction()}>Next</button>
+  <div className="button-step1">
+  <div className="button-step1">
+  <div className="button-step1">
+  <button
+    style={{ marginTop: "40px" }}
+    className="custom-button"
+    onClick={() => handleSubmitproduction()}
+    disabled={
+      !totalproduit || // Disable if totalproduit is empty
+      (parseInt(totalproduit) < parseInt(objectiveProduction) &&
+        (!typeproblemeproduction.length || // Must have at least one problem type selected
+          !startTimeproduction || // Start time must be provided
+          !endTimeproduction)) // End time must be provided
+    }
+  >
+    Next
+  </button>
+</div>
+
+</div>
+
+
 </div>
     </>
   )}
@@ -722,7 +734,8 @@ const Form = () => {
   </div>
 
       {parseInt(totalproduitcf) < parseInt(objectivecf) && (
-       <div className="input-field" >
+       <div>
+      <div className="input-field" >
        <label>
          Commentaires  (
          {parseInt(totalproduitcf) < parseInt(objectivecf)
@@ -734,10 +747,8 @@ const Form = () => {
          value={commentairescsl}
          onChange={(e) => setCommentairecsl(e.target.value)}
        />
-     </div>
-      )}
- 
- <div className='form-row'>
+     </div>  
+      <div className='form-row'>
  <div className="input-field">
                <label>Type de probléme</label>
                <Select
@@ -754,9 +765,8 @@ const Form = () => {
          ))}
        </Select>
        </div>
-</div>
-<div className="form-row">
-{ typeproblemecf && (
+
+       { typeproblemecf && (
   <div>
    <div className="input-field">
             <label htmlFor="start-time">Start Time:</label>
@@ -782,8 +792,14 @@ const Form = () => {
             </p>
           )}
   </div>
-)}   
-</div>
+)}  
+      </div>
+     </div>
+      )}
+
+
+ 
+
 </div>
 )}
   </div>
@@ -806,26 +822,26 @@ const Form = () => {
   />
 </div>
 
-{selectedMachine && defectOptions[phase] && (
   <div className="references-dropdown" style={{ flex: 1,  fontWeight:'bold' }}>
     <label style={{ display: 'block', marginBottom: '5px' }}>
       Type defaut CF
     </label>
     <Select
-      value={typedefautcf}
-      onChange={(value) => setTypedefautcf(value)}
-      style={{ width: '100%' }}
-      placeholder="Select type defaut de cf"
-    >
-      {Array.isArray(defectOptions[phase]) &&
-        defectOptions[phase].map((defaut, index) => (
-          <Option key={index} value={defaut}>
-            {defaut}
-          </Option>
-        ))}
-    </Select>
+  mode='multiple'
+  value={typedefautcf}
+  onChange={(value) => setTypedefautcf(value)}
+  style={{ width: '100%' }}
+  placeholder="Select type defaut de cf"
+>
+  {Array.isArray(defautinspection) &&
+    defautinspection.map((defaut) => (
+      <Option key={defaut.id} value={defaut.id}>
+        {defaut.inspectiondefaut}
+      </Option>
+    ))}
+</Select>
+
   </div>
-)}
 </div>
 
 
@@ -833,7 +849,14 @@ const Form = () => {
  </div>
 
   <div className="button-step1">
-  <button className="custom-button" onClick={()=>handleSubmitcf()}>Next </button>
+  <button className="custom-button" onClick={()=>handleSubmitcf()} 
+        disabled={
+          !totalproduitcf || // Disable if totalproduit is empty
+          (parseInt(totalproduitcf) < parseInt(objectiveCF) &&
+            (!typeproblemecf.length || // Must have at least one problem type selected
+              !startTimecf || // Start time must be provided
+              !endTimecf)) // End time must be provided
+        }>Next </button>
  </div>
             
  </div>
@@ -873,8 +896,12 @@ const Form = () => {
     <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>
     </div>
   </div>
+    </div>
+  )}
 
-  <div className="input-field" >
+  {parseInt(totalproduitcsl)< parseInt(objectiveCSL) && (
+    <div>
+        <div className="input-field" >
         <label>
           Commentaires  (
           {parseInt(totalproduitcsl) < parseInt(objectivecsl)
@@ -888,9 +915,8 @@ const Form = () => {
         />
       </div>
 
-   <div className='form-row'>
-   <div className="input-field">
-  <label>Type de probléme</label>
+      <div className="input-field">
+    <label>Type de probléme</label>
      <Select
        mode="multiple"
        value={typeproblemecsl}
@@ -905,7 +931,6 @@ const Form = () => {
          ))}
        </Select>
        </div>
-  </div>
 
   {typeproblemecsl && (
       <div className='form-row'>
@@ -960,33 +985,41 @@ const Form = () => {
         className="typedefaut-csl"
         style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
       >
-        {selectedMachine && defectOptions[phase] && (
+       
           <div className="references-dropdown" style={{ flex: 1 }}>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight:'bold' }}>
               Type defaut CSL
             </label>
             <Select
-             mode='multiple'
-              value={typedefautcsl}
-              onChange={(value) => setTypedefautcsl(value)}
-              style={{ width: '100%' }}
-              placeholder="Select type defaut de csl"
-            >
-              {Array.isArray(defectOptions[phase]) &&
-                defectOptions[phase].map((defaut, index) => (
-                  <Option key={index} value={defaut}>
-                    {defaut}
-                  </Option>
-                ))}
-            </Select>
+            mode='multiple'
+          value={typedefautcsl}
+          onChange={(value) => setTypedefautcsl(value)}
+         style={{ width: '100%' }}
+         placeholder="Select type defaut de cf"
+         >
+    {Array.isArray(defautinspection) &&
+    defautinspection.map((defaut) => (
+      <Option key={defaut.id} value={defaut.id}>
+        {defaut.inspectiondefaut}
+      </Option>
+    ))}
+</Select>
+
           </div>
-        )}
+        
       </div>
   </div>
  )}
  </div>
   <div className="button-step1">
-            <button className="custom-button" onClick={()=>handleSubmitcsl()}>Submit</button>
+            <button className="custom-button" onClick={()=>handleSubmitcsl()} 
+               disabled={
+                !totalproduitcsl || // Disable if totalproduit is empty
+                (parseInt(totalproduitcsl) < parseInt(objectiveCSL) &&
+                  (!typeproblemecsl.length || // Must have at least one problem type selected
+                    !startTimecsl || // Start time must be provided
+                    !endTimecsl)) // End time must be provided
+              }>Submit</button>
           </div>
             
  </div>

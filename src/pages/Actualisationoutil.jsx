@@ -57,13 +57,21 @@ const Actualisationoutil = () => {
 
   // Handle outil button click
   const handleOutilClick = (machine) => {
-    const confirmAction = window.confirm(
-      `Do you want to refresh the "durée de vie" of the tool "${machine.nom_outil}"?`
-    );
-
-    if (confirmAction) {
-      updateDureedevie(machine.id); // Reset durée de vie
-    }
+    Modal.confirm({
+      title: `Do you want to refresh the "durée de vie" of the tool "${machine.nom_outil}"?`,
+      onOk() {
+        // Reset durée de vie when "Valider" is clicked
+        updateDureedevie(machine.id);
+      },
+      okText: 'Valider',  // Customizing the OK button text to "Valider"
+      cancelText: 'Annuler',  // Customizing the Cancel button text
+      okButtonProps: {
+        style: { backgroundColor: 'green', borderColor: 'green', color: 'white' },  // Green "Valider" button
+      },
+      cancelButtonProps: {
+        style: { borderColor: 'gray' },  // Optional: Customizing the cancel button color
+      }
+    });
   };
 
   useEffect(() => {
@@ -98,7 +106,7 @@ const Actualisationoutil = () => {
       </div>
   
       <div className="machine-form-container">
-        <h2>Actualiser les dureé de vie des outils</h2>
+        <h2>Changement des meules</h2>
         <div className="machine-buttons">
           {outils.map((machine) => (
             <button

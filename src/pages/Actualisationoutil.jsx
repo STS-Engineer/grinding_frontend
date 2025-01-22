@@ -42,7 +42,7 @@ const Actualisationoutil = () => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
-        }
+        }    
       );
 
       if (response.status === 200) {

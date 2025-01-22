@@ -80,18 +80,25 @@ const Ajouteroutil = () => {
           layout="vertical"
         
         >
-          <Form.Item
-            name="phase"
-            label="phase"
-           
-          >
-         <Input
-           type="text"
-           value={phase}
-           onChange={(e) => setPhase(e.target.value)}
-          placeholder="Entrez le phase "
-          />
-        </Form.Item>
+     <Form.Item
+        name="phase"
+        label="Phase"
+        rules={[{ required: true, message: "Please select a phase!" }]} // Optional validation rule
+         >
+       <Select
+      value={phase}
+      onChange={(value) => setPhase(value)}
+      placeholder="Select a phase"
+      >
+      <Option value="roueavancement">Roue d'avancement</Option>
+      <Option value="usinagehauteur">Usinage Hauteur</Option>
+      <Option value="usinagelargeur">Usinage Largeur</Option>
+      <Option value="usinagechanfreins">Usinage Chanfreins</Option>
+      <Option value="usinagerainure">Usinage rainure</Option>
+      <Option value="usinagerayonnage">Usinage rayonnage</Option>
+      <Option value="usinagetete">Usinage tete</Option>
+      </Select>
+      </Form.Item>
         <Form.Item
             name="Réference Outil"
             label="Réference Outil"

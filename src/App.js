@@ -23,7 +23,7 @@ import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 
 function App() {    
   return (
-    <div className="App">
+    <div className="App">      
      <Router>
       <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />

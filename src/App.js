@@ -18,7 +18,7 @@ import Ajouterposte from './pages/Ajouter poste de controle';
 import Ajouteroutil from './pages/Ajouter outil';
 import ActionHistory from './pages/ActionHistory';
 import Actualisationoutil from './pages/Actualisationoutil';
-
+import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 
 
 function App() {    
@@ -45,6 +45,7 @@ function App() {
       <Route path="/Ajouteroutil" element={<Ajouteroutil/>} />
       <Route path="/history" element={<ActionHistory/>} />
       <Route path="/actualisation" element={<Actualisationoutil/>} />
+      <Route path="/ajouterdefautinspection" element={<Ajouterdefautinspection/>} />
    
       </Routes>
      </Router>

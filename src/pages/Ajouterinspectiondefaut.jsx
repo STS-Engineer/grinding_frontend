@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Ajouterregleur.css';
 import { Modal, Input, message, Select,  Form, Button } from 'antd'; // Import Ant Design components
 import { useNavigate } from 'react-router-dom';
 import ActionHistory from './ActionHistory ';

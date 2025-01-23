@@ -1883,7 +1883,6 @@ key={selectedMachine.id}
       style={{ width: '100%' }}
     >
       {regleurs
-        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
             {regleur.nom}
@@ -2217,7 +2216,6 @@ transition={{ duration: 0.5 }}
       style={{ width: '100%' }}
     >
       {regleurs
-        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
             {regleur.nom}
@@ -2634,7 +2632,6 @@ key={selectedMachine.id}
       style={{ width: '100%' }}
     >
       {regleurs
-        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
             {regleur.nom}
@@ -2968,7 +2965,6 @@ transition={{ duration: 0.5 }}
       style={{ width: '100%' }}
     >
       {regleurs
-        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
             {regleur.nom}

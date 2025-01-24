@@ -68,6 +68,9 @@ const Form = () => {
   const [objectiveCSL, setObjectiveCSL] = useState(null);
   const [defautinspection, setDefautinspection] = useState([]);
   const [defautproduction, setDefautproduction] = useState([]);
+  const [defauts, setDefauts] = useState([{ totaldefautproduction: '', typedefautproduction: [] }]);
+  const [defautscf, setDefautscf] = useState([{ totaldefautcf: '', typedefautcf: [] }]);
+  const [defautscsl, setDefautscsl] = useState([{ totaldefautcsl: '', typedefautcsl: [] }]);
 
 
   const navigate = useNavigate();
@@ -270,7 +273,41 @@ const Form = () => {
   
     setIsModalVisible(true);
   };
-  
+
+    const handleAddField = () => {
+    setDefauts([
+      ...defauts,
+      { totaldefautproduction: '', typedefautproduction: [] }, // Add new field set
+    ]);
+  };
+  const handleAddFieldcf = () => {
+    setDefautscf([
+      ...defautscf,
+      { totaldefautcf: '', typedefautcf: [] }, // Add new field set
+    ]);
+  };
+  const handleAddFieldcsl = () => {
+    setDefautscsl([
+      ...defautscsl,
+      { totaldefautcsl: '', typedefautcsl: [] }, // Add new field set
+    ]);
+  };
+
+  const handleFieldChange = (index, value, fieldName) => {
+    const newDefauts = [...defauts];
+    newDefauts[index][fieldName] = value;
+    setDefauts(newDefauts);
+  };
+  const handleFieldChangecf = (index, value, fieldName) => {
+    const newDefauts = [...defautscf];
+    newDefauts[index][fieldName] = value;
+    setDefauts(newDefauts);
+  };
+  const handleFieldChangecsl = (index, value, fieldName) => {
+    const newDefauts = [...defautscsl];
+    newDefauts[index][fieldName] = value;
+    setDefauts(newDefauts);
+  };
 
   // Handle form submission
   const handleSubmitproduction = async () => {
@@ -437,7 +474,6 @@ const Form = () => {
     navigate('/login');
   };
 
-
   return (
     <div className="body_container">
        <div className='navbar'>
@@ -460,7 +496,7 @@ const Form = () => {
       </div>
 
       <div className="machine-form-container">
-        <h2>Select a Machine to Update</h2>
+        <h2>Ajouter Production</h2>
 
         <div className="machine-buttons">
           
@@ -555,25 +591,9 @@ const Form = () => {
       <label style={{ fontWeight: 'bold' }}>Objective Production:</label>
       <span>{objectiveProduction !== null ? objectiveProduction : 'No data for today'}</span>
     </div>
-
-    
   </div>
   {parseInt(totalproduit) < parseInt(objectiveProduction) && (
   <div>
-    <div className="input-field">
-      <label>
-        Commentaires (
-        {parseInt(totalproduit) < parseInt(objectiveProduction)
-          ? "Total produit < Objective"
-          : ""}
-        )
-      </label>
-      <Input.TextArea
-        value={commentaires}
-        onChange={(e) => setCommentaires(e.target.value)}
-      />
-    </div>
-
     <div className="input-field">
       <label>Type de probléme</label>
       <Select
@@ -621,6 +641,20 @@ const Form = () => {
         )}
       </div>
     )}
+
+    <div className="input-field">
+      <label>
+        Commentaires (
+        {parseInt(totalproduit) < parseInt(objectiveProduction)
+          ? "Total produit < Objective"
+          : ""}
+        )
+      </label>
+      <Input.TextArea
+        value={commentaires}
+        onChange={(e) => setCommentaires(e.target.value)}
+      />
+    </div>
   </div>
 )}
 </div>
@@ -629,48 +663,68 @@ const Form = () => {
 
   <div>
   <Checkbox style={{fontWeight:'bold'}} value={declarationdefaut} onChange={setDecalarationdefaut}>Déclaration des defauts Production</Checkbox>
-      {declarationdefaut && (
-             <div
-             className="typedefaut-production"
-             style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
-           >
-     
-     <div className="input-field" style={{ flex: 1 }}>
-  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-    Type defaut production
-  </label>
-  <Select
-    mode="multiple"
-    value={typedefautproduction}
-    onChange={(value) => setTypedefautproduction(value)}
-    style={{ width: '100%' }}
-    placeholder="Select type defaut de production"
+  {declarationdefaut && (
+  <div
+    className="typedefaut-production"
+    style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
   >
-    {Array.isArray(defautproduction) &&
-      defautproduction.map((defaut) => (
-        <Option key={defaut.id} value={defaut.id}>
-          {defaut.defaut}
-        </Option>
-      ))}
-  </Select>
-</div>
+    {defauts.map((defaut, index) => (
+      <div
+        key={index}
+        className="typedefaut-production"
+        style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}
+      >
+        {/* Type defaut production */}
+        <div className="input-field" style={{ flex: 1 }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Type defaut production
+          </label>
+          <Select
+            mode="multiple"
+            value={defaut.typedefautcf}
+            onChange={(value) => handleFieldChange(index, value, 'typedefautproduction')}
+            style={{ width: '100%' }}
+            placeholder="Select type defaut de production"
+          >
+            {Array.isArray(defautproduction) &&
+              defautproduction.map((defautItem) => (
+                <Option key={defautItem.id} value={defautItem.id}>
+                  {defautItem.defaut}
+                </Option>
+              ))}
+          </Select>
+        </div>
 
-          
-   
-               <div className="input-field" style={{ flex: 1 }}>
-                 <label style={{ display: 'block', marginBottom: '5px' }}>
-                   Total defaut production
-                 </label>
-                 <Input
-                   type="number"
-                   value={totaldefautproduction}
-                   onChange={(e) => setTotaldefaut(e.target.value)}
-                   style={{ width: '100%' }}
-                 />
-               </div>
-          
-           </div>
-      )}
+        {/* Total defaut production */}
+        <div className="input-field" style={{ flex: 1 }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Total defaut production
+          </label>
+          <Input
+            type="number"
+            value={defaut.totaldefautcf}
+            onChange={(e) => handleFieldChange(index, e.target.value, 'totaldefautproduction')}
+            style={{ width: '100%' }}
+          />
+        </div>
+      </div>
+    ))}
+
+    <button
+      onClick={handleAddField}
+      style={{
+        padding: '10px 20px',
+        backgroundColor: '#2196F3',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+      }}
+    >
+     Ajouter des défauts
+    </button>
+  </div>
+)}
   </div>
   <div className="button-step1">
   <div className="button-step1">
@@ -684,7 +738,10 @@ const Form = () => {
       (parseInt(totalproduit) < parseInt(objectiveProduction) &&
         (!typeproblemeproduction.length || // Must have at least one problem type selected
           !startTimeproduction || // Start time must be provided
-          !endTimeproduction)) // End time must be provided
+          !endTimeproduction ||
+          !defauts || // Defauts must be provided
+          defauts.some(defaut => !defaut.typedefautproduction || !defaut.totaldefautproduction)
+          )) // End time must be provided
     }
   >
     Next
@@ -733,72 +790,71 @@ const Form = () => {
     </div>
   </div>
 
-      {parseInt(totalproduitcf) < parseInt(objectivecf) && (
-       <div>
-      <div className="input-field" >
-       <label>
-         Commentaires  (
-         {parseInt(totalproduitcf) < parseInt(objectivecf)
-           ? 'Total produit  < Objective'
-           : ''}
-         )
-       </label>
-       <Input.TextArea
-         value={commentairescsl}
-         onChange={(e) => setCommentairecsl(e.target.value)}
-       />
-     </div>  
-      <div className='form-row'>
- <div className="input-field">
-               <label>Type de probléme</label>
-               <Select
-              mode="multiple"
-             value={typeproblemecf}
-             onChange={(value) => setTypeproblemecf(value)}
-            placeholder="Select Type de probléme"
-            style={{ width: '100%' }}
-             >
-         {problemespostecontrole.map((problemeObj) => (
-         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.problemecontrole}`}>
-         {problemeObj.problemecontrole}
-         </Option>
-         ))}
-       </Select>
-       </div>
-
-       { typeproblemecf && (
+  {parseInt(totalproduitcf) < parseInt(objectiveCF) && (
   <div>
-   <div className="input-field">
-            <label htmlFor="start-time">Start Time:</label>
-            <Input
-              id="start-time"
-              type="time"
-              value={startTimecf}
-              onChange={(e) => setStartTimecf(e.target.value)}
-            />
-          </div>
-          <div className="input-field">
-            <label htmlFor="end-time">End Time:</label>
-            <Input
-              id="end-time"
-              type="time"
-              value={endTimecf}
-              onChange={(e) => setEndTimecf(e.target.value)}
-            />
-          </div>
-             {durationcf && (
-            <p style={{ marginTop: '10px' }}>
-              Durée: <strong>{durationcf}</strong>
-            </p>
-          )}
-  </div>
-)}  
+    <div className="input-field">
+      <label>Type de probléme</label>
+      <Select
+        mode="multiple"
+        value={typeproblemecf}
+        onChange={(value) => setTypeproblemecf(value)}
+        placeholder="Select Type de probléme"
+        style={{ width: "100%" }}
+      >
+        {problemespostecontrole.map((problemeObj) => (
+          <Option
+            key={problemeObj.id}
+            value={`${problemeObj.id}-${problemeObj.problemecontrole}`}
+          >
+            {problemeObj.problemecontrole}
+          </Option>
+        ))}
+      </Select>
+    </div>
+
+    {typeproblemecf.length > 0 && (
+      <div className="form-row">
+        <div className="input-field">
+          <label htmlFor="start-time">Start Time:</label>
+          <Input
+            id="start-time"
+            type="time"
+            value={startTimecf}
+            onChange={(e) => setStartTimecf(e.target.value)}
+          />
+        </div>
+        <div className="input-field">
+          <label htmlFor="end-time">End Time:</label>
+          <Input
+            id="end-time"
+            type="time"
+            value={endTimecf}
+            onChange={(e) => setEndTimecf(e.target.value)}
+          />
+        </div>
+        {durationcf && (
+          <p style={{ marginTop: "10px" }}>
+            Durée: <strong>{durationcf}</strong>
+          </p>
+        )}
       </div>
-     </div>
-      )}
+    )}
 
-
- 
+    <div className="input-field">
+      <label>
+        Commentaires (
+        {parseInt(totalproduitcf) < parseInt(objectiveCF)
+          ? "Total produit CF< Objective"
+          : ""}
+        )
+      </label>
+      <Input.TextArea
+        value={commentairescf}
+        onChange={(e) => setCommentaires(e.target.value)}
+      />
+    </div>
+  </div>
+)}
 
 </div>
 )}
@@ -808,45 +864,73 @@ const Form = () => {
  <Checkbox style={{fontWeight:'bold', marginBottom:'30px'}} value={declarationdefautcf} onChange={setDecalarationdefautcf}>Déclaration des defauts CF</Checkbox>
 
  {declarationdefautcf && (
+  <div
+    className="typedefaut-production"
+    style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+  >
+    {defautscf.map((defaut, index) => (
+      <div
+        key={index}
+        className="typedefaut-production"
+        style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}
+      >
+        {/* Type defaut production */}
+        <div className="input-field" style={{ flex: 1 }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Type defaut CF
+          </label>
+          <Select
+              mode="multiple"
+              value={defaut.typedefautcf}
+              onChange={(value) => handleFieldChangecf(index, value, 'typedefautcf')}
+              style={{ width: '100%' }}
+              placeholder="Select type defaut de production"
+            >
+              {Array.isArray(defautinspection) &&
+                defautinspection.map((probleme) => (
+                  <Option key={probleme.id} value={probleme.id}>
+                    {probleme.inspectiondefaut}  {/* Display the problemecontrole text */}
+                  </Option>
+                ))}
+            </Select>
+        </div>
 
-<div className="input-container" style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
-<div className="input-field" style={{ flex: 1 }}>
-  <label style={{ display: 'block', marginBottom: '5px' }}>
-    Total defaut CF
-  </label>
-  <Input
-    type="number"
-    value={totaldefautcf}
-    onChange={(e) => setTotaldefautcf(e.target.value)}
-    style={{ width: '100%' }}
-  />
-</div>
-
-  <div className="references-dropdown" style={{ flex: 1,  fontWeight:'bold' }}>
-    <label style={{ display: 'block', marginBottom: '5px' }}>
-      Type defaut CF
-    </label>
-    <Select
-  mode='multiple'
-  value={typedefautcf}
-  onChange={(value) => setTypedefautcf(value)}
-  style={{ width: '100%' }}
-  placeholder="Select type defaut de cf"
->
-  {Array.isArray(defautinspection) &&
-    defautinspection.map((defaut) => (
-      <Option key={defaut.id} value={defaut.id}>
-        {defaut.inspectiondefaut}
-      </Option>
+        {/* Total defaut production */}
+        <div className="input-field" style={{ flex: 1 }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Total defaut CF
+          </label>
+          <Input
+            type="number"
+            value={defaut.totaldefautcf}
+            onChange={(e) => handleFieldChangecf(index, e.target.value, 'totaldefautcf')}
+            style={{ width: '100%' }}
+          />
+        </div>
+      </div>
     ))}
-</Select>
 
+    {/* Add More button */}
+    <button
+      onClick={handleAddFieldcf}
+      style={{
+        padding: '10px 20px',
+        backgroundColor: '#2196F3',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        marginBottom: '20px',
+        cursor: 'pointer',
+      }}
+    >
+     Ajouter des défauts
+    </button>
   </div>
-</div>
-
-
- )}
+)}
  </div>
+
+    
+  
 
   <div className="button-step1">
   <button className="custom-button" onClick={()=>handleSubmitcf()} 
@@ -855,7 +939,8 @@ const Form = () => {
           (parseInt(totalproduitcf) < parseInt(objectiveCF) &&
             (!typeproblemecf.length || // Must have at least one problem type selected
               !startTimecf || // Start time must be provided
-              !endTimecf)) // End time must be provided
+              !defautscf ||
+              defautscf.some(defaut => !defaut.typedefautcf || !defaut.totaldefautcf))) 
         }>Next </button>
  </div>
             
@@ -863,7 +948,7 @@ const Form = () => {
 )}
 
 </motion.div>
-
+  
 <motion.div
   key="step3"
   initial={{ opacity: 0, y: 20 }}
@@ -899,68 +984,71 @@ const Form = () => {
     </div>
   )}
 
-  {parseInt(totalproduitcsl)< parseInt(objectiveCSL) && (
-    <div>
-        <div className="input-field" >
-        <label>
-          Commentaires  (
-          {parseInt(totalproduitcsl) < parseInt(objectivecsl)
-            ? 'Total produit  < Objective'
-            : ''}
-          )
-        </label>
-        <Input.TextArea
-          value={commentairescsl}
-          onChange={(e) => setCommentairecsl(e.target.value)}
-        />
-      </div>
-
-      <div className="input-field">
-    <label>Type de probléme</label>
-     <Select
-       mode="multiple"
-       value={typeproblemecsl}
-       onChange={(value) => setTypeproblemecsl(value)}
-       placeholder="Select Type de probléme"
-        style={{ width: '100%' }}
-             >
-         {problemespostecontrole.map((problemeObj) => (
-         <Option key={problemeObj.id} value={`${problemeObj.id}-${problemeObj.problemecontrole}`}>
-         {problemeObj.problemecontrole}
-         </Option>
-         ))}
-       </Select>
-       </div>
-
-  {typeproblemecsl && (
-      <div className='form-row'>
-      <div className="input-field">
-                  <label htmlFor="start-time">Start Time:</label>
-                  <Input
-                    id="start-time"
-                    type="time"
-                    value={startTimecsl}
-                    onChange={(e) => setStartTimecsl(e.target.value)}
-                  />
-                </div>
-                <div className="input-field">
-                  <label htmlFor="end-time">End Time:</label>
-                  <Input
-                    id="end-time"
-                    type="time"
-                    value={endTimecsl}
-                    onChange={(e) => setEndTimecsl(e.target.value)}
-                  />
-                </div>
-                {durationcsl && (
-                  <p style={{ marginTop: '10px' }}>
-                    Durée: <strong>{durationcsl}</strong>
-                  </p>
-                )}
-                </div>
-  )}
+{parseInt(totalproduitcsl) < parseInt(objectiveCSL) && (
+  <div>
+    <div className="input-field">
+      <label>Type de probléme</label>
+      <Select
+        mode="multiple"
+        value={typeproblemecsl}
+        onChange={(value) => setTypeproblemecsl(value)}
+        placeholder="Select Type de probléme"
+        style={{ width: "100%" }}
+      >
+        {problemespostecontrole.map((problemeObj) => (
+          <Option
+            key={problemeObj.id}
+            value={`${problemeObj.id}-${problemeObj.problemecontrole}`}
+          >
+            {problemeObj.problemecontrole}
+          </Option>
+        ))}
+      </Select>
     </div>
-  )}   
+
+    {typeproblemecsl.length > 0 && (
+      <div className="form-row">
+        <div className="input-field">
+          <label htmlFor="start-time">Start Time:</label>
+          <Input
+            id="start-time"
+            type="time"
+            value={startTimecsl}
+            onChange={(e) => setStartTimecsl(e.target.value)}
+          />
+        </div>
+        <div className="input-field">
+          <label htmlFor="end-time">End Time:</label>
+          <Input
+            id="end-time"
+            type="time"
+            value={endTimecsl}
+            onChange={(e) => setEndTimecsl(e.target.value)}
+          />
+        </div>
+        {durationcsl && (
+          <p style={{ marginTop: "10px" }}>
+            Durée: <strong>{durationcsl}</strong>
+          </p>
+        )}
+      </div>
+    )}
+
+    <div className="input-field">
+      <label>
+        Commentaires (
+        {parseInt(totalproduitcsl) < parseInt(objectiveCSL)
+          ? "Total produit CF< Objective"
+          : ""}
+        )
+      </label>
+      <Input.TextArea
+        value={commentairescf}
+        onChange={(e) => setCommentaires(e.target.value)}
+      />
+    </div>
+  </div>
+)}   
 </div>
    
 
@@ -968,48 +1056,69 @@ const Form = () => {
  <Checkbox style={{fontWeight:'bold', marginBottom:'30px'}} value={declarationdefautcsl} onChange={setDecalarationdefautcsl}>Déclaration des defauts CSL</Checkbox>
 
  {declarationdefautcsl && (
-  <div style={{ display: 'flex', gap: '60px', alignItems: 'flex-start' }}>
-      <div className="input-field" style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>
-              Total defaut CSL
-            </label>
-            <Input
-              type="number"
-              value={totaldefautcsl}
-              onChange={(e) => setTotaldefautcsl(e.target.value)}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div
-        className="typedefaut-csl"
-        style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
+  <div
+    className="typedefaut-production"
+    style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+  >
+    {defautscsl.map((defaut, index) => (
+      <div
+        key={index}  
+        className="typedefaut-production"
+        style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}
       >
-       
-          <div className="references-dropdown" style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight:'bold' }}>
-              Type defaut CSL
-            </label>
-            <Select
-            mode='multiple'
-          value={typedefautcsl}
-          onChange={(value) => setTypedefautcsl(value)}
-         style={{ width: '100%' }}
-         placeholder="Select type defaut de cf"
-         >
-    {Array.isArray(defautinspection) &&
-    defautinspection.map((defaut) => (
-      <Option key={defaut.id} value={defaut.id}>
-        {defaut.inspectiondefaut}
-      </Option>
-    ))}
-</Select>
+        {/* Type defaut production */}
+        <div className="input-field" style={{ flex: 1 }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Type defaut CSL
+          </label>
+          <Select
+              mode="multiple"
+              value={defaut.typedefautcsl}
+              onChange={(value) => handleFieldChangecsl(index, value, 'typedefautcsl')}
+              style={{ width: '100%' }}
+              placeholder="Select type defaut csl"
+            >
+              {Array.isArray(defautinspection) &&
+                defautinspection.map((probleme) => (
+                  <Option key={probleme.id} value={probleme.id}>
+                    {probleme.inspectiondefaut}  {/* Display the problemecontrole text */}
+                  </Option>
+                ))}
+            </Select>
+        </div>
 
-          </div>
-        
+        {/* Total defaut production */}
+        <div className="input-field" style={{ flex: 1 }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+            Total defaut CSL
+          </label>
+          <Input
+            type="number"
+            value={defaut.totaldefautcsl}
+            onChange={(e) => handleFieldChangecsl(index, e.target.value, 'totaldefautcsl')}
+            style={{ width: '100%' }}
+          />
+        </div>
       </div>
+    ))}
+
+    {/* Add More button */}
+    <button
+      onClick={handleAddFieldcsl}
+      style={{
+        padding: '10px 20px',
+        backgroundColor: '#2196F3',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        marginBottom: '20px',
+        cursor: 'pointer',
+      }}
+    >
+     Ajouter des défauts
+    </button>
   </div>
- )}
+)}
  </div>
   <div className="button-step1">
             <button className="custom-button" onClick={()=>handleSubmitcsl()} 
@@ -1018,7 +1127,9 @@ const Form = () => {
                 (parseInt(totalproduitcsl) < parseInt(objectiveCSL) &&
                   (!typeproblemecsl.length || // Must have at least one problem type selected
                     !startTimecsl || // Start time must be provided
-                    !endTimecsl)) // End time must be provided
+                    !endTimecsl ||
+                    !defautscsl ||
+                    defautscsl.some(defaut => !defaut.typedefautcsl || !defaut.totaldefautcsl))) // End time must be provided
               }>Submit</button>
           </div>
             
@@ -1033,6 +1144,7 @@ const Form = () => {
   </div>
     </div>
   );
+
 };
 
 export default Form;

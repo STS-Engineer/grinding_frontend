@@ -22,32 +22,46 @@ const Ajouteroutil = () => {
   const navigate = useNavigate();
   const userID = localStorage.getItem("userID")
   console.log(userID);
-
-  const handleSubmit = async (values) => {
-    
+ const handleSubmit = async (values) => {
     try {
-      // Sending the request with the correct body format
-      await axios.post(
-        "https://grinding-backend.azurewebsites.net/ajouter/ajouteroutil",
-        {
-            phase: phase, 
-            nom_outil: nomoutil,
-            dureedevie: dureedevie,
-            referenceproduit: referenceproduit,/// Replace with actual value from the form
-  
-          
-        },
+      // Step 1: Check if the tool exists
+      const checkResponse = await axios.post(
+        "https://grinding-backend.azurewebsites.net/ajouter/checkoutil",
+        { nom_outil: nomoutil }, // Send the tool name to check
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure token is valid
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         }
       );
+  
+      if (checkResponse.data.exists) {
+        message.warning("L'outil existe déjà dans la base de données.");
+        return; // Stop the submission
+      }
+  
+      // Step 2: Add the tool if it does not exist
+      await axios.post(
+        "https://grinding-backend.azurewebsites.net/ajouteroutil",
+        {
+          phase: phase,
+          nom_outil: nomoutil,
+          dureedevie: dureedevie,
+          referenceproduit: referenceproduit,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
       message.success("L'outil a été ajouté avec succès!");
     } catch (error) {
       console.error("Error:", error);
-      message.error("Failed to add machine.");
+      message.error("Failed to add the tool.");
     }
   };
   

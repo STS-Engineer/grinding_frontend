@@ -1828,7 +1828,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
+      {regleur.prenom}  {regleur.nom} 
       </Option>
     ))}
   </Select>
@@ -1957,7 +1957,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
+         {regleur.prenom} {regleur.nom} 
       </Option>
     ))}
   </Select>
@@ -2024,7 +2024,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
+           {regleur.prenom} {regleur.nom}
       </Option>
     ))}
   </Select>
@@ -2151,7 +2151,7 @@ transition={{ duration: 0.5 }}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
+         {regleur.prenom} {regleur.nom}
       </Option>
     ))}
   </Select>
@@ -2208,9 +2208,9 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("regleur") && (
   <div>
-   <Select
+ <Select
       mode="multiple"
-      value={operateurregleurshift2}
+      value={operateurregleurshift1}
       onChange={handleRegleurChange}
       placeholder="Select Regleurs"
       style={{ width: '100%' }}
@@ -2218,7 +2218,7 @@ transition={{ duration: 0.5 }}
       {regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
-            {regleur.nom}
+            {regleur.prenom} {regleur.nom} 
           </Option>
         ))}
     </Select>

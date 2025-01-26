@@ -21,7 +21,7 @@ const Ajouterposte = () => {
       await axios.post(
         "https://grinding-backend.azurewebsites.net/ajouter/ajouterproblemecontrole",
         {
-          probleme: probleme, // Replace with actual value from the form
+          problemecontrole: probleme, // Replace with actual value from the form
   
           
         },

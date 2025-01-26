@@ -85,39 +85,51 @@ const Ajouternouvellemachine = () => {
 
     fetchTools();
   }, []);
-  const handleToolChange = (value) => {
+
+
+  
+    // Static filter: Only show tools from a specific phase
+    const filteredToolshauteur = tools.filter((outil) => outil.phase === "Usinagehauteur");
+    const filteredToolslargeur = tools.filter((outil) => outil.phase === "Usinagelargeur");
+    const filteredToolsrainure = tools.filter((outil) => outil.phase === "Usinagerainure");
+    const filteredToolsrayonnage = tools.filter((outil) => outil.phase === "Usinagerayonnage");
+    const filteredToolschanfreins = tools.filter((outil) => outil.phase === "Usinagechanfreins");
+    const filteredToolstete = tools.filter((outil) => outil.phase === "Usinagetete");
+    const filteredToolroueavancement = tools.filter((outil) => outil.phase === "roueavancement");
+  
+ const handleToolChange = (value) => {
     const tool = tools.find((t) => t.nom_outil === value);
     setSelectedTool(tool);
     setDureevierefroueoutil(tool ? tool.dureedevie : '');  // Update dureedevie
   };
 
   const handleToolChangehauteur = (value) => {
-    const tool = tools.find((t) => t.nom_outil === value);
+    const tool = filteredToolshauteur.find((t) => t.nom_outil === value);
     setSelectedToolhauteur(tool);
     setDureevierefmeulehauteuroutil(tool ? tool.dureedevie : '');  // Update dureedevie
   };
   const handleToolChangelargeur = (value) => {
-    const tool = tools.find((t) => t.nom_outil === value);
+    const tool = filteredToolslargeur.find((t) => t.nom_outil === value);
     setSelectedToollargeur(tool);
     setDureevierefmeulelargeuroutil(tool ? tool.dureedevie : '');  // Update dureedevie
   };
   const handleToolChangechanfreins = (value) => {
-    const tool = tools.find((t) => t.nom_outil === value);
+    const tool = filteredToolschanfreins.find((t) => t.nom_outil === value);
     setSelectedToolselectedToolchanfreins(tool);
     setDureevierefmeulechanfrein(tool ? tool.dureedevie : '');  // Update dureedevie
   };
   const handleToolChangerainure = (value) => {
-    const tool = tools.find((t) => t.nom_outil === value);
+    const tool = filteredToolsrainure.find((t) => t.nom_outil === value);
     setSelectedToolrainure(tool);
     setDureevieoutillageusinagerainureoutil(tool ? tool.dureedevie : '');  // Update dureedevie
   };
   const handleToolChangerayonnage = (value) => {
-    const tool = tools.find((t) => t.nom_outil === value);
+    const tool = filteredToolsrayonnage.find((t) => t.nom_outil === value);
     setSelectedToolrayonnagel(tool);
     setDureevierefmeulerayonnageoutil(tool ? tool.dureedevie : '');  // Update dureedevie
   };
   const handleToolChangetete = (value) => {
-    const tool = tools.find((t) => t.nom_outil === value);
+    const tool = filteredToolstete.find((t) => t.nom_outil === value);
     setSelectedTooltete(tool);
     setDureevieusinagetete(tool ? tool.dureedevie : '');  // Update dureedevie
   };
@@ -461,37 +473,41 @@ const Ajouternouvellemachine = () => {
                  </Checkbox.Group>
               </div>
 
-              {phase1chargement && (
+       {phase1chargement && (
               <div className="input-field">
                    <label>Nombre d'opérateur chargement</label>
                    <Input type='text' value={nombre_operateur_chargement} onChange={(e)=>setNombre_operateur_chargement(e.target.value)} />
               </div>
-              )
-              }
-
+        )
+        }
          <div className="input-field">
-                <label>Phase1: Roue d'avancement</label>
-                  <Checkbox.Group
-                   style={{ width: '100%' }}
-                   value={phase1roueavancement}
-                   onChange={(value)=>setphase1roueavancement(value)}
-                 >
+          <label>Phase1: Roue d'avancement</label>
+         <Checkbox.Group
+         style={{ width: '100%' }}
+          value={phase1roueavancement}
+          onChange={(value)=>setphase1roueavancement(value)}
+            >
                    <Checkbox value="phase1roueavancement"></Checkbox>
                 
                  </Checkbox.Group>
               </div>
          {phase1roueavancement && (
        <div className='phase'>
- <div className="input-field">
+     <div className="input-field">
         <label htmlFor="nom_outil">Réf roue</label>
         <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px",height: "40px", color:"black" }}
           onChange={handleToolChange}
-          value={selectedTool ? selectedTool.nom_outil : ''}
+          value={selectedTool?.nom_outil || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          }
         >
-          {tools.map((outil) => (
+          {filteredToolroueavancement.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -520,6 +536,7 @@ const Ajouternouvellemachine = () => {
                    style={{ width: '100%' }}
                    value={phase2usinagehauteur}
                    onChange={(value)=>setPhase2usinagehauteur(value)}
+                   
                  >
                    <Checkbox value="phase2usinagehauteur"></Checkbox>
                 
@@ -531,12 +548,17 @@ const Ajouternouvellemachine = () => {
         <label htmlFor="nom_outil">Réf Meule Hauteur</label>
         <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px" , color:"black"}}
           onChange={handleToolChangehauteur}
-          value={selectedToolhauteur ? selectedToolhauteur.nom_outil : ''}
+          value={selectedToolhauteur ? selectedToolhauteur.nom_outil : '' || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          }
         >
-          {tools.map((outil) => (
+          {filteredToolshauteur.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -574,12 +596,17 @@ const Ajouternouvellemachine = () => {
           <label htmlFor="nom_outil">Réf Meule Largeur</label>
          <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px" }}
           onChange={handleToolChangelargeur}
-          value={selectedToollargeur ? selectedToollargeur.nom_outil : ''}
+          value={selectedToollargeur ? selectedToollargeur.nom_outil : '' || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+          option.children.toLowerCase().includes(input.toLowerCase())
+          }
         >
-          {tools.map((outil) => (
+          {filteredToolslargeur.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -619,12 +646,17 @@ const Ajouternouvellemachine = () => {
           <label htmlFor="nom_outil">Réf Meule Chanfreins</label>
          <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px" }}
           onChange={handleToolChangechanfreins}
-          value={selectedToolchanfreins ? selectedToolchanfreins.nom_outil : ''}
+          value={selectedToolchanfreins ? selectedToolchanfreins.nom_outil : '' || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          }
         >
-          {tools.map((outil) => (
+          {filteredToolschanfreins.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -663,12 +695,17 @@ const Ajouternouvellemachine = () => {
           <label htmlFor="nom_outil">Réf Meule Rainure</label>
          <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px" }}
           onChange={handleToolChangerainure}
-          value={selectedToolrainure ? selectedToolrainure.nom_outil : ''}
+          value={selectedToolrainure ? selectedToolrainure.nom_outil : '' || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          }
         >
-          {tools.map((outil) => (
+          {filteredToolsrainure.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -709,12 +746,17 @@ const Ajouternouvellemachine = () => {
           <label htmlFor="nom_outil">Réf Meule Rayonnage</label>
          <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px" }}
           onChange={handleToolChangerayonnage}
-          value={selectedToolrayonnage ? selectedToolrayonnage.nom_outil : ''}
+          value={selectedToolrayonnage ? selectedToolrayonnage.nom_outil : '' || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          }
         >
-          {tools.map((outil) => (
+          {filteredToolsrayonnage.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -754,12 +796,17 @@ const Ajouternouvellemachine = () => {
           <label htmlFor="nom_outil">Outillage Usinage Tete</label>
          <Select
           id="nom_outil"
-          placeholder="Select a tool"
-          style={{ width: "100%" }}
+          placeholder="Search and select a tool"
+          style={{ width: "200px" }}
           onChange={handleToolChangetete}
-          value={selectedTooltete ? selectedTooltete.nom_outil : ''}
+          value={selectedTooltete ? selectedTooltete.nom_outil : '' || undefined}
+          allowClear // Allows clearing the selected value
+          showSearch // Enables search functionality within the dropdown
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          } // Advanced filtering logic
         >
-          {tools.map((outil) => (
+          {filteredToolstete.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>
@@ -807,7 +854,7 @@ const Ajouternouvellemachine = () => {
 <      div className="input-field">
                 <label>Phase 6: Inspection CSL </label>
                   <Checkbox.Group
-                   style={{ width: '100%' }}
+                   style={{ width: '200px' }}
                    value={phase6inspectioncsl}
                    onChange={(value)=>setPhase6inspectioncslf(value)}
                  >
@@ -1159,7 +1206,7 @@ const Ajouternouvellemachine = () => {
           onChange={handleToolChangerainure}
           value={selectedToolrainure ? selectedToolrainure.nom_outil : ''}
         >
-          {tools.map((outil) => (
+          {filteredToolsrainure.map((outil) => (
             <Select.Option key={outil.id} value={outil.nom_outil}>
               {outil.nom_outil}
             </Select.Option>

@@ -1657,7 +1657,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
 <Modal
 visible={isModalVisible} onOk={onclose} onCancel={onclose}
       title="Update Plannification"
-        // Make sure this is the correct state
+  
       confirmLoading={loading}
        // Ensure this matches the correct state setter
       footer={null}  // This removes the OK and Cancel buttons
@@ -1674,8 +1674,8 @@ transition={{ duration: 0.5 }}
  <div className="machine-buttons">
 {machines.map((machine)=>(
   <button key={machine.id_machine} onClick={() => handleMachineSelect(machine)}>
-  {machine.nom}
-  {machine.referenceproduit}
+  Machine {machine.nom} <br/>
+  Réference:{machine.referenceproduit}
 </button>
 ))}
 </div> 
@@ -1828,7 +1828,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-      {regleur.prenom}  {regleur.nom} 
+        {regleur.nom}
       </Option>
     ))}
   </Select>
@@ -1883,6 +1883,7 @@ key={selectedMachine.id}
       style={{ width: '100%' }}
     >
       {regleurs
+        .filter((regleur) => isRegleurAvailable(regleur.nom)) // Filter out unavailable regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
             {regleur.nom}
@@ -1957,7 +1958,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-         {regleur.prenom} {regleur.nom} 
+        {regleur.nom}
       </Option>
     ))}
   </Select>
@@ -2024,7 +2025,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-           {regleur.prenom} {regleur.nom}
+        {regleur.nom}
       </Option>
     ))}
   </Select>
@@ -2151,7 +2152,7 @@ transition={{ duration: 0.5 }}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-         {regleur.prenom} {regleur.nom}
+        {regleur.nom}
       </Option>
     ))}
   </Select>
@@ -2208,9 +2209,9 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("regleur") && (
   <div>
- <Select
+   <Select
       mode="multiple"
-      value={operateurregleurshift1}
+      value={operateurregleurshift2}
       onChange={handleRegleurChange}
       placeholder="Select Regleurs"
       style={{ width: '100%' }}
@@ -2218,7 +2219,7 @@ transition={{ duration: 0.5 }}
       {regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
-            {regleur.prenom} {regleur.nom} 
+            {regleur.nom} {regleur.prenom}
           </Option>
         ))}
     </Select>
@@ -2514,7 +2515,7 @@ key={selectedMachine.id}
  <div style={{marginBottom:'30px'}}>
  {selectedMachine && machineReferences[selectedMachine.nom] && (
  <div className="references-dropdown">
- <label>References</label>
+ <label>Réferences</label>
  <Select
    value={selectedReference}
    onChange={handleReferenceSelect}
@@ -2577,7 +2578,7 @@ key={selectedMachine.id}
   >
     {operateurs.map((regleur) => (
       <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}
+        {regleur.nom}  {regleur.prenom}
       </Option>
     ))}
   </Select>
@@ -2634,7 +2635,7 @@ key={selectedMachine.id}
       {regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
-            {regleur.nom}
+            {regleur.nom} {regleur.prenom}
           </Option>
         ))}
     </Select>
@@ -2957,9 +2958,10 @@ transition={{ duration: 0.5 }}
    </div> 
 {phasereguleurshif2.includes("regleur") && (
   <div>
+   
    <Select
       mode="multiple"
-      value={operateurregleurshift2}
+      value={operateurregleurshift1}
       onChange={handleRegleurChange}
       placeholder="Select Regleurs"
       style={{ width: '100%' }}
@@ -2967,7 +2969,7 @@ transition={{ duration: 0.5 }}
       {regleurs
         .map((regleur) => (
           <Option key={regleur.id} value={regleur.nom}>
-            {regleur.nom}
+            {regleur.nom} {regleur.prenom}
           </Option>
         ))}
     </Select>

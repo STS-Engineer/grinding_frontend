@@ -43,7 +43,7 @@ const Ajouteroutil = () => {
   
       // Step 2: Add the tool if it does not exist
       await axios.post(
-        "https://grinding-backend.azurewebsites.net/ajouteroutil",
+        "https://grinding-backend.azurewebsites.net/ajouter/ajouteroutil",
         {
           phase: phase,
           nom_outil: nomoutil,

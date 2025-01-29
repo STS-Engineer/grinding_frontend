@@ -142,7 +142,7 @@ const Form = () => {
   const getCurrentShift = () => {
     const currentHour = new Date().getHours();
     const shift1Start = 6;
-    const shift1End = 14; // 3 PM
+    const shift1End = 16; // 3 PM
     return currentHour >= shift1Start && currentHour < shift1End ? 'shift1' : 'shift2';
   };
 
@@ -735,13 +735,16 @@ const Form = () => {
     onClick={() => handleSubmitproduction()}
     disabled={
       !totalproduit || // Disable if totalproduit is empty
-      (parseInt(totalproduit) < parseInt(objectiveProduction) &&
-        (!typeproblemeproduction.length || // Must have at least one problem type selected
-          !startTimeproduction || // Start time must be provided
-          !endTimeproduction ||
-          !defauts || // Defauts must be provided
-          defauts.some(defaut => !defaut.typedefautproduction || !defaut.totaldefautproduction)
-          )) // End time must be provided
+      parseInt(totalproduit) < parseInt(objectiveProduction) && (
+        !typeproblemeproduction.length || // Must have at least one problem type selected
+        !startTimeproduction || // Start time must be provided
+        !endTimeproduction || // End time must be provided
+        !defauts.length || // Defauts must exist
+        defauts.some(defaut => 
+          !defaut.typedefautproduction.length || // Must select at least 2 types (typedefautproduction)
+          !defaut.totaldefautproduction.trim() // Must enter total defects (totaldefautproduction)
+        )
+      )
     }
   >
     Next
@@ -932,17 +935,25 @@ const Form = () => {
     
   
 
-  <div className="button-step1">
-  <button className="custom-button" onClick={()=>handleSubmitcf()} 
-        disabled={
-          !totalproduitcf || // Disable if totalproduit is empty
-          (parseInt(totalproduitcf) < parseInt(objectiveCF) &&
-            (!typeproblemecf.length || // Must have at least one problem type selected
-              !startTimecf || // Start time must be provided
-              !defautscf ||
-              defautscf.some(defaut => !defaut.typedefautcf || !defaut.totaldefautcf))) 
-        }>Next </button>
- </div>
+ <div className="button-step1">
+  <button 
+    className="custom-button" 
+    onClick={() => handleSubmitcf()} 
+    disabled={
+      !totalproduitcf || // Disable if totalproduit is empty
+      (parseInt(totalproduitcf) < parseInt(objectiveCF) && (
+        !typeproblemecf.length || // Must have at least one problem type selected
+        !startTimecf || // Start time must be provided
+        defautscf.some(defaut => 
+          !defaut.typedefautcf.length || // Must select at least one typedefautcf
+          !defaut.totaldefautcf.trim() // Must enter totaldefautcf (not just whitespace)
+        )
+      ))
+    }
+  >
+    Next
+  </button>
+</div>
             
  </div>
 )}
@@ -1128,8 +1139,10 @@ const Form = () => {
                   (!typeproblemecsl.length || // Must have at least one problem type selected
                     !startTimecsl || // Start time must be provided
                     !endTimecsl ||
-                    !defautscsl ||
-                    defautscsl.some(defaut => !defaut.typedefautcsl || !defaut.totaldefautcsl))) // End time must be provided
+                    defautscsl.some(defaut => 
+                      !defaut.typedefautcsl.length || // Must select at least 2 types (typedefautproduction)
+                      !defaut.totaldefautcsl.trim() // Must enter total defects (totaldefautproduction)
+                    )))
               }>Submit</button>
           </div>
             

@@ -19,6 +19,7 @@ import Ajouteroutil from './pages/Ajouter outil';
 import ActionHistory from './pages/ActionHistory';
 import Actualisationoutil from './pages/Actualisationoutil';
 import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
+import ToolDetails from './pages/detailstool';
 
 
 function App() {    
@@ -31,6 +32,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/home" element={<AnimatedPage />} />
       <Route path="/details" element={<MachineDetails />} />
+      <Route path="/detailoutil" element={<ToolDetails />} />
       <Route path="/machineform" element={<MachineForm />} />
       <Route path="/ajouternouvellemachine" element={<Ajouternouvellemachine />} />
       <Route path="/calendar" element={<Calendar />} />

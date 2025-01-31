@@ -418,12 +418,12 @@ const Form = () => {
   };
 
  
-  const fetchPlannificationByPhase = async (phase, shift, date_creation, id_machine) => {
-    console.log("Request Params:", { phase, shift, date_creation, id_machine });
+  const fetchPlannificationByPhase = async (phase, shift, startDate, endDate, id_machine, referenceproduit) => {
+    console.log("Request Params:", { phase, shift, startDate, endDate, id_machine, referenceproduit });
   
     try {
       const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannificationss", {
-        params: { phase, shift, date_creation, id_machine },
+        params: { phase, shift, startDate, endDate, id_machine, referenceproduit },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -441,14 +441,30 @@ const Form = () => {
     }
   };
   
+  
+  const getStartAndEndDate = () => {
+    const today = new Date();
+    
+    // Get the first day of the current month (start date)
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+  
+    // Get the last day of the current month (end date)
+    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+  
+    return { startDate, endDate };
+  };
+  
   const fetchObjectives = async () => {
-
-   const currentDate = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" format
+    // Get dynamic start and end dates
+    const { startDate, endDate } = getStartAndEndDate();
+  
+    const referenceproduit = selectedMachine.referenceproduit; // Provide the referenceproduit
+  
     try {
       const [productionObjective, cfObjective, cslObjective] = await Promise.all([
-        fetchPlannificationByPhase("chargement", shift, currentDate, selectedMachine.id),
-        fetchPlannificationByPhase("cf", shift, currentDate, selectedMachine.id),
-        fetchPlannificationByPhase("csl", shift, currentDate, selectedMachine.id),
+        fetchPlannificationByPhase("chargement", shift, startDate, endDate, selectedMachine.id, referenceproduit),
+        fetchPlannificationByPhase("cf", shift, startDate, endDate, selectedMachine.id, referenceproduit),
+        fetchPlannificationByPhase("csl", shift, startDate, endDate, selectedMachine.id, referenceproduit),
       ]);
   
       setObjectiveProduction(productionObjective);
@@ -543,28 +559,18 @@ const Form = () => {
         </div>
       )}
 
-      {selectedMachine && machineReferences[selectedMachine.nom] && (
-        <div className="references-dropdown">
-          <label>Ref: PN</label>
-          <Select
-            value={refprod}
-            onChange={(value) => setRefprod(value)}
-            style={{ width: '100%', marginBottom: '50px' }}
-            placeholder="Select reference"
-          >
-            {Array.isArray(machineReferences[selectedMachine.nom]) &&
-              machineReferences[selectedMachine.nom].map((reference, index) => (
-                <Option key={index} value={reference}>
-                  {reference}
-                </Option>
-              ))}
-          </Select>
-        </div>
-      )}
+    <div className="references-dropdown">
+       <label>Référence</label>
+       <Input
+         value={refprod}
+         onChange={((e)=>setRefprod(e.target.value))}
+         style={{ width: '100%' }}
+         placeholder="Select reference"
+       > 
+       </Input>
+       </div>
 
-          {/* Display Objective Production */}
-       
-  
+  {/* Display Objective Production */}
   <div style={{marginBottom:'80px'}}>
   <div className="input-field">
           <label>Déclaration du quantité produit</label>

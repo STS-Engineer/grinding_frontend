@@ -104,6 +104,12 @@ const Calendar = () => {
     });
     const [updatedEvent, setUpdatedEvent] = useState(null);
     const [selectedPlannification, setSelectedPlannification] = useState(null); // For editing
+    const[nombreoperateurproductionshift1, setNombreoperateurproductionshift1] = useState(0);
+    const[nombreoperateurcfshift1, setNombreoperateurcfshift1] = useState(0);
+    const[nombreoperateurcslshift1, setNombreoperateurcslshift1] = useState(0);
+    const[nombreoperateurproductionshift2, setNombreoperateurproductionshift2] = useState(0);
+    const[nombreoperateurcfshift2, setNombreoperateurcfshift2] = useState(0);
+    const[nombreoperateurcslshift2, setNombreoperateurcslshift2] = useState(0);
 
     useEffect(() => {
       if (selectedEvent) {
@@ -125,6 +131,25 @@ const Calendar = () => {
         console.error('Error fetching machines:', error);
       }
     };
+
+
+  useEffect(() => {
+    if (selectedEvent) {
+      // Initialize form values based on the selected event data
+      setShift(selectedEvent.shift || []);
+      setPhasechargement(selectedEvent.phasechargement || []);
+      setNombre_heure_shift1(selectedEvent.nombre_heure_shift1 || "");
+      setTotalproduction(selectedEvent.totalproduction || 0);
+      setOperateurcfshift1(selectedEvent.operateurcfshift1 || []);
+      setManquecfshift1(selectedEvent.manquecfshift1 || 0);
+      setTotalcf(selectedEvent.totalcf || 0);
+      setSelectedMachine(selectedEvent.selectedMachine || null);
+      setMachineReferences(selectedEvent.machineReferences || {});
+      setSelectedReference(selectedEvent.selectedReference || "");
+      setOperateurs(selectedEvent.operateurs || []);
+      setManquechargementshift1(selectedEvent.manquechrgementshift1 || 0);
+    }
+  }, [selectedEvent]);
 
 // Fetching plannification by id
 const fetchPlannificationById = async (id) => {
@@ -248,32 +273,59 @@ useEffect(()=>{
       }
     }, [selectedMachine, shift, nombre_heure_shift1, nombre_heure_shift2]);
   
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const machinereponse = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines");
-        setMachines(machinereponse.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    const fetchoperateur = async()=>{
-      try {
-        const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/getoperateurs");
-        setOperateurs(response.data.operateurs);
-        console.log(response.data);
-
-      } catch (error){
-        console.error("Error fetching data:", error);
-
-      }
-    }
-    fetchData();
-    fetchoperateur();
-
-    const today = new Date().toISOString().split('T')[0];
-    setDate(today);
-  }, []);
+    useEffect(() => {
+      const fetchMachines = async () => {
+        try {
+          const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines");
+          setMachines(response.data);
+        } catch (error) {
+          console.error("Error fetching machines:", error);
+        }
+      };
+    
+      const fetchOperateurs = async () => {
+        try {
+          const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/getoperateurs");
+          setOperateurs(response.data.operateurs);
+          console.log("Operateurs fetched:", response.data.operateurs);
+        } catch (error) {
+          console.error("Error fetching operateurs:", error);
+        }
+      };
+    
+      const fetchPreviousPlannifications = async () => {
+        try {
+          const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannifications");
+          const previousData = response.data;
+    
+          // Populate state with previous data
+          setShift(previousData.shift || []);
+          setSelectedReference(previousData.selectedReference || null);
+          setNombre_heure_shift1(previousData.nombre_heure_shift1 || 0);
+          setTotalproduction(previousData.totalproduction || 0);
+          setPhasechargement(previousData.phasechargement || []);
+          setOperateurchargementshift1(previousData.operateurchargementshift1 || []);
+          setManquechargementshift1(previousData.manquechargementshift1 || 0);
+          setOperateurregleurshift1(previousData.operateurregleurshift1 || []);
+          setManqueregleurshift1(previousData.manqueregleurshift1 || 0);
+    
+          console.log("Previous plannifications fetched:", previousData);
+        } catch (error) {
+          console.error("Error fetching previous plannifications:", error);
+        }
+      };
+    
+      const initializeData = async () => {
+        await Promise.all([fetchMachines(), fetchOperateurs(), fetchPreviousPlannifications()]);
+      };
+    
+      initializeData();
+    
+      // Set today's date
+      const today = new Date().toISOString().split("T")[0];
+      setDate(today);
+    }, []);
+    
 
   const totalmanqueoperateurshift1 = productionShift1 + reguleurShift1 + cfShift1 +cslShift1;
    const totalmanqueoperateurshift2 = productionShift2 + reguleurShift2 + cfShift2 +cslShift2;
@@ -448,6 +500,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setLoading(false);
       return;
     }
+
+    console.log("Nombre opérateurs before sending:", nombreoperateurproductionshift1);
   
     try {
       const plannificationData = {
@@ -466,6 +520,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         start_date: startDate,
         end_date: endDate,
         referenceproduit: selectedReference,
+        nombreoperateurprod: nombreoperateurproductionshift1
       };
   
       const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -474,9 +529,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           "Content-Type": "application/json",
         },
       });
-  
       console.log("Event added successfully:", response.data.plannification);
-  
+
       // Save event ID to hiddenEvents in localStorage
       const eventId = response.data.plannification.id; // Assuming response contains the event ID
       const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
@@ -537,6 +591,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         start_date: startDate,
         end_date: endDate,
         referenceproduit: selectedReference,
+        nombreoperateurprod: nombreoperateurproductionshift1
       };
   
     const response=  await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -604,7 +659,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecfshift1,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcfshift1
         };
   
         // Send request for each weekly plannification
@@ -618,7 +674,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
              const eventId = response.data.plannification.id; // Assuming response contains the event ID
              const hiddenEvents = JSON.parse(localStorage.getItem("hiddenEvents")) || [];
              hiddenEvents.push(eventId);
-             localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents));
+             localStorage.setItem("hiddenEvents", JSON.stringify(hiddenEvents)); 
       setShouldFetchEvents(false);
       setCurrentStep(5);
       
@@ -660,7 +716,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecslshift1,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcslshift1
         };
   
         // Send request for each weekly plannification
@@ -730,11 +787,13 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquechargementshift2,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurproductionshift2
+          
         };
   
         // Send request for each weekly plannification
-    const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+    const response =    await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
@@ -799,11 +858,12 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manqueregleurshift2,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurproductionshift2
         };
   
         // Send request for each weekly plannification
-    const response= await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+    const response=    await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
@@ -870,6 +930,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           start_date: date,
           end_date: endDate,
           referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcfshift2
         };
   
      const response =   await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -954,6 +1015,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           start_date: date,
           end_date: endDate,
           referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcslshift2
         };
   
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -1608,6 +1670,33 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       </div>
     );
   };
+
+    // ✅ Handle selection changes and update nombreoperateurproduction
+    const handleSelectChangeproductionshift1 = (selectedValues) => {
+      setOperateurchargementshift1(selectedValues);
+      setNombreoperateurproductionshift1(selectedValues.length); // ✅ Update count dynamically
+    };
+
+    const handleSelectChangecfshift1 = (selectedValues) => {
+      setOperateurcfshift1(selectedValues);
+      setNombreoperateurcfshift1(selectedValues.length); // ✅ Update count dynamically
+    };
+    const handleSelectChangecslshift1 = (selectedValues) => {
+      setOperateurcslshift1(selectedValues);
+      setNombreoperateurcslshift1(selectedValues.length); // ✅ Update count dynamically
+    };
+    const handleSelectChangeproductionshift2 = (selectedValues) => {
+      setOperateurchargementshift2(selectedValues);
+      setNombreoperateurproductionshift2(selectedValues.length); // ✅ Update count dynamically
+    };
+    const handleSelectChangecfshift2 = (selectedValues) => {
+      setOperateurcfshift2(selectedValues);
+      setNombreoperateurcfshift2(selectedValues.length); // ✅ Update count dynamically
+    };
+    const handleSelectChangecslshift2 = (selectedValues) => {
+      setOperateurcslshift2(selectedValues);
+      setNombreoperateurcslshift2(selectedValues.length); // ✅ Update count dynamically
+    };
   
   return (
   <div>
@@ -1822,7 +1911,7 @@ key={selectedMachine.id}
    <Select
     mode="multiple" // Enables multi-selection
     value={operateurchargementshift1} // Bind the state
-    onChange={(selectedValues) => setOperateurchargementshift1(selectedValues)} // Update state on selection
+    onChange={handleSelectChangeproductionshift1}// Update state on selection
     placeholder="Select Operateurs"
     style={{ width: '100%' }}
   >
@@ -1832,7 +1921,8 @@ key={selectedMachine.id}
       </Option>
     ))}
   </Select>
-
+     {/* Display the count of selected operators */}
+     <p>Nombre d'opérateurs sélectionnés: {nombreoperateurproductionshift1}</p>
 <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
@@ -2513,27 +2603,17 @@ key={selectedMachine.id}
 
 {shift.includes("shift1") && (
  <div style={{marginBottom:'30px'}}>
- {selectedMachine && machineReferences[selectedMachine.nom] && (
+ 
  <div className="references-dropdown">
  <label>Réferences</label>
- <Select
+ <Input
    value={selectedReference}
-   onChange={handleReferenceSelect}
+   onChange={((e)=>setSelectedReference(e.target.value))}
    style={{ width: '100%' }}
    placeholder="Select reference"
- >
-   {/* Check if references are an array before mapping */}
-   {Array.isArray(machineReferences[selectedMachine.nom]) && 
-     machineReferences[selectedMachine.nom].map((reference, index) => (
-       <Option key={index} value={reference}>
-         {reference}
-       </Option>
-     ))
-   }
- </Select>
+ > 
+ </Input>
  </div>
- )}
- 
  </div>
 )}
 
@@ -2565,41 +2645,37 @@ key={selectedMachine.id}
       )}
     
     {phasechargement.includes("chargement") && (
-    <div>
-    <div className="operateur-select">
-   
-     
-   <Select
-    mode="multiple" // Enables multi-selection
-    value={operateurchargementshift1} // Bind the state
-    onChange={(selectedValues) => setOperateurchargementshift1(selectedValues)} // Update state on selection
-    placeholder="Select Operateurs"
-    style={{ width: '100%' }}
-  >
-    {operateurs.map((regleur) => (
-      <Option key={regleur.id} value={regleur.nom}>
-        {regleur.nom}  {regleur.prenom}
-      </Option>
-    ))}
-  </Select>
-
-<Checkbox.Group style={{ width: '100%' }}>
-        <Row>
-       
-          <Col span={8}>
-          Manque des opérateurs
-            <InputNumber
-              min={0}
-              placeholder="Enter a number"
-              style={{ marginLeft: 10 }}
-              value={manquechrgementshift1}
-              onChange={(value) => setManquechargementshift1(value)}
-            />
-          </Col>
-        </Row>
- </Checkbox.Group>
-    </div>
-    </div>
+      <div className="operateur-select">
+      <Select
+       mode="multiple" // Enables multi-selection
+       value={operateurchargementshift1} // Bind the state
+       onChange={handleSelectChangeproductionshift1}// Update state on selection
+       placeholder="Select Operateurs"
+       style={{ width: '100%' }}
+     >
+       {operateurs.map((regleur) => (
+         <Option key={regleur.id} value={regleur.nom}>
+           {regleur.nom}
+         </Option>
+       ))}
+     </Select>
+      
+   <Checkbox.Group style={{ width: '100%' }}>
+           <Row>
+          
+             <Col span={8}>
+             Manque des opérateurs
+               <InputNumber
+                 min={0}
+                 placeholder="Enter a number"
+                 style={{ marginLeft: 10 }}
+                 value={manquechrgementshift1}
+                 onChange={(value) => setManquechargementshift1(value)}
+               />
+             </Col>
+           </Row>
+    </Checkbox.Group>
+       </div>
     )}
     
   
@@ -2701,7 +2777,7 @@ key={selectedMachine.id}
     <Select
     mode="multiple" // Enables multi-selection
     value={operateurcfshift1} // Bind the state
-    onChange={(selectedValues) => setOperateurcfshift1(selectedValues)} // Update state on selection
+    onChange={handleSelectChangecfshift1} // Update state on selection
     placeholder="Select Operateurs"
     style={{ width: '100%' }}
   >
@@ -2768,7 +2844,7 @@ key={selectedMachine.id}
  <Select
     mode="multiple" // Enables multi-selection
     value={operateurcslshift1} // Bind the state
-    onChange={(selectedValues) => setOperateurcslshift1(selectedValues)} // Update state on selection
+    onChange={handleSelectChangecslshift1} // Update state on selection
     placeholder="Select Operateurs"
     style={{ width: '100%' }}
   >
@@ -2895,7 +2971,7 @@ transition={{ duration: 0.5 }}
    <Select
     mode="multiple" // Enables multi-selection
     value={operateurchargementshift2} // Bind the state
-    onChange={(selectedValues) => setOperateurchargementshift2(selectedValues)} // Update state on selection
+    onChange={handleSelectChangeproductionshift2} // Update state on selection
     placeholder="Select Operateurs"
     style={{ width: '100%' }}
   >
@@ -3030,7 +3106,7 @@ transition={{ duration: 0.5 }}
   <Select
     mode="multiple" // Enables multi-selection
     value={operateurcfshift2} // Bind the state
-    onChange={(selectedValues) => setOperateurcfshift2(selectedValues)} // Update state on selection
+    onChange={handleSelectChangecfshift2} // Update state on selection
     placeholder="Select Operateurs"
     style={{ width: '100%' }}
   >
@@ -3101,7 +3177,7 @@ transition={{ duration: 0.5 }}
  <Select
     mode="multiple" // Enables multi-selection
     value={operateurcslshift2} // Bind the state
-    onChange={(selectedValues) => setOperateurcslshift2(selectedValues)} // Update state on selection
+    onChange={handleSelectChangecslshift2} // Update state on selection
     placeholder="Select Operateurs"
     style={{ width: '100%' }}
   >

@@ -20,6 +20,7 @@ import ActionHistory from './pages/ActionHistory';
 import Actualisationoutil from './pages/Actualisationoutil';
 import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 import ToolDetails from './pages/detailstool';
+import Listeplannification from './pages/Listplannification';
 
 
 function App() {    
@@ -48,6 +49,7 @@ function App() {
       <Route path="/history" element={<ActionHistory/>} />
       <Route path="/actualisation" element={<Actualisationoutil/>} />
       <Route path="/ajouterdefautinspection" element={<Ajouterdefautinspection/>} />
+      <Route path="/listplannification" element={<Listeplannification/>} />
    
       </Routes>
      </Router>

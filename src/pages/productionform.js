@@ -288,6 +288,7 @@ const Form = () => {
         totalrealise: totalproduit || 0,
         machine_id: machineId,
         dureedeproblemeproduction: durationproduction,
+        nombreoperateur: Nombreopearateurproduction,
       };
   
       await axios.post("https://grinding-backend.azurewebsites.net/ajouter/prod", productionData, {
@@ -323,6 +324,7 @@ const Form = () => {
         totalrealise: totalproduit || 0,
         machine_id: machineId,
         dureedeproblemecf: durationcf,
+        nombreoperateur: Nombreopearateurcf,
       };
   
       await axios.post("https://grinding-backend.azurewebsites.net/ajouter/prod", productionData, {
@@ -394,6 +396,7 @@ const Form = () => {
         totalrealise: totalproduit || 0,
         machine_id: machineId,
         dureedeproblemecsl: durationcsl,
+        nombreoperateur: Nombreopearateurcsl,
       };
   
       await axios.post("https://grinding-backend.azurewebsites.net/ajouter/prod", productionData, {
@@ -625,9 +628,9 @@ const Form = () => {
         onChange={(e) => setTotalproduit(e.target.value)}
       />
     </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
-      <span>{Nombreopearateurproduction !== null ? Nombreopearateurproduction : 'No data for today'}</span>
+     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Nombre Operateur</label>
+      <Input value={Nombreopearateurproduction} onChange={(e)=>setNombreoperateurproduction(e.target.value)}></Input>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <label style={{ fontWeight: 'bold' }}>Objective Production:</label>
@@ -830,9 +833,9 @@ const Form = () => {
     <label style={{ fontWeight: "bold" }}>Total produit CF</label>
     <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
     </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
-      <span>{Nombreopearateurcf !== null ? Nombreopearateurcf : 'No data for today'}</span>
+   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Nombre Operateur</label>
+      <Input value={Nombreopearateurcf} onChange={(e)=>setNombreoperateurcf(e.target.value)}></Input>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CF:</label>
@@ -1055,7 +1058,7 @@ const Form = () => {
   </div>
   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
-      <span>{Nombreopearateurcsl !== null ? Nombreopearateurcsl : 'No data for today'}</span>
+      <Input value={Nombreopearateurcsl} onChange={(e)=>setNombreoperateurcsl(e.target.value)}></Input>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CSL:</label>

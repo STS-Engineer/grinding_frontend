@@ -505,7 +505,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
   
     try {
       const plannificationData = {
-        phase: phasechargement,
+        phase: 'chargement',
         id_machine: selectedMachine.id,
         id_operateur: operateurs.id,
         phasereguleur: phasereguleur,
@@ -756,7 +756,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
 
         const plannificationData = {
-          phase: phasechargementshif2,
+          phase: 'chargement',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -1038,6 +1038,257 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setLoading(false);
     }
   };
+
+   const handlesubmitcfshift1 = async () => {
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const generateWeeklyDates = (start, end) => {
+        const dates = [];
+        let currentDate = new Date(start);
+        const finalEndDate = new Date(end);
+  
+        while (currentDate <= finalEndDate) {
+          dates.push(currentDate.toISOString().split("T")[0]);
+          currentDate.setDate(currentDate.getDate() + 7);
+        }
+  
+        return dates;
+      };
+  
+      const plannificationDates = generateWeeklyDates(startDate, endDate);
+  
+      // Add the new events to the backend
+      for (const date of plannificationDates) {
+        const plannificationData = {
+          phase: phasecslshift2,
+          id_machine: selectedMachine.id,
+          id_operateur: operateurs.id,
+          phasereguleur: phasereguleur,
+          operateurs: operateurcslshift2.join(', '),
+          phasecsl: phasecsl,
+          operateur_csl: operateur_csl,
+          phasecf: phasecf,
+          operateur_cf: operateur_cf,
+          operateur_chargement: operateurchargement,
+          totalplanifie: totalproduction,
+          nombre_heure_shift1: nombre_heure_shift1,
+          nombre_heure_shift2: nombre_heure_shift2,
+          shift: shift,
+          shift2: shift2,
+          phasechargementshif2: phasechargementshif2,
+          operateurchargementshift2: operateurchargementshift2,
+          phasereguleurshif2: phasereguleurshif2,
+          operateur_reguleurshif2: operateur_reguleurshif2,
+          phasecslshift2: phasecslshift2,
+          operateurcslshift2: operateurcslshift2,
+          phasecfshift2: phasecfshift2,
+          operateurcfshift2: operateurcfshift2,
+          objectiveproductionshift2: totalproductionshift2,
+          objectivecslshift2: totalcslshift2,
+          objectivecfshift2: totalcfshift2,
+          objectivecf: totalcf,
+          objectivecsl: totalcsl,
+          nombredemanqueoperateur: manquecslshift2,
+          start_date: date,
+          end_date: endDate,
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcslshift2
+        };
+  
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+  
+      message.success("Plannification added successfully.");
+      setIsAddModalVisible(false);
+      setShouldFetchEvents(true); 
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
+
+  const handlesubmitfromshif1regleurtoshift2 = async () => {
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const generateWeeklyDates = (start, end) => {
+        const dates = [];
+        let currentDate = new Date(start);
+        const finalEndDate = new Date(end);
+  
+        while (currentDate <= finalEndDate) {
+          dates.push(currentDate.toISOString().split("T")[0]);
+          currentDate.setDate(currentDate.getDate() + 7);
+        }
+  
+        return dates;
+      };
+  
+      const plannificationDates = generateWeeklyDates(startDate, endDate);
+  
+      // Add the new events to the backend
+      for (const date of plannificationDates) {
+        const plannificationData = {
+          phase: phasecslshift2,
+          id_machine: selectedMachine.id,
+          id_operateur: operateurs.id,
+          phasereguleur: phasereguleur,
+          operateurs: operateurcslshift2.join(', '),
+          phasecsl: phasecsl,
+          operateur_csl: operateur_csl,
+          phasecf: phasecf,
+          operateur_cf: operateur_cf,
+          operateur_chargement: operateurchargement,
+          totalplanifie: totalproduction,
+          nombre_heure_shift1: nombre_heure_shift1,
+          nombre_heure_shift2: nombre_heure_shift2,
+          shift: shift,
+          shift2: shift2,
+          phasechargementshif2: phasechargementshif2,
+          operateurchargementshift2: operateurchargementshift2,
+          phasereguleurshif2: phasereguleurshif2,
+          operateur_reguleurshif2: operateur_reguleurshif2,
+          phasecslshift2: phasecslshift2,
+          operateurcslshift2: operateurcslshift2,
+          phasecfshift2: phasecfshift2,
+          operateurcfshift2: operateurcfshift2,
+          objectiveproductionshift2: totalproductionshift2,
+          objectivecslshift2: totalcslshift2,
+          objectivecfshift2: totalcfshift2,
+          objectivecf: totalcf,
+          objectivecsl: totalcsl,
+          nombredemanqueoperateur: manquecslshift2,
+          start_date: date,
+          end_date: endDate,
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcslshift2
+        };
+  
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+  
+      setShouldFetchEvents(true); 
+      setCurrentStep(6);
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlesubmitshift2 = async () => {
+    setLoading(true);
+  
+    if (!startDate || !endDate) {
+      message.error("Please select a valid start and end date for plannification.");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const generateWeeklyDates = (start, end) => {
+        const dates = [];
+        let currentDate = new Date(start);
+        const finalEndDate = new Date(end);
+  
+        while (currentDate <= finalEndDate) {
+          dates.push(currentDate.toISOString().split("T")[0]);
+          currentDate.setDate(currentDate.getDate() + 7);
+        }
+  
+        return dates;
+      };
+  
+      const plannificationDates = generateWeeklyDates(startDate, endDate);
+  
+      // Add the new events to the backend
+      for (const date of plannificationDates) {
+        const plannificationData = {
+          phase: phasecslshift2,
+          id_machine: selectedMachine.id,
+          id_operateur: operateurs.id,
+          phasereguleur: phasereguleur,
+          operateurs: operateurcslshift2.join(', '),
+          phasecsl: phasecsl,
+          operateur_csl: operateur_csl,
+          phasecf: phasecf,
+          operateur_cf: operateur_cf,
+          operateur_chargement: operateurchargement,
+          totalplanifie: totalproduction,
+          nombre_heure_shift1: nombre_heure_shift1,
+          nombre_heure_shift2: nombre_heure_shift2,
+          shift: shift,
+          shift2: shift2,
+          phasechargementshif2: phasechargementshif2,
+          operateurchargementshift2: operateurchargementshift2,
+          phasereguleurshif2: phasereguleurshif2,
+          operateur_reguleurshif2: operateur_reguleurshif2,
+          phasecslshift2: phasecslshift2,
+          operateurcslshift2: operateurcslshift2,
+          phasecfshift2: phasecfshift2,
+          operateurcfshift2: operateurcfshift2,
+          objectiveproductionshift2: totalproductionshift2,
+          objectivecslshift2: totalcslshift2,
+          objectivecfshift2: totalcfshift2,
+          objectivecf: totalcf,
+          objectivecsl: totalcsl,
+          nombredemanqueoperateur: manquecslshift2,
+          start_date: date,
+          end_date: endDate,
+          referenceproduit: selectedReference,
+          nombreoperateurprod: nombreoperateurcslshift2
+        };
+  
+        await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
+      message.success('Plannification Added succesfully');
+      setIsAddModalVisible(false);
+      setShouldFetchEvents(true); 
+      setCurrentStep(6);
+  
+    } catch (error) {
+      message.error("Failed to add plannifications.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   const handleUpdateEvent = async (plannificationId) => {
@@ -1697,8 +1948,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setOperateurcslshift2(selectedValues);
       setNombreoperateurcslshift2(selectedValues.length); // ✅ Update count dynamically
     };
-  
-  return (
+
+   return (
   <div>
     <div className='navbar'>
         <ul className="navbar-links">
@@ -1921,8 +2172,7 @@ key={selectedMachine.id}
       </Option>
     ))}
   </Select>
-     {/* Display the count of selected operators */}
-     <p>Nombre d'opérateurs sélectionnés: {nombreoperateurproductionshift1}</p>
+    
 <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
@@ -2077,6 +2327,11 @@ key={selectedMachine.id}
   >
     Back
   </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handlesubmitcfshift1()}
+  >
+    Submit  </button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleUpdateEvent3()}
@@ -2680,7 +2935,7 @@ key={selectedMachine.id}
     
   
     <div className="button-step1">
-      <button className="custom-button" onClick={()=>handleAddEvent()}>Next </button>
+      <button className="custom-button" onClick={()=>handleAddEvent()}>Next  </button>
     </div>
     
     </div>
@@ -2747,9 +3002,13 @@ key={selectedMachine.id}
   >
     Next
   </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handlesubmitfromshif1regleurtoshift2()}
+  >
+    Next to shift 2  </button>
 </div>
-
-    </div>
+ </div>
   
 
     
@@ -2816,8 +3075,13 @@ key={selectedMachine.id}
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent3()}
   >
-    Next
+    Next To CSL
   </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handlesubmitfromshif1regleurtoshift2()}
+  >
+    Next to shift 2  </button>
 </div>
     
     </div>
@@ -3078,8 +3342,14 @@ transition={{ duration: 0.5 }}
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent6()}
   >
-    Next
+    Next To CF
   </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handlesubmitshift2()}
+  >
+   Submit  </button>
+ 
 </div>
   </div>
 )}
@@ -3146,9 +3416,14 @@ transition={{ duration: 0.5 }}
   </button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
+    onClick={() => handlesubmitshift2()}
+  >
+   Submit  </button>
+  <button 
+    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent7()}
   >
-    Next
+    Next TO CSL
   </button>
 </div>
     </div>
@@ -3232,6 +3507,7 @@ transition={{ duration: 0.5 }}
  
  </div>
   );
+ 
 };
 
 export default Calendar;

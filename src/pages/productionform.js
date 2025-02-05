@@ -13,9 +13,6 @@ const Form = () => {
   const [problemespostecontrole, setProblemespostecontrole] = useState([]);
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [phase, setPhase] = useState('');
-  const [phasecf, setPhasecf] = useState('');
-  const [phasecsl, setPhasecsl] = useState('');
-  const [outil, setOutil] = useState('');
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -66,11 +63,15 @@ const Form = () => {
   const [objectiveProduction, setObjectiveProduction] = useState(null);
   const [objectiveCF, setObjectiveCF] = useState(null);
   const [objectiveCSL, setObjectiveCSL] = useState(null);
+  const [Nombreopearateurproduction, setNombreoperateurproduction] = useState(null);
+  const [Nombreopearateurcf, setNombreoperateurcf] = useState(null);
+  const [Nombreopearateurcsl, setNombreoperateurcsl] = useState(null);
   const [defautinspection, setDefautinspection] = useState([]);
   const [defautproduction, setDefautproduction] = useState([]);
   const [defauts, setDefauts] = useState([{ totaldefautproduction: '', typedefautproduction: [] }]);
   const [defautscf, setDefautscf] = useState([{ totaldefautcf: '', typedefautcf: [] }]);
   const [defautscsl, setDefautscsl] = useState([{ totaldefautcsl: '', typedefautcsl: [] }]);
+
 
 
   const navigate = useNavigate();
@@ -142,7 +143,7 @@ const Form = () => {
   const getCurrentShift = () => {
     const currentHour = new Date().getHours();
     const shift1Start = 6;
-    const shift1End = 16; // 3 PM
+    const shift1End = 16; // 4 PM
     return currentHour >= shift1Start && currentHour < shift1End ? 'shift1' : 'shift2';
   };
 
@@ -212,46 +213,6 @@ const Form = () => {
     setDurationproduction(calculateDuration(startTimeproduction, endTimeproduction));
   }, [startTimeproduction, endTimeproduction]);
 
-// Map of machine IDs to corresponding references
-  const machineReferences = {
-    "MUD6": ["1026188", "1026540", "102629"],
-    "NGG3": ["1026649"],
-    "NGG4": ["1026577", "1026578 "],
-    "NGG6": ["1026648"],
-    "SSS 3227": ["1026617"],
-    "MUD7": ["473801"],
-    "MUD420": ["1026325"],
-    "KOJ": ["1029647"],
-    "MK100-3": ["1026620", "1026621"],
-  };
-  const defectOptions = {
-    "Production": [
-      "DefautreglageUsinagehauteur ",
-      "DefautreglageUsinagelargeur",
-      "DefautreglageChanfreinage",
-      "DefautreglageRayonnage ",  
-    ],
-    "cf": [
-      "DefautEpaisseur Max",
-      "DefautEpaisseur min",
-      "DefautLargeur",
-      "DefautChanfrein",
-      "DefautRayonnageSurfacefrottante",
-      "DefautCassureAspect",
-      "Defaut Blocage",
-      "MesureSPC"
-    ],
-    "csl": [
-      "DefautEpaisseur ",
-      "DefautLargeur",
-      "DefautChanfrein ",
-      "DefautRayonnageSurface frottante",
-      "DefautCassureAspect",
-
-     
-    ],
-  };
-
 
   // Handle machine selection
   const handleMachineSelect = async (machine) => {
@@ -273,8 +234,8 @@ const Form = () => {
   
     setIsModalVisible(true);
   };
-
-    const handleAddField = () => {
+  
+  const handleAddField = () => {
     setDefauts([
       ...defauts,
       { totaldefautproduction: '', typedefautproduction: [] }, // Add new field set
@@ -308,7 +269,6 @@ const Form = () => {
     newDefauts[index][fieldName] = value;
     setDefauts(newDefauts);
   };
-
   // Handle form submission
   const handleSubmitproduction = async () => {
     try {
@@ -381,6 +341,42 @@ const Form = () => {
     }
   };
 
+  const handleSubmitcflose = async () => {
+    try {
+      const token = localStorage.getItem('token');
+  
+      // Ensure all numeric fields have a valid value (default to 0 if empty)
+      const productionData = {
+        referenceproduit: refprod,
+        date: date,
+        shift: shift,
+        phase: phase,
+        totalplanifie: objectiveCF.join(','),
+        typedefautcf: typedefautcf,
+        totaldefautcf: totaldefautcf || 0,
+        typedeproblemecf: typeproblemecf,
+        totalrealise: totalproduit || 0,
+        machine_id: machineId,
+        dureedeproblemecf: durationcf,
+      };
+  
+      await axios.post("https://grinding-backend.azurewebsites.net/ajouter/prod", productionData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+     setIsModalVisible(false);
+     message.success('Production has been added succefully ');
+    } catch (error) {
+      console.error('Error adding production:', error);
+      message.error('Failed to add production.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmitcsl = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -440,6 +436,30 @@ const Form = () => {
       return null;
     }
   };
+
+  
+  const fetchPlannificationBynombreoperateur = async (phase, shift, startDate, endDate, id_machine, referenceproduit) => {
+    console.log("Request Params:", { phase, shift, startDate, endDate, id_machine, referenceproduit });
+  
+    try {
+      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/plannificationss", {
+        params: { phase, shift, startDate, endDate, id_machine, referenceproduit },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log("Response Data:", response.data);
+  
+      // Extract totalplanifie values
+      if (response.data && Array.isArray(response.data)) {
+        return response.data.map(record => record.nombreoperateurprod);
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching plannification for phase ${phase}:`, error);
+      return null;
+    }
+  };
   
   
   const getStartAndEndDate = () => {
@@ -461,15 +481,22 @@ const Form = () => {
     const referenceproduit = selectedMachine.referenceproduit; // Provide the referenceproduit
   
     try {
-      const [productionObjective, cfObjective, cslObjective] = await Promise.all([
+      const [productionObjective, cfObjective, cslObjective, Nombreopearateurproduction, Nombreopearateurcf, Nombreopearateurcsl] = await Promise.all([
         fetchPlannificationByPhase("chargement", shift, startDate, endDate, selectedMachine.id, referenceproduit),
         fetchPlannificationByPhase("cf", shift, startDate, endDate, selectedMachine.id, referenceproduit),
         fetchPlannificationByPhase("csl", shift, startDate, endDate, selectedMachine.id, referenceproduit),
+        fetchPlannificationBynombreoperateur("chargement", shift, startDate, endDate, selectedMachine.id, referenceproduit),
+        fetchPlannificationBynombreoperateur("cf", shift, startDate, endDate, selectedMachine.id, referenceproduit),
+        fetchPlannificationBynombreoperateur("csl", shift, startDate, endDate, selectedMachine.id, referenceproduit),
       ]);
   
       setObjectiveProduction(productionObjective);
       setObjectiveCF(cfObjective);
       setObjectiveCSL(cslObjective);
+      setNombreoperateurproduction(Nombreopearateurproduction);
+      setNombreoperateurcf(Nombreopearateurcf);
+      setNombreoperateurcsl(Nombreopearateurcsl);
+ 
   
       console.log("Production Objective:", productionObjective);
       console.log("CF Objective:", cfObjective);
@@ -479,9 +506,13 @@ const Form = () => {
     }
   };
   
+  
+  
+  
   useEffect(() => {
     if (selectedMachine && selectedMachine.id) {
       fetchObjectives();
+      fetchPlannificationBynombreoperateur();
     }
   }, [selectedMachine]);
   
@@ -489,6 +520,7 @@ const Form = () => {
   const handleLogout = () => {
     navigate('/login');
   };
+
 
   return (
     <div className="body_container">
@@ -559,8 +591,8 @@ const Form = () => {
         </div>
       )}
 
-    <div className="references-dropdown">
-       <label>Référence</label>
+       <div className="references-dropdown">
+       <label>Réferences</label>
        <Input
          value={refprod}
          onChange={((e)=>setRefprod(e.target.value))}
@@ -573,7 +605,7 @@ const Form = () => {
   {/* Display Objective Production */}
   <div style={{marginBottom:'80px'}}>
   <div className="input-field">
-          <label>Déclaration du quantité produit</label>
+          <label>Déclaration du quantité produite machine</label>
           <Checkbox.Group
             style={{ width: '100%' }}
             value={phase}
@@ -592,6 +624,10 @@ const Form = () => {
         value={totalproduit}
         onChange={(e) => setTotalproduit(e.target.value)}
       />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
+      <span>{Nombreopearateurproduction !== null ? Nombreopearateurproduction : 'No data for today'}</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
       <label style={{ fontWeight: 'bold' }}>Objective Production:</label>
@@ -757,6 +793,7 @@ const Form = () => {
   </button>
 </div>
 
+
 </div>
 
 
@@ -792,6 +829,10 @@ const Form = () => {
     <div  style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold" }}>Total produit CF</label>
     <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
+      <span>{Nombreopearateurcf !== null ? Nombreopearateurcf : 'No data for today'}</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CF:</label>
@@ -957,9 +998,28 @@ const Form = () => {
       ))
     }
   >
-    Next
+    Next To CSL
+  </button>
+
+  <button 
+    className="custom-button" 
+    onClick={() => handleSubmitcflose()} 
+    disabled={
+      !totalproduitcf || // Disable if totalproduit is empty
+      (parseInt(totalproduitcf) < parseInt(objectiveCF) && (
+        !typeproblemecf.length || // Must have at least one problem type selected
+        !startTimecf || // Start time must be provided
+        defautscf.some(defaut => 
+          !defaut.typedefautcf.length || // Must select at least one typedefautcf
+          !defaut.totaldefautcf.trim() // Must enter totaldefautcf (not just whitespace)
+        )
+      ))
+    }
+  >
+    Submit
   </button>
 </div>
+
             
  </div>
 )}
@@ -993,6 +1053,10 @@ const Form = () => {
   <label style={{ fontWeight: "bold" }}>Total produit CSL</label>
    <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
   </div>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
+      <span>{Nombreopearateurcsl !== null ? Nombreopearateurcsl : 'No data for today'}</span>
+    </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CSL:</label>
     <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>
@@ -1163,7 +1227,6 @@ const Form = () => {
   </div>
     </div>
   );
-
 };
 
 export default Form;

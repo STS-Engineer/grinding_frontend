@@ -21,26 +21,26 @@ const Ajouternouvellemachine = () => {
 
   const [phase1roueavancement,setphase1roueavancement]= useState('');
   const [refroueoutil,setRefroueoutil]= useState('');
-  const [dureevierefroueoutil,setDureevierefroueoutil]= useState('');
+  const [dureevierefroueoutil,setDureevierefroueoutil]= useState(0);
   const [phase2usinagehauteur,setPhase2usinagehauteur]= useState('');
   const [refmeulehauteuroutil,setRefmeulehauteuroutil]= useState('');
-  const [dureevierefmeulehauteuroutil,setDureevierefmeulehauteuroutil]= useState('');
+  const [dureevierefmeulehauteuroutil,setDureevierefmeulehauteuroutil]= useState(0);
   const [phase3usinagelargeur,setPhase3usinagelargeur]= useState('');
   const [refmeulelargeuroutil,setRefmeulelargeuroutil]= useState('');
-  const [dureevierefmeulelargeuroutil,setDureevierefmeulelargeuroutil]= useState('');
+  const [dureevierefmeulelargeuroutil,setDureevierefmeulelargeuroutil]= useState(0);
   const [phase4usinagechanfreins,setPhase4usinagechanfreins]= useState('');
   const [refmeulechanfreinsoutil,setRefmeulechanfreinsoutil]= useState('');
-  const [dureevierefmeulechanfrein,setDureevierefmeulechanfrein]= useState('');
+  const [dureevierefmeulechanfrein,setDureevierefmeulechanfrein]= useState(0);
   const [phase5usinagerainure,setPhase5usinagerainure]= useState('');
   const [outillageusinagerainureoutil,setOutillageusinagerainureoutil]= useState('');
-  const [dureevieoutillageusinagerainureoutil,setDureevieoutillageusinagerainureoutil]= useState('');
+  const [dureevieoutillageusinagerainureoutil,setDureevieoutillageusinagerainureoutil]= useState(0);
 
   const [phase5usinagerayonnage,setPhase5usinagerayonnage]= useState('');
   const [refmeulerayonnage,setRefmeulerayonnage]= useState('');
-  const [dureevierefmeulerayonnageoutil,setDureevierefmeulerayonnageoutil]= useState('');
+  const [dureevierefmeulerayonnageoutil,setDureevierefmeulerayonnageoutil]= useState(0);
   const [phase5usinagetete,setPhase5usinagetete]= useState('');
   const [outillageusinagetete,setOutillageusinagetete]= useState('');
-  const [dureevieusinagetete, setDureevieusinagetete] = useState('');
+  const [dureevieusinagetete, setDureevieusinagetete] = useState(0);
   const [phase6inspectioncf, setphase6inspectioncf] = useState('');
   const [nombre_operateur_cf, setNombre_operateur_cf] = useState('');
   const [phase6inspectioncsl, setPhase6inspectioncslf] = useState('');

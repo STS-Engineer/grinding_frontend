@@ -6,6 +6,7 @@ import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
@@ -22,8 +23,10 @@ const Login = () => {
 
       if (response.status === 200) {
         const token = response.data.token; // Extract the token from the response
+        const role = response.data.role
         // Save the token in local storage
         localStorage.setItem("token", token);
+        localStorage.setItem("role", role);
   
         // Optionally, you can store the user's information like email or ID
         localStorage.setItem("userEmail", email);

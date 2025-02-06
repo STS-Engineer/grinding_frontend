@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Modal, Form, Input, Button, message } from "antd";
+import { Modal, Form, Input, Button, message, Select } from "antd";
+import { RoleContext } from "./RoleContext";
+import { useNavigate } from "react-router-dom";
 
 
 
-
+const{Option} = Select;
 const ToolDetails = () => {
   const [Tools, setTool] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,7 @@ const ToolDetails = () => {
     dureedevie: ''
 
   });
+   const [form] = Form.useForm(); 
 
   // Fetch machines from the backend
   const fetchTool = async () => {
@@ -104,6 +107,7 @@ const ToolDetails = () => {
   const showModal = (machine) => {
     setSelectedTool(machine);
     setIsModalVisible(true);
+    form.setFieldsValue(machine);
   };
   const handleDelete = async (ToolId) => {
     try {
@@ -132,15 +136,11 @@ const ToolDetails = () => {
     setIsModalVisible(false);
   };
 
-  const handleFormChange = (changedValues) => {
-    setFormValues(prevState => ({
-      ...prevState,
-      ...changedValues,
-    }));
-  };
 
-  const onFinish = (values) => {
-    handleUpdate(values); // Pass the updated values to the handler
+
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    navigate('/login');
   };
 
   if (loading) return <div>Loading...</div>;
@@ -148,18 +148,14 @@ const ToolDetails = () => {
 
   return (
     <div>
-          <div className='navbar'>
+        <div className='navbar'>
         <ul className="navbar-links">
-          <li><a href="/home">Acceuil</a></li>
-          <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
-          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
-          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
-          <li><a href="/details">Détails des machines</a></li>
-          <li><a href="/calendar">Plannification</a></li>
-          
+        <li><a href="/form">Ajouter Production</a></li>
+        <li><a href="/changementmeules">Changement des meules</a></li>
+        <button className='logout-button' onClick={handleLogout}>Logout</button>  
         </ul>
       </div>
+      
   
       <div className="machine-list">
         {Tools.map((machine) => {
@@ -241,16 +237,25 @@ const ToolDetails = () => {
         className="machine-modal"
       >
         <Form
-          initialValues={formValues}
-          onFinish={onFinish}
-          onValuesChange={handleFormChange} // Capture form changes
-          className="machine-form"
+          form={form}
+          onFinish={handleUpdate}
+          layout="vertical"
         >
           <Form.Item label="Nom_outil" name="nom_outil" rules={[{ required: true }]}>
             <Input type="text" />
           </Form.Item>
           <Form.Item label="Phase" name="phase" rules={[{ required: true }]}>
-            <Input type="text" />
+          <Select
+              placeholder="Select a phase"
+              >
+             <Option value="roueavancement">Roue d'avancement</Option>
+              <Option value="Usinagehauteur">Usinage Hauteur</Option>
+              <Option value="Usinagelargeur">Usinage Largeur</Option>
+              <Option value="Usinagechanfreins">Usinage Chanfreins</Option>
+              <Option value="Usinagerainure">Usinage rainure</Option>
+              <Option value="Usinagerayonnage">Usinage rayonnage</Option>
+              <Option value="Usinagetete">Usinage tete</Option>
+             </Select>
           </Form.Item>
           <Form.Item label="DUrée de vie" name="dureedevie" rules={[{ required: true }]}>
             <Input type="text" />

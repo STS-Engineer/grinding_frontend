@@ -25,7 +25,7 @@ import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 import ToolDetails from './pages/detailstool';
 import Listeproblemecontrole from './pages/Listproblemecontrole';
 import Listeplannification from './pages/Listplannification';
-import Listedefautsinspection from './pages/Lisdefautsinspection';
+
 
 function App() {
   return (     
@@ -59,7 +59,7 @@ function App() {
             <Route path="/changementmeules" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Actualisationoutil /></ProtectedRoute>} />
             <Route path="/ajouterdefautinspection" element={<ProtectedRoute allowedRoles={['REGLEUR']}><Ajouterdefautinspection /></ProtectedRoute>} />
             <Route path="/listplannification" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listeplannification /></ProtectedRoute>} />
-            <Route path="/listdefautsinspection" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listedefautsinspection /></ProtectedRoute>} />
+           
 
             {/* Specific Role-Based Access */}    
             <Route path="/form" element={<ProtectedRoute allowedRoles={['ADMIN','REGLEUR']}><Form /></ProtectedRoute>} />

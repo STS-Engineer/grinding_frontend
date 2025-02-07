@@ -1,59 +1,73 @@
 import './App.css';
-import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { RoleProvider } from './pages/RoleContext';
+import ProtectedRoute from './pages/ProtectedRoute';
 import Form from './pages/productionform';
 import AnimatedPage from './pages/Animatedpage';
 import MachineDetails from './pages/machinedetails';
 import MachineForm from './pages/MachineForm';
 import Login from './pages/Login';
 import PlannificationForm from './pages/Plannification';
-import Ajouternouvellemachine from './pages/Ajouternouvellemachine';
+import Ajoutermachine from './pages/Ajouternouvellemachine';
 import Calendar from './pages/calendar';
-import Ajouterregleur from './pages/Ajouterregleur';  
-import Ajouteroperateur from './pages/Ajouteroperateur';  
+import Ajouternouvellemachine from './pages/Ajouternouvellemachine';
+import Ajouterregleur from './pages/Ajouterregleur';
+import Ajouteroperateur from './pages/Ajouteroperateur';
 import Ajouterprobleme from './pages/ajouterprobleme';
 import Ajouterdefaut from './pages/Ajouterdefaut';
-import Listregleur from './pages/List de regleurs';
 import Listoperateur from './pages/Listoperateurs';
+import Listregleur from './pages/List de regleurs';
 import Ajouterposte from './pages/Ajouter poste de controle';
 import Ajouteroutil from './pages/Ajouter outil';
-import ActionHistory from './pages/ActionHistory';
+import ActionHistory from './pages/ActionHistory ';
 import Actualisationoutil from './pages/Actualisationoutil';
 import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 import ToolDetails from './pages/detailstool';
+import Listeproblemecontrole from './pages/Listproblemecontrole';
 import Listeplannification from './pages/Listplannification';
+import Listedefautsinspection from './pages/Lisdefautsinspection';
 
+function App() {
+  return (     
+    <RoleProvider>
+      <div className="App">
+        <Router>
+          <Routes>
+            {/* Redirect to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-function App() {    
-  return (
-    <div className="App">      
-     <Router>
-      <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/form" element={<Form />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/home" element={<AnimatedPage />} />
-      <Route path="/details" element={<MachineDetails />} />
-      <Route path="/detailoutil" element={<ToolDetails />} />
-      <Route path="/machineform" element={<MachineForm />} />
-      <Route path="/ajouternouvellemachine" element={<Ajouternouvellemachine />} />
-      <Route path="/calendar" element={<Calendar />} />
-      <Route path="/ajouterregleur" element={<Ajouterregleur />} />
-      <Route path="/ajouteroperateur" element={<Ajouteroperateur />} />
-      <Route path="/plannification" element={<PlannificationForm/>} />
-      <Route path="/ajouterprobleme" element={<Ajouterprobleme/>} />
-      <Route path="/ajouterdefaut" element={<Ajouterdefaut/>} />
-      <Route path="/listoperateur" element={<Listoperateur/>} />
-      <Route path="/listregleur" element={<Listregleur/>} />
-      <Route path="/Ajouterproblemepostedecontrole" element={<Ajouterposte/>} />
-      <Route path="/Ajouteroutil" element={<Ajouteroutil/>} />
-      <Route path="/history" element={<ActionHistory/>} />
-      <Route path="/actualisation" element={<Actualisationoutil/>} />
-      <Route path="/ajouterdefautinspection" element={<Ajouterdefautinspection/>} />
-      <Route path="/listplannification" element={<Listeplannification/>} />
-   
-      </Routes>
-     </Router>
-    </div>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Protected Routes - Role Based Access */}
+            <Route path="/home" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><AnimatedPage /></ProtectedRoute>} />
+            <Route path="/details" element={<ProtectedRoute allowedRoles={['ADMIN']}><MachineDetails /></ProtectedRoute>} />
+            <Route path="/machineform" element={<ProtectedRoute allowedRoles={['ADMIN']}><MachineForm /></ProtectedRoute>} />
+            <Route path="/ajoutermachine" element={<ProtectedRoute allowedRoles={['ADMIN']}><Ajoutermachine /></ProtectedRoute>} />
+            <Route path="/calendar" element={<ProtectedRoute allowedRoles={['ADMIN']}><Calendar /></ProtectedRoute>} />
+            <Route path="/ajouternouvellemachine" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Ajouternouvellemachine /></ProtectedRoute>} />
+            <Route path="/ajouterregleur" element={<ProtectedRoute allowedRoles={['ADMIN']}><Ajouterregleur /></ProtectedRoute>} />
+            <Route path="/ajouteroperateur" element={<ProtectedRoute allowedRoles={['ADMIN']}><Ajouteroperateur /></ProtectedRoute>} />
+            <Route path="/ajouterprobleme" element={<ProtectedRoute allowedRoles={['REGLEUR']}><Ajouterprobleme /></ProtectedRoute>} />
+            <Route path="/ajouterdefaut" element={<ProtectedRoute allowedRoles={['ADMIN']}><Ajouterdefaut /></ProtectedRoute>} />
+            <Route path="/listoperateur" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listoperateur /></ProtectedRoute>} />
+            <Route path="/listregleur" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listregleur /></ProtectedRoute>} />
+            <Route path="/Ajouterproblemepostedecontrole" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Ajouterposte /></ProtectedRoute>} />
+            <Route path="/Listproblemecontrole" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Listeproblemecontrole /></ProtectedRoute>} />
+            <Route path="/Ajouteroutil" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Ajouteroutil /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute allowedRoles={['ADMIN']}><ActionHistory /></ProtectedRoute>} />
+            <Route path="/changementmeules" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Actualisationoutil /></ProtectedRoute>} />
+            <Route path="/ajouterdefautinspection" element={<ProtectedRoute allowedRoles={['REGLEUR']}><Ajouterdefautinspection /></ProtectedRoute>} />
+            <Route path="/listplannification" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listeplannification /></ProtectedRoute>} />
+            <Route path="/listdefautsinspection" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listedefautsinspection /></ProtectedRoute>} />
+
+            {/* Specific Role-Based Access */}    
+            <Route path="/form" element={<ProtectedRoute allowedRoles={['ADMIN','REGLEUR']}><Form /></ProtectedRoute>} />
+            <Route path="/detailoutil" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><ToolDetails /></ProtectedRoute>} />
+          </Routes>
+        </Router>
+      </div>
+    </RoleProvider>
   );
 }
 

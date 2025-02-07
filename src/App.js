@@ -19,7 +19,7 @@ import Listoperateur from './pages/Listoperateurs';
 import Listregleur from './pages/List de regleurs';
 import Ajouterposte from './pages/Ajouter poste de controle';
 import Ajouteroutil from './pages/Ajouter outil';
-import ActionHistory from './pages/ActionHistory ';
+import ActionHistory from './pages/ActionHistory';
 import Actualisationoutil from './pages/Actualisationoutil';
 import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 import ToolDetails from './pages/detailstool';

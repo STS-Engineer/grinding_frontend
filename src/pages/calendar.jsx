@@ -1961,13 +1961,13 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
   <div>
      <div className='navbar'>
         <ul className="navbar-links">
-        {(role === 'ADMIN' || role=== 'REGLEUR' ) && <li><a href="/form">Ajouter Production</a></li>}
-        {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
-        {role === 'ADMIN' &&  <li><a href="/listregleur">List des régleurs</a></li>}
-        {role === 'ADMIN' &&  <li><a href="/detailoutil">List des outils</a></li>}
-        {role === 'ADMIN' &&  <li><a href="/listoperateur">List des Opérateurs</a></li>}
-        {role === 'ADMIN' &&  <li><a href="/ajouterdefaut">List des defauts</a></li>}
-        {role === 'ADMIN' &&  <li><a href="/details">Détails des machines</a></li>}
+        <li><a href="/form">Ajouter Production</a></li>
+        <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
+        <li><a href="/listregleur">List des régleurs</a></li>
+         <li><a href="/detailoutil">List des outils</a></li>
+        <li><a href="/listoperateur">List des Opérateurs</a></li>
+         <li><a href="/ajouterdefaut">List des defauts</a></li>
+          <li><a href="/details">Détails des machines</a></li>
         <button className='logout-button' onClick={handleLogout}>Logout</button>  
         </ul>
       </div>

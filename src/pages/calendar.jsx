@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -8,7 +8,6 @@ import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker, InputNum
 import { motion, AnimatePresence } from 'framer-motion';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './calendar.css'
-import { RoleContext } from './RoleContext';
 import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
@@ -1951,7 +1950,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setOperateurcslshift2(selectedValues);
       setNombreoperateurcslshift2(selectedValues.length); // ✅ Update count dynamically
     };
-    const {role} = useContext(RoleContext);
+   
     const navigate = useNavigate();
     const handleLogout = () => {
       navigate('/login');

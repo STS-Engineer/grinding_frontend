@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -8,6 +8,8 @@ import { Modal, Input, Select, message, Checkbox, Row, Col, DatePicker, InputNum
 import { motion, AnimatePresence } from 'framer-motion';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './calendar.css'
+import { RoleContext } from './RoleContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -347,6 +349,7 @@ const handleMachineSelect = (machine) => {
 
   setCurrentStep(2);  // Go to the next step
   fetchEvents(startDate, endDate, machine.id_machine);  // Fetch events for the selected machine
+  setSelectedReference(machine.referenceproduit);
 
   // Fetch plannification based on the selected machine's id_machine
   if (machine && machine.id_machine) {
@@ -642,7 +645,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       
       
         const plannificationData = {
-          phase: phasechargement,
+          phase: 'cf',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -699,7 +702,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
      
         const plannificationData = {
-          phase: phasechargement,
+          phase: 'csl',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -793,7 +796,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         };
   
         // Send request for each weekly plannification
-    const response =    await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+    const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
@@ -898,7 +901,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     try {
    
         const plannificationData = {
-          phase: phasecfshift2,
+          phase: 'cf',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -933,7 +936,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombreoperateurprod: nombreoperateurcfshift2
         };
   
-     const response =   await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
+     const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
@@ -983,7 +986,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       // Add the new events to the backend
       for (const date of plannificationDates) {
         const plannificationData = {
-          phase: phasecslshift2,
+          phase: 'csl',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -1039,7 +1042,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     }
   };
 
-   const handlesubmitcfshift1 = async () => {
+
+  const handlesubmitcfshift1 = async () => {
     setLoading(true);
   
     if (!startDate || !endDate) {
@@ -1067,7 +1071,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       // Add the new events to the backend
       for (const date of plannificationDates) {
         const plannificationData = {
-          phase: phasecslshift2,
+          phase: 'cf',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -1152,7 +1156,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       // Add the new events to the backend
       for (const date of plannificationDates) {
         const plannificationData = {
-          phase: phasecslshift2,
+          phase: 'cf',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -1234,7 +1238,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       // Add the new events to the backend
       for (const date of plannificationDates) {
         const plannificationData = {
-          phase: phasecslshift2,
+          phase: 'cf',
           id_machine: selectedMachine.id,
           id_operateur: operateurs.id,
           phasereguleur: phasereguleur,
@@ -1288,7 +1292,6 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setLoading(false);
     }
   };
-
 
 
   const handleUpdateEvent = async (plannificationId) => {
@@ -1948,25 +1951,24 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       setOperateurcslshift2(selectedValues);
       setNombreoperateurcslshift2(selectedValues.length); // ✅ Update count dynamically
     };
-
-   return (
+    const {role} = useContext(RoleContext);
+    const navigate = useNavigate();
+    const handleLogout = () => {
+      navigate('/login');
+    };
+  
+  return (
   <div>
-    <div className='navbar'>
+     <div className='navbar'>
         <ul className="navbar-links">
-          <li><a href="/home">Acceuil</a></li>
-          <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
-          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
-          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
-          <li><a href="/listoperateur">List des Opérateurs</a></li>
-          <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
-          <li><a href="/listregleur">List des régleurs</a></li>
-          <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
-          <li><a href="/Ajouterproblemepostedecontrole">Ajouter des problémes de poste de controle </a></li>
-          <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
-          <li><a href="/details">Détails des machines</a></li>
-          <li><a href="/calendar">Plannification</a></li>
-    
+        {(role === 'ADMIN' || role=== 'REGLEUR' ) && <li><a href="/form">Ajouter Production</a></li>}
+        {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/listregleur">List des régleurs</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/detailoutil">List des outils</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/listoperateur">List des Opérateurs</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/ajouterdefaut">List des defauts</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/details">Détails des machines</a></li>}
+        <button className='logout-button' onClick={handleLogout}>Logout</button>  
         </ul>
       </div>
      <FullCalendar
@@ -2172,7 +2174,8 @@ key={selectedMachine.id}
       </Option>
     ))}
   </Select>
-    
+     {/* Display the count of selected operators */}
+     <p>Nombre d'opérateurs sélectionnés: {nombreoperateurproductionshift1}</p>
 <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        
@@ -2859,16 +2862,15 @@ key={selectedMachine.id}
 {shift.includes("shift1") && (
  <div style={{marginBottom:'30px'}}>
  
- <div className="references-dropdown">
- <label>Réferences</label>
- <Input
-   value={selectedReference}
-   onChange={((e)=>setSelectedReference(e.target.value))}
-   style={{ width: '100%' }}
-   placeholder="Select reference"
- > 
- </Input>
- </div>
+       {/* Read-Only Reference Input */}
+        <div className="references-dropdown">
+        <label>Référence</label>   
+        <Input
+          value={selectedReference} // Shows selected reference
+          readOnly
+          style={{ width: "100%", backgroundColor: "#f5f5f5", cursor: "not-allowed" }}
+        />
+      </div>
  </div>
 )}
 
@@ -3189,23 +3191,17 @@ transition={{ duration: 0.5 }}
   {shift.includes("shift2") && (
    <div>
     {selectedMachine && machineReferences[selectedMachine.nom] && (
-<div className="references-dropdown">
-<label>References</label>
-<Select
-  value={selectedReference}
-  onChange={handleReferenceSelect}
-  style={{ width: '100%' }}
-  placeholder="Select reference"
->
-  {/* Check if references are an array before mapping */}
-  {Array.isArray(machineReferences[selectedMachine.nom]) && 
-    machineReferences[selectedMachine.nom].map((reference, index) => (
-      <Option key={index} value={reference}>
-        {reference}
-      </Option>
-    ))
-  }
-</Select>
+ <div style={{marginBottom:'30px'}}>
+ 
+ {/* Read-Only Reference Input */}
+  <div className="references-dropdown">
+  <label>Référence</label>   
+  <Input
+    value={selectedReference} // Shows selected reference
+    readOnly
+    style={{ width: "100%", backgroundColor: "#f5f5f5", cursor: "not-allowed" }}
+  />
+</div>
 </div>
 )}
 
@@ -3507,7 +3503,6 @@ transition={{ duration: 0.5 }}
  
  </div>
   );
- 
 };
 
 export default Calendar;

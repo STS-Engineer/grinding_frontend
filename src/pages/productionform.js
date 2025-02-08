@@ -7,7 +7,7 @@ import{AnimatePresence, motion} from 'framer-motion';
 import { RoleContext } from './RoleContext';
 
 const { Option } = Select;
-
+   
 const Form = () => {
   const [machines, setMachines] = useState([]);
   const [problemes, setProblemes] = useState([]);

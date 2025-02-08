@@ -33,6 +33,11 @@ const Login = () => {
         navigate('/home')
         // Optionally, navigate to a different page or set a token in local storage
       }
+      if(response.data.role === 'ADMIN'){
+        navigate('/calendar');
+      } else if(response.data.role === 'REGLEUR'){
+        navigate('/detailoutil');
+      }
              
     } catch (error) {
       console.error("Failed login", error);

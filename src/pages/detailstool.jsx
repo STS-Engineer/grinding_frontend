@@ -16,7 +16,7 @@ const ToolDetails = () => {
   const [formValues, setFormValues] = useState({
     phase: '',
     nom_outil: '',
-    dureedevie: ''
+    dureedeviepointeur: ''
 
   });
    const [form] = Form.useForm(); 
@@ -66,7 +66,7 @@ const ToolDetails = () => {
     const updatedMachineData = {
       phase: values.phase,
       nom_outil: values.nom_outil,
-      dureedevie: values.dureedevie,
+      dureedeviepointeur: values.dureedeviepointeur,
     };
 
     try {
@@ -184,7 +184,7 @@ const ToolDetails = () => {
                 <div className="machine-details">
                   <p><strong>Nom_outil:</strong> {machine.nom_outil}</p>
                   <p><strong>Phase:</strong> {machine.phase}</p>
-                  <p><strong>dureedevie:</strong> {machine.dureedevie}</p>
+                    <p><strong>Durée de vie:</strong> {machine.dureedeviepointeur}</p>
                
                 </div>
               </div>
@@ -257,7 +257,7 @@ const ToolDetails = () => {
               <Option value="Usinagetete">Usinage tete</Option>
              </Select>
           </Form.Item>
-          <Form.Item label="DUrée de vie" name="dureedevie" rules={[{ required: true }]}>
+            <Form.Item label="Durée de vie" name="dureedeviepointeur" >
             <Input type="text" />
           </Form.Item>
        

@@ -609,7 +609,7 @@ const handleLogout = () => {
           <Checkbox.Group
             style={{ width: '100%' }}
             value={phase}
-            onChange={(value) => setPhase(value[0])}
+            onChange={(value) => setPhase(value.length ? [value[0]] : [])}
           >
             <Checkbox value="Production"></Checkbox>
           </Checkbox.Group>
@@ -817,7 +817,7 @@ const handleLogout = () => {
      <Checkbox.Group
       style={{ width: '100%' }}
       value={phase}
-      onChange={(value)=>setPhase(value[0])}
+      onChange={(value) => setPhase(value.length ? [value[0]] : [])}
     >
       <Checkbox value="cf"></Checkbox>
     </Checkbox.Group>
@@ -1040,7 +1040,7 @@ const handleLogout = () => {
      <Checkbox.Group
       style={{ width: '100%' }}
       value={phase}
-      onChange={(value)=>setPhase(value[0])}
+      onChange={(value) => setPhase(value.length ? [value[0]] : [])}
     >
       <Checkbox value="csl"></Checkbox>
    

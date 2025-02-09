@@ -234,6 +234,7 @@ const Form = () => {
     }
   
     setIsModalVisible(true);
+    setRefprod(machine.referenceproduit);
   };
   
   const handleAddField = () => {
@@ -591,16 +592,14 @@ const handleLogout = () => {
         </div>
       )}
 
-       <div className="references-dropdown">
-       <label>Réferences</label>
-       <Input
-         value={refprod}
-         onChange={((e)=>setRefprod(e.target.value))}
-         style={{ width: '100%' }}
-         placeholder="Select reference"
-       > 
-       </Input>
-       </div>
+     <div className="references-dropdown">
+        <label>Référence</label>
+        <Input
+          value={refprod} // Shows selected reference
+          readOnly
+          style={{ width: "100%", backgroundColor: "#f5f5f5", cursor: "not-allowed" }}
+        />
+      </div>
 
   {/* Display Objective Production */}
   <div style={{marginBottom:'80px'}}>

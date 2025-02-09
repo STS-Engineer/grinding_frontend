@@ -2,6 +2,8 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { RoleContext } from "./RoleContext";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
 
 const ActionHistory = () => {
   const [historique, setHistorique] = useState([]);
@@ -65,6 +67,49 @@ const ActionHistory = () => {
     }
   };
 
+  
+const handleDownloadPDF = () => {
+  const doc = new jsPDF();
+
+  // Set document title and add content (this could be dynamic, for example using your filtered data)
+  doc.setFontSize(18);
+  doc.text("Action History Report", 20, 20);
+  
+  doc.setFontSize(12);
+  doc.text("Generated Data:", 20, 30);
+
+  // Sample content: You can customize this based on your data
+  filteredHistorique.forEach((entry, index) => {
+    const { date, time } = formatDate(entry.created_at);
+    const shift = getShift(time);
+    const rowData = `${date} ${time} - ${entry.text} - ${shift}`;
+    doc.text(rowData, 20, 40 + index * 10); // Adjust position based on number of rows
+  });
+
+  // Save the generated PDF
+  doc.save("ActionHistoryReport.pdf");
+};
+
+  const handleDownloadExcel = () => {
+    const data = filteredHistorique.map((entry) => {
+      const { date, time } = formatDate(entry.created_at);
+      return {
+        Date: date,
+        Time: time,
+        Action: entry.text,
+        Shift: getShift(time),
+        User: user,
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Historique");
+
+    XLSX.writeFile(workbook, "Historique.xlsx");
+  };
+
+
   const { role } = useContext(RoleContext);
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -105,6 +150,20 @@ const ActionHistory = () => {
             value={selectedDate}
             onChange={handleDateChange}
           />
+          <button
+       className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-2 rounded-lg shadow-md flex items-center gap-2 transition-all duration-300"
+       onClick={handleDownloadExcel}
+        >
+       📥 Download Excel
+      </button>
+
+     {/* PDF Download Button */}
+     <button
+      className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-2 rounded-lg shadow-md flex items-center gap-2 transition-all duration-300"
+      onClick={handleDownloadPDF}
+      >
+     📄 Download PDF
+     </button>
         </div>
 
         {/* Table Display */}

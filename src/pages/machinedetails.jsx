@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Modal, Form, Input, Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import "./machinedetails.css";
+import { RoleContext } from "./RoleContext";
+import { useNavigate } from "react-router-dom";
+
+
 
 const MachineDetails = () => {
   const [machines, setMachines] = useState([]);
@@ -22,6 +26,7 @@ const MachineDetails = () => {
     nombre_operateur_csl: '',
     tools: [],
   });
+  const [form]= Form.useForm();
 
   // Fetch machines from the backend
   const fetchMachines = async () => {
@@ -57,7 +62,7 @@ const MachineDetails = () => {
         cadence_horaire_csl: selectedMachine.cadence_horaire_csl,
         nombre_operateur_cf: selectedMachine.nombre_operateur_cf,
         nombre_operateur_csl: selectedMachine.nombre_operateur_csl,
-        // Ensure tools is never undefined
+      
       });
     }
   }, [selectedMachine]);
@@ -104,12 +109,20 @@ const MachineDetails = () => {
     }
   };
 
+  const machineImages = {
+    NGG3: '/images/machines/NNG3.png',
+    NGG4: '/images/machines/NGG4.png',
+    KOJ: '/images/machines/KOJ.png',
+    MUD6: '/images/machines/MUD6.png',
+    MUD7: '/images/machines/MUD7.png',
+    NGG6: '/images/machines/NGG6.png'
+  };
+
   const showModal = (machine) => {
     setSelectedMachine(machine);
     setIsModalVisible(true);
+    form.setFieldsValue(machine);
   };
-
-
   const handleDelete = async (machineId) => {
     try {
       const token = localStorage.getItem("token");
@@ -132,49 +145,37 @@ const MachineDetails = () => {
     }
   };
 
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
-  const handleFormChange = (changedValues) => {
-    setFormValues(prevState => ({
-      ...prevState,
-      ...changedValues,
-    }));
-  };
-
-  const onFinish = (values) => {
-    handleUpdate(values); // Pass the updated values to the handler
-  };
-
-   const machineImages = {
-    NGG3: '/images/machines/NNG3.png',
-    NGG4: '/images/machines/NGG4.png',
-    KOJ: '/images/machines/KOJ.png',
-    MUD6: '/images/machines/MUD6.png',
-    MUD7: '/images/machines/MUD7.png',
-    NGG6: '/images/machines/NGG6.png'
-  };
 
 
+ const{role}= useContext(RoleContext);
+    const navigate = useNavigate();
+    const handleLogout = () => {
+      navigate('/login');
+    };
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
     <div>
-       <div className='navbar' style={{marginBottom:'60px'}} >
+     <div className='navbar'>
         <ul className="navbar-links">
-          <li><a href="/home">Acceuil</a></li>
-          <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
-          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
-          <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
-          <li><a href="/details">Détails des machines</a></li>
-          <li><a href="/calendar">Plannification</a></li>
-       
+        {(role === 'ADMIN' || role=== 'REGLEUR' ) && <li><a href="/form">Ajouter Production</a></li>}
+        {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/listregleur">List des régleurs</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/detailoutil">List des outils</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/listoperateur">List des Opérateurs</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/ajouterdefaut">List des defauts</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/details">Détails des machines</a></li>}
+        <button className='logout-button' onClick={handleLogout}>Logout</button>  
         </ul>
       </div>
-           <div className="machine-list">
+  
+      <div className="machine-list">
         {machines.map((machine) => {
           const machineImage = machineImages[machine.nom]; // Get the image based on machine name
   
@@ -204,11 +205,11 @@ const MachineDetails = () => {
                   <p><strong>Cadence_horaire_production:</strong> {machine.cadence_horaire}</p>
                   <p><strong>Cadence_horaire_cf:</strong> {machine.cadence_horaire_cf}</p>
                   <p><strong>Cadence_horaire_csl:</strong> {machine.cadence_horaire_csl}</p>
-                  <p><strong>Date de creation:</strong> {new Date(machine.date).toLocaleDateString()}</p>
+                  <p><strong>Date de creation:</strong> {machine.date}</p>
                 </div>
               </div>
   
-                <div style={{ display: 'flex', gap: '30px', marginTop: '20px' }}>
+        <div style={{ display: 'flex', gap: '30px', marginTop: '20px' }}>
           <button
             className="update-button"
            onClick={() => showModal(machine)}
@@ -242,13 +243,13 @@ const MachineDetails = () => {
       Delete Machine
      </button>
            </div>
+
             </div>
           );
         })}
       </div>
-
-      {/* Modal for updating machine */}
-      <Modal
+            {/* Modal for updating machine */}
+            <Modal
         title={`Update Machine: ${selectedMachine?.nom}`}
         visible={isModalVisible}
         onCancel={handleCancel}
@@ -256,9 +257,9 @@ const MachineDetails = () => {
         className="machine-modal"
       >
         <Form
-          initialValues={formValues}
-          onFinish={onFinish}
-          onValuesChange={handleFormChange} // Capture form changes
+         form={form}
+          onFinish={handleUpdate}
+
           className="machine-form"
         >
           <Form.Item label="Machine Name" name="nom" rules={[{ required: true }]}>

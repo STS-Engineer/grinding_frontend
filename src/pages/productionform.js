@@ -530,10 +530,11 @@ const handleLogout = () => {
 
   return (
     <div className="body_container">
-  <div className='navbar'>
+      <div className='navbar'>
         <ul className="navbar-links">
-       {(role === 'ADMIN' || role === 'REGLEUR') && <li><a href="/form">Ajouter Production</a></li>}
-       {(role === 'ADMIN' || role=== 'REGLEUR' ) && <li><a href="/changementmeules">Changement des meules</a></li>}
+        {role === 'ADMIN'  && <li><a href="/calendar">Plannification</a></li>}
+        {role === 'ADMIN'  && <li><a href="/history">Historique</a></li>}
+       { role=== 'REGLEUR'  && <li><a href="/changementmeules">Changement des meules</a></li>}
         {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
         {role === 'ADMIN' &&  <li><a href="/listregleur">List des régleurs</a></li>}
         {role === 'ADMIN' &&  <li><a href="/detailoutil">List des outils</a></li>}

@@ -138,18 +138,7 @@ const Ajouteroutil = () => {
           placeholder="Entrez le dureé devie "
           />
            </Form.Item>
-           <Form.Item
-            name="Réference produit"
-            label="Réference produit"
-           
-          >
-         <Input
-           type="text"
-           value={referenceproduit}
-           onChange={(e) => setReferenceproduit(e.target.value)}
-          placeholder="Entrez la réference "
-          />
-          </Form.Item>
+       
           <Form.Item>
             <Button type="primary" htmlType="submit" onClick={()=>handleSubmit()} >
               Soumettre

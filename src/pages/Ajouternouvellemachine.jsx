@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import axios from 'axios';
 import './Outil.css';
 import { Modal, Input, message, Select, Checkbox, Form, Button } from 'antd'; // Import Ant Design components
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { RoleContext } from './RoleContext';
 
 const { Option } = Select;
 
@@ -151,7 +152,7 @@ const Ajouternouvellemachine = () => {
   }, []);   
 
 
-  const navigate = useNavigate();
+
   const userID = localStorage.getItem("userID")
   console.log(userID);
 
@@ -336,9 +337,11 @@ const Ajouternouvellemachine = () => {
   };
   
 
-  const handleLogout = () => {
-    navigate('/login');
-  };
+ const {role} = useContext(RoleContext);
+    const navigate = useNavigate();
+    const handleLogout = () => {
+      navigate('/login');
+    };
   useEffect(()=>{
     
     setCurrentstep(1);
@@ -348,22 +351,16 @@ const Ajouternouvellemachine = () => {
   <div className="body_container">
     <AnimatePresence mode="wait">
   
-    <div className='navbar'>
+      <div className='navbar'>
         <ul className="navbar-links">
-          <li><a href="/home">Acceuil</a></li>
-          <li><a href="/form">Ajouter Production</a></li>
-          <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>
-          <li><a href="/Ajouteroutil">Ajouter un outil</a></li>
-          <li><a href="/ajouteroperateur">Ajouter des Opérateurs</a></li>
-          <li><a href="/listoperateur">List des Opérateurs</a></li>
-          <li><a href="/ajouterregleur">Ajouter des Régleurs</a></li>
-          <li><a href="/listregleur">List des régleurs</a></li>
-          <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
-          <li><a href="/Ajouterproblemepostedecontrole">Ajouter des problémes de poste de controle </a></li>
-          <li><a href="/ajouterdefaut">Ajouter des defauts </a></li>
-          <li><a href="/details">Détails des machines</a></li>
-          <li><a href="/calendar">Plannification</a></li>
-          <button className='logout-button' onClick={handleLogout}>logout</button>  
+        {(role === 'ADMIN' || role=== 'REGLEUR' ) && <li><a href="/form">Ajouter Production</a></li>}
+        {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/listregleur">List des régleurs</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/detailoutil">List des outils</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/listoperateur">List des Opérateurs</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/ajouterdefaut">List des defauts</a></li>}
+        {role === 'ADMIN' &&  <li><a href="/details">Détails des machines</a></li>}
+        <button className='logout-button' onClick={handleLogout}>Logout</button>  
         </ul>
       </div>
    <div className="machine-form-container">

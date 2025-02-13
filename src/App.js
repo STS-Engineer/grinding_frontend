@@ -25,6 +25,7 @@ import Ajouterdefautinspection from './pages/Ajouterinspectiondefaut';
 import ToolDetails from './pages/detailstool';
 import Listeproblemecontrole from './pages/Listproblemecontrole';
 import Listeplannification from './pages/Listplannification';
+import ReferenceUpdater from './pages/Affectationoutilref';
 
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
            
 
             {/* Specific Role-Based Access */}    
+            <Route path="/affectationoutilref" element={<ProtectedRoute allowedRoles={['ADMIN']}><ReferenceUpdater /></ProtectedRoute>} />
             <Route path="/form" element={<ProtectedRoute allowedRoles={['ADMIN','REGLEUR']}><Form /></ProtectedRoute>} />
             <Route path="/detailoutil" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><ToolDetails /></ProtectedRoute>} />
           </Routes>

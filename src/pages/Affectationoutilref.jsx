@@ -1,78 +1,89 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { RoleContext } from './RoleContext';
 
-const ReferenceUpdater = () => {
+const RferenceUpdater = () => {
   const [machines, setMachines] = useState([]);
-  const [references, setReferences] = useState([]);
-  const [tools, setTools] = useState([]);
-  
   const [selectedMachine, setSelectedMachine] = useState('');
+  const [references, setReferences] = useState([]);
   const [selectedReference, setSelectedReference] = useState('');
+  const [tools, setTools] = useState([]);
   const [newReference, setNewReference] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  // Fetch machines
+  // Fetch machines data
   useEffect(() => {
     axios.get('https://grinding-backend.azurewebsites.net/ajouter/nommachine')
-      .then(response => {
-        console.log('Fetched Machines:', response.data); // Log the fetched machines
-        setMachines(response.data);
-      })
+      .then(response => setMachines(response.data))
       .catch(error => console.error('Error fetching machines:', error));
   }, []);
-  
-// Step 4: Filter out the selected reference from the list of references
-const filteredReferences = references.filter(
-    (ref) => ref.reference !== selectedReference
-  );
 
   // Fetch references when a machine is selected
+  useEffect(() => {
+    if (selectedMachine) {
+      axios.get(`https://grinding-backend.azurewebsites.net/ajouter/get/references/${selectedMachine}`)
+        .then(response => setReferences(response.data))
+        .catch(error => console.error('Error fetching references:', error));
+    } else {
+      setReferences([]); // Clear references if no machine is selected
+    }
+  }, [selectedMachine]);
+
+  // Handle machine selection change
   const handleMachineChange = (machine) => {
+    console.log("Selected Machine:", machine); // Debugging line
     setSelectedMachine(machine);
     setReferences([]);
     setSelectedReference('');
     setTools([]);
-
-    // Fetch references for the selected machine
-    axios.get(`https://grinding-backend.azurewebsites.net/ajouter/get/references/${machine}`)
-      .then(response => setReferences(response.data))
-      .catch(error => console.error('Error fetching references:', error));
   };
 
-  // Fetch tools when a reference is selected
-  const handleReferenceChange = (reference) => {
-    setSelectedReference(reference);
-    setTools([]);
+  // Handle reference selection change
+  const handleReferenceChange = (reference, machine) => {
+    console.log("Selected Reference:", reference);  // Check selected reference
+    console.log("Selected Machine:", machine);  // Check selected machine
 
-    // Fetch tools for the selected reference
-    axios.get(`https://grinding-backend.azurewebsites.net/ajouter/get/tools/${reference}`)
+    if (!machine) {
+      console.error("Machine is not selected.");
+      return; // Don't proceed if machine is undefined
+    }
+
+    setSelectedReference(reference); // Set selected reference
+    setTools([]); // Reset tools before fetching new tools
+
+    // Fetch tools for the selected reference and machine
+    axios.get(`https://grinding-backend.azurewebsites.net/ajouter/get/tools/${reference}/${machine}`)
       .then(response => setTools(response.data))
       .catch(error => console.error('Error fetching tools:', error));
   };
 
-  // Update reference and tools
   const updateReference = () => {
-    if (!selectedMachine || !newReference) {
-      alert('Please select a machine and enter a new reference.');
+    if (!selectedMachine || !newReference || !selectedReference) {
+      alert('Please select a machine, an old reference, and a new reference.');
       return;
     }
-
-    // Make PUT request to update reference
-    axios.put('https://grinding-backend.azurewebsites.net/ajouter/update/reference', {
-      nom_machine: selectedMachine,
-      new_reference: newReference
-    })
+  
+    axios
+      .put('https://grinding-backend.azurewebsites.net/ajouter/update/reference', {
+        nom_machine: selectedMachine,
+        old_reference: selectedReference,
+        new_reference: newReference
+      })
       .then(response => {
         alert('Reference updated successfully!');
-        // Optionally, you can fetch updated tools after reference update
-        setTools(response.data.updatedTools || []); // Make sure your backend returns the updated tools if needed
+        // Refresh references and tools
+        handleMachineChange(selectedMachine);
       })
       .catch(error => console.error('Error updating reference:', error));
   };
-  const {role}= useContext(RoleContext);
+  
 
-// Link Style
+    // Filter out the selected reference from the new reference options
+    const filteredReferences = references.filter(
+        (ref) => ref.reference !== selectedReference
+      );
+    
+      // Link Style
 const linkStyle = {
     textDecoration: "none",
     color: "white",
@@ -82,6 +93,7 @@ const linkStyle = {
     borderRadius: "5px",
     transition: "0.3s",
   };
+  const {role}= useContext(RoleContext);
 
   return (
     <div>
@@ -233,42 +245,63 @@ const linkStyle = {
           </option>
         ))}
       </select>
-  
-      {/* Reference Dropdown */}
-      {selectedMachine && (
-        <>
-          <label>Reference:</label>
-          <select onChange={(e) => handleReferenceChange(e.target.value)} value={selectedReference}>
-            <option value="">Select Reference</option>
-            {references.map((ref) => (
-              <option key={ref.reference} value={ref.reference}>
-                {ref.reference}
-              </option>
-            ))}
-          </select>
-        </>
-      )}
-  
-      {/* Display Tools and Durée de Vie */}
-      {selectedReference && (
-        <div>
-          <h3>Tools for Selected Reference:</h3>
-          <ul>
-            {tools.length > 0 ? (
-              tools.map((tool, index) => (
-                <li key={index}>
-                  <strong>Tool:</strong> {tool.outil} | <strong>Durée de Vie:</strong> {tool.dureedeviepointeur}
-                </li>
-              ))
-            ) : (
-              <p>No tools found</p>
-            )}
-          </ul>
-        </div>
-      )}
-  
-      {/* New Reference Input */}
-      {selectedMachine && selectedReference && (
+           {/* Reference selection dropdown */}
+      <div>
+        <label>Select Reference</label>
+        <select onChange={(e) => handleReferenceChange(e.target.value, selectedMachine)} value={selectedReference}>
+          <option value="">Select Reference</option>
+          {references.map((ref) => (
+            <option key={ref.reference} value={ref.reference}>
+              {ref.reference}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Display tools based on selected reference and machine */}
+      <div
+  style={{
+    padding: '20px',
+    backgroundColor: '#f4f4f9',
+    borderRadius: '8px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    maxWidth: '600px',
+    margin: '20px auto',
+  }}
+>
+ 
+  {tools.length > 0 ? (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr', // Two columns
+        gap: '15px', // Space between columns
+        padding: '0 15px',
+      }}
+    >
+      <div style={{ fontWeight: 'bold', textAlign: 'center' }}>Tool</div>
+      <div style={{ fontWeight: 'bold', textAlign: 'center' }}>Durée de vie</div>
+      {tools.map((tool, index) => (
+        <React.Fragment key={index}>
+          <div style={{ textAlign: 'center' }}>{tool.outil}</div>
+          <div style={{ textAlign: 'center' }}>{tool.dureedeviepointeur}</div>
+        </React.Fragment>
+      ))}
+    </div>
+  ) : (
+    <p
+      style={{
+        textAlign: 'center',
+        color: '#888',
+        fontSize: '1rem',
+        marginTop: '20px',
+      }}
+    >
+      No tools available for the selected reference and machine.
+    </p>
+  )}
+</div>
+     {selectedMachine && selectedReference && (
         <>
           <label>New Reference:</label>
           <select
@@ -286,26 +319,9 @@ const linkStyle = {
           <button onClick={updateReference}>Update Reference</button>
         </>
       )}
-
-         {/* Footer */}
-    <footer
-      style={{
-        width: "100%",
-        background: "#1b1b1b",
-        color: "#fff",
-        textAlign: "center",
-        padding: "15px",
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        zIndex: 1000,
-      }}
-    >
-      
-    </footer>
-    </div>
-  );
   
+          </div>
+  );
 };
 
-export default ReferenceUpdater;
+export default RferenceUpdater;

@@ -22,12 +22,18 @@ const Ajouteroutil = () => {
   const navigate = useNavigate();
   const userID = localStorage.getItem("userID")
   console.log(userID);
- const handleSubmit = async (values) => {
+  const handleSubmit = async (values) => {
     try {
-      // Step 1: Check if the tool exists
+      // Step 1: Validate input fields
+      if (!nomoutil || !phase) {
+        message.warning("Nom de l'outil et phase sont obligatoires.");
+        return;
+      }
+  
+      // Step 2: Check if the tool exists
       const checkResponse = await axios.post(
         "https://grinding-backend.azurewebsites.net/ajouter/checkoutil",
-        { nom_outil: nomoutil }, // Send the tool name to check
+        { nom_outil: nomoutil, phase: phase },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -41,7 +47,7 @@ const Ajouteroutil = () => {
         return; // Stop the submission
       }
   
-      // Step 2: Add the tool if it does not exist
+      // Step 3: Add the tool if it does not exist
       await axios.post(
         "https://grinding-backend.azurewebsites.net/ajouter/ajouteroutil",
         {

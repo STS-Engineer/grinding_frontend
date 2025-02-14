@@ -71,13 +71,14 @@ const Ajouternouvellemachine = () => {
 
 
   useEffect(() => {
-    const fetchTools = async () => {
+ const fetchTools = async () => {
       try {
-        const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/tools', {
+        const response = await axios.get('http://localhost:4000/ajouter/toolss', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
+        console.log("tools",response.data);
         setTools(response.data);
       } catch (error) {
         console.error('Error fetching tools:', error);

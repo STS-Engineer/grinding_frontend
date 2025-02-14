@@ -101,7 +101,6 @@ const linkStyle = {
       style={{
         width: "100%",
         background: "#1b1b1b",
-        padding: "5px 8px",
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
         position: "fixed",
         top: 0,

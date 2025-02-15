@@ -26,6 +26,8 @@ import ToolDetails from './pages/detailstool';
 import Listeproblemecontrole from './pages/Listproblemecontrole';
 import Listeplannification from './pages/Listplannification';
 import ReferenceUpdater from './pages/Affectationoutilref';
+import UpdateDeclaration from './pages/Update refrence';
+import Ajouterdeclaration from './pages/Ajouterdeclaration';
 
 
 function App() {
@@ -62,9 +64,11 @@ function App() {
             <Route path="/listplannification" element={<ProtectedRoute allowedRoles={['ADMIN']}><Listeplannification /></ProtectedRoute>} />
            
 
-            {/* Specific Role-Based Access */}    
+            {/* Specific Role-Based Access */}
+             <Route path="/updatereference" element={<ProtectedRoute allowedRoles={['ADMIN']}><UpdateDeclaration /></ProtectedRoute>} />
             <Route path="/affectationoutilref" element={<ProtectedRoute allowedRoles={['ADMIN']}><ReferenceUpdater /></ProtectedRoute>} />
             <Route path="/form" element={<ProtectedRoute allowedRoles={['ADMIN','REGLEUR']}><Form /></ProtectedRoute>} />
+            <Route path="/ajouterdeclaration" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Ajouterdeclaration /></ProtectedRoute>} />  
             <Route path="/detailoutil" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><ToolDetails /></ProtectedRoute>} />
           </Routes>
         </Router>

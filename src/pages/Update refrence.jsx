@@ -72,7 +72,7 @@ const UpdateDeclaration = () => {
       old_reference: oldReference,
       new_reference: newReference,
       tools: toolsArray,
-      dureedevie,
+      dureedevie
     };
 
     console.log('Payload:', payload);
@@ -333,52 +333,35 @@ const UpdateDeclaration = () => {
 
 const styles = {
   container: {
-    maxWidth: '500px',
-    margin: '80px auto', // Centering the form and adding space below the navbar
-    padding: '40px',
+    maxWidth: '400px',
+    margin: '40px 10px',
+    padding: '60px 80px',
     fontFamily: 'Arial, sans-serif',
     border: '1px solid #ccc',
-    borderRadius: '10px',
-    backgroundColor: '#f9f9f9',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    borderRadius: '5px',
+   
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px', // Adding space between form fields
   },
   formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
+    marginBottom: '15px',
   },
   input: {
-    padding: '12px',
+    padding: '10px',
     borderRadius: '5px',
     border: '1px solid #ccc',
-    fontSize: '16px',
-    outline: 'none',
-  },
-  select: {
-    padding: '12px',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-    fontSize: '16px',
-    outline: 'none',
   },
   button: {
-    padding: '12px',
+    padding: '10px',
     backgroundColor: '#1e90ff',
     color: '#fff',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '18px',
-    transition: 'background 0.3s',
-  },
-  buttonHover: {
-    backgroundColor: '#0073e6',
+    fontSize: '16px',
   },
 };
-
 
 export default UpdateDeclaration;

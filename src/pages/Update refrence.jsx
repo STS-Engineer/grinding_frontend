@@ -333,17 +333,23 @@ const UpdateDeclaration = () => {
 
 const styles = {
   container: {
-    maxWidth: '400px',
-    margin: '40px 10px',
-    padding: '60px 80px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh', // Full viewport height
+    width: '100%', // Full width
     fontFamily: 'Arial, sans-serif',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-   
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
+    maxWidth: '400px',
+    width: '100%',
+    padding: '40px',
+    border: '1px solid #ccc',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
   },
   formGroup: {
     marginBottom: '15px',

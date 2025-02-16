@@ -256,7 +256,7 @@ const UpdateDeclaration = () => {
           </ul>
         </div>
       </div>
-      <h1 style={{marginBottom:'20px', fontWeight:'bold', fontSize:'25px'}}>Update Reference</h1>
+      <h1 style={{marginBottom:'20px', fontWeight:'bold', fontSize:'25px'}}>Update References</h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         {/* Machine Dropdown */}
         <div style={styles.formGroup}>

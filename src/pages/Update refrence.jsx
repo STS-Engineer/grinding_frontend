@@ -68,7 +68,7 @@ const UpdateDeclaration = () => {
     const toolsArray = tools.split(',').map((tool) => tool.trim()).filter(Boolean);
 
     const payload = {
-      nom_machine: selectedMachine,
+      nom_machine: selectedMachine,     
       old_reference: oldReference,
       new_reference: newReference,
       tools: toolsArray,

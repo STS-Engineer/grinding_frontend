@@ -8,7 +8,6 @@ const Actualisationoutil = () => {
   const [outils, setOutils] = useState([]);
   const [machines, setMachines] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
-  // In your component, track the state of the button color
   const navigate = useNavigate();
   const { role } = useContext(RoleContext);
 
@@ -20,23 +19,61 @@ const Actualisationoutil = () => {
           "Content-Type": "application/json",
         },
       });
-
-      if (response.data && response.data.operateurs) {
-        const fetchedOutils = response.data.operateurs.filter(op => op.nom_outil);
-        setOutils(fetchedOutils);
+  
+      console.log("API Response:", response.data);
+  
+      if (response.data && Array.isArray(response.data.operateurs)) {
+        const validData = response.data.operateurs.filter(
+          (item) => item && item.outil // Ensure 'outil' exists
+        );
+        setOutils(validData);
       } else {
-        message.error("Failed to fetch outils. Unexpected response structure.");
+        message.error("Unexpected response structure from server.");
       }
     } catch (error) {
-      console.error("Error fetching outils:", error);
-      message.error("Failed to fetch outils.");
+      console.error("Error fetching declarations:", error);
+      message.error("Failed to fetch declarations.");
     }
   };
-
+  
   useEffect(() => {
     handleGetoutil();
     fetchMachines();
   }, []);
+
+  const fetchMachines = async () => {
+    try {
+      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.data && Array.isArray(response.data)) {
+        setMachines(response.data);
+      } else {
+        message.error("Failed to fetch machine data.");
+      }
+    } catch (error) {
+      console.error("Error fetching machines:", error);
+      message.error("Could not fetch machines.");
+    }
+  };
+
+
+
+  const getButtonColor = (dureedevie, dureedeviepointeur) => {
+    dureedevie = Number(dureedevie);
+    dureedeviepointeur = Number(dureedeviepointeur);
+  
+    if (dureedeviepointeur <= dureedevie * 0.2) {
+      return { backgroundColor: 'red', color: 'white' };
+    }
+    if (dureedeviepointeur <= dureedevie * 0.5) {
+      return { backgroundColor: 'orange', color: 'white' };
+    }
+    return { backgroundColor: 'green', color: 'white' };
+  };
 
   const updateDureedevie = async (id) => {
     try {
@@ -62,59 +99,13 @@ const Actualisationoutil = () => {
     }
   };
 
-  const fetchMachines = async () => {
-    try {
-      const response = await axios.get("https://grinding-backend.azurewebsites.net/ajouter/machines", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-      });
-    console.log(response.data);
-      if (response.data && Array.isArray(response.data)) {
-        setMachines(response.data);
-      } else {
-        message.error("Failed to fetch machine data.");
-      }
-    } catch (error) {
-      console.error("Error fetching machines:", error);
-      message.error("Could not fetch machines.");
-    }
-  };
-  
-  const getMachineName = (machine_id) => {
-    if (!machines.length) return "Loading..."; // Ensures data is loaded first
-    const machine = machines.find((m) => m.id === machine_id);
-    return machine ? machine.nom : "Unknown"; // Use `nom` instead of `nom_machine`
-  };
-  
-
-  const getButtonColor = (dureedevie, dureedeviepointeur) => {
-    dureedevie = Number(dureedevie);
-    dureedeviepointeur = Number(dureedeviepointeur);
-  
-    // Red persists once reached
-    if (dureedeviepointeur <= dureedevie * 0.2) {
-      return { backgroundColor: 'red', color: 'white' };
-    }
-    // Orange persists until red is reached
-    if (dureedeviepointeur <= dureedevie * 0.5) {
-      return { backgroundColor: 'orange', color: 'white' };
-    }
-  
-    // Default: Green persists until orange is reached
-    return { backgroundColor: 'green', color: 'white' };
-  };
-  
-  
-  
   const handleOutilClick = (machine) => {
     Modal.confirm({
-      title: `Do you want to refresh the "durée de vie" of the tool "${machine.nom_outil}"?`,
+      title: `Do you want to refresh the "durée de vie" of the tool "${machine.outil}"?`, // Fixed field name
       onOk() {
         updateDureedevie(machine.id);
       },
-      okText: 'Valider',  
+      okText: 'Valider',
       cancelText: 'Annuler',
       okButtonProps: {
         style: { backgroundColor: 'green', borderColor: 'green', color: 'white' }, 
@@ -131,21 +122,21 @@ const Actualisationoutil = () => {
   };
 
   // Filter outils based on searchTerm and only show orange or red tools
-  const filteredOutils = outils.filter(machine => {
+  const filteredOutils = outils.filter((machine) => {
     const dureedevie = Number(machine.dureedevie);
     const dureedeviepointeur = Number(machine.dureedeviepointeur);
 
     const isOrange = dureedeviepointeur <= dureedevie * 0.8 && dureedeviepointeur > dureedevie * 0.5;
     const isRed = dureedeviepointeur <= dureedevie * 0.5;
 
-    return (isOrange || isRed) && machine.nom_outil.toLowerCase().includes(searchTerm.toLowerCase());
+    return (isOrange || isRed) && machine.outil.toLowerCase().includes(searchTerm.toLowerCase()); // Fixed field name
   });
 
   return (
     <div className="body_container">
       <div className="navbar">
         <ul className="navbar-links">
-         {(role === 'ADMIN' || role === 'REGLEUR') && <li><a href="/form">Ajouter Production</a></li>}
+          {(role === 'ADMIN' || role === 'REGLEUR') && <li><a href="/form">Ajouter Production</a></li>}
           {(role === 'ADMIN' || role === 'REGLEUR') && <li><a href="/changementmeules">Changement des meules</a></li>}
           {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
           {role === 'ADMIN' && <li><a href="/listregleur">List des régleurs</a></li>}
@@ -171,27 +162,25 @@ const Actualisationoutil = () => {
         />
 
         <div>
-        {filteredOutils.map((outil) => (
-      <button 
-      key={outil.id} 
-      onClick={() => handleOutilClick(outil)}
-      style={{
-        ...getButtonColor(outil.dureedevie, outil.dureedeviepointeur), // Use the function to get the color
-        border: "1px solid white",
-        padding: "10px",
-        borderRadius: "5px",
-        margin: "5px",
-        cursor: "pointer",
-      }}
-    >
-      Machine: {getMachineName(outil.machine_id)} <br />
-      Référence: {outil.referenceproduit} <br />
-      Outil: {outil.nom_outil} <br />
-      Durée de vie: {outil.dureedeviepointeur} <br />
-    
-    </button>
-    
-    ))}
+          {filteredOutils.map((outil) => (
+            <button 
+              key={outil.id} 
+              onClick={() => handleOutilClick(outil)}
+              style={{
+                ...getButtonColor(outil.dureedevie, outil.dureedeviepointeur),
+                border: "1px solid white",
+                padding: "10px",
+                borderRadius: "5px",
+                margin: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Machine: {outil.nom_machine} <br />
+              Référence: {outil.reference} <br />
+              Outil: {outil.outil} <br /> {/* Fixed field name */}
+              Durée de vie: {outil.dureedeviepointeur} <br />
+            </button>
+          ))}
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { RoleContext } from './RoleContext';
 import { Modal, Input, message, Select,  Form, Button } from 'antd';
+import axios from 'axios';
 
 const UpdateDeclaration = () => {
   const [machines, setMachines] = useState([]);

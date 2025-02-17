@@ -8,11 +8,37 @@ const UpdateDeclaration = () => {
   const [selectedMachine, setSelectedMachine] = useState('');
   const [oldReference, setOldReference] = useState('');
   const [newReference, setNewReference] = useState('');
-  const [tools, setTools] = useState('');
+  const [tools, setTools] = useState([]);
   const [dureedevie, setDureedevie] = useState('');
   const [message, setMessage] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { role } = useContext(RoleContext);
+
+    const references = {
+    "NGG1": [1026047, 1026348],
+    "NGG3": [1027649],
+    "NGG4": [1026577, 1026578],
+    "NGG5": [1026700],
+    "KOJ": [1026647],
+    "MUD6": [1026188, 1026540,1999810,1999810,1999811],
+    "MUD7": [473801],
+    "MUD8": [1020510,1017541,1026413,1026165],
+    "MUD12": [1026020,1026065,1026348,1026850,1026357,1022047,1015204,1027455,1026047],
+    "MUD420": [1026325,473801],
+    "SSS3144": [1021731, 1022201,1017540,1026564],
+    "SSS3153": [1016088,1026085,1026193,1026205,1026365],
+    "SSS3171": [1019061,1019962,1022926,1026371,1019963,1017400,1018655,1027361,1027362,1022934,1026619 ],
+    "SSS3213": [1022973,1027700],
+    "SSS3220": [1020063,1023501,1027501,1027560,1026537],
+    "SSS3227": [1026614,1026617 ],
+    "SSS14203": [1026425,1026672],
+    "SSS14873": [1026299],
+    "SSS18016": [1021612,1023628,1026276,1026660,1021613],
+    "SSS3151": [1023628,1026151],
+    "MUD14": [1026203],
+    "MK100-1-3": [1026620,1026621],
+    "SSS14699": [1023628,1026151],
+  };
 
   // Fetch the list of machines on mount
   useEffect(() => {
@@ -62,10 +88,27 @@ const UpdateDeclaration = () => {
     }
   }, [oldReference, newReference, oldReferences]);
 
+    useEffect(() => {
+    if (oldReference) {
+      const fetchTools = async () => {
+        try {
+          const response = await axios.get(`https://grinding-backend.azurewebsites.net/ajouter/get/tools/${oldReference}/${selectedMachine}`);
+          setTools(response.data);
+        } catch (error) {
+          console.error('Error fetching tools:', error);
+        }
+      };
+  
+      fetchTools();
+    }
+  }, [oldReference, selectedMachine]); 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const toolsArray = tools.split(',').map((tool) => tool.trim()).filter(Boolean);
+        const toolsArray = Array.isArray(tools) 
+        ? tools.map((tool) => tool.outil.trim()).filter(Boolean) // Extract 'outil' values
+        : [];
 
     const payload = {
       nom_machine: selectedMachine,     
@@ -100,6 +143,11 @@ const UpdateDeclaration = () => {
     }
   };
 
+
+  // Get available references excluding the selected old reference
+    const availableReferences = selectedMachine
+    ? references[selectedMachine].filter((ref) => ref !== Number(oldReference))
+    : [];
   const linkStyle = {
     textDecoration: 'none',
     color: 'white',
@@ -293,31 +341,37 @@ const UpdateDeclaration = () => {
         </div>
 
         {/* New Reference */}
-        <div style={styles.formGroup}>
-          <label htmlFor="newReference">New Reference</label>
-          <input
-            type="text"
-            id="newReference"
+            {/* New Reference Dropdown */}
+      {oldReference && (
+        <div>
+          <label>New Reference:</label>
+          <select
             value={newReference}
             onChange={(e) => setNewReference(e.target.value)}
-            style={styles.input}
-            required
-          />
+          >
+            <option value="">Select a New Reference</option>
+            {availableReferences.map((ref) => (
+              <option key={ref} value={ref}>
+                {ref}
+              </option>
+            ))}
+          </select>
         </div>
+      )}
 
         {/* Tools */}
-        <div style={styles.formGroup}>
-          <label htmlFor="tools">Tools</label>
-          <input
-            type="text"
-            id="tools"
-            value={tools}
-            onChange={(e) => setTools(e.target.value)}
-            style={styles.input}
-            placeholder=""
-            required
-          />
-        </div>
+    
+       <div style={styles.formGroup}>
+      <label htmlFor="tools" style={styles.label}>Tools</label>
+      <div style={styles.inputContainer}>
+      {tools && tools.map((tool, index) => (
+      <div key={index} style={styles.inputWrapper}>
+        <input type="text"  value={`${tool.outil} - ${tool.dureedeviepointeur}`}   readOnly style={styles.input} />
+      </div>
+      ))}
+      </div>
+      </div>
+
 
     
 

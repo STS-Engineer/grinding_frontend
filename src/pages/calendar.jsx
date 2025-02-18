@@ -2991,12 +2991,39 @@ key={selectedMachine.id}
      )}
 
 <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(2)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(2);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent2()}
@@ -3066,12 +3093,39 @@ key={selectedMachine.id}
       </div>
     )}                
    <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(3)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(3);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent3()}
@@ -3140,12 +3194,39 @@ key={selectedMachine.id}
         )}
       
       <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(4)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(4);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent4()}
@@ -3261,12 +3342,39 @@ transition={{ duration: 0.5 }}
 
 
 <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(5)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(5);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent5()}
@@ -3327,12 +3435,39 @@ transition={{ duration: 0.5 }}
 )}
   
   <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(6)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(6);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent6()}
@@ -3403,12 +3538,39 @@ transition={{ duration: 0.5 }}
   
 
   <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(7)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(7);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handlesubmitshift2()}
@@ -3477,12 +3639,39 @@ transition={{ duration: 0.5 }}
  </div>
 )}
 <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', margin: '20px 0' }}>
-  <button 
-    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
-    onClick={() => setCurrentStep(8)}
-  >
-    Back
-  </button>
+<button 
+    style={{ 
+      backgroundColor: 'blue', 
+      color: 'white', 
+      padding: '10px 20px', 
+      border: 'none', 
+      borderRadius: '5px', 
+      cursor: 'pointer' 
+    }} 
+    onClick={async () => {
+      try {
+        // Send a proper DELETE request
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/plannification/delete-last', {
+          method: 'DELETE', // Move method inside the first object
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // After successful deletion, navigate back to step 2
+        setCurrentStep(8);
+      } catch (error) {
+        console.error('Error deleting last row:', error);
+      }
+    }}
+>
+  Back
+</button>
   <button 
     style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }} 
     onClick={() => handleAddEvent8()}

@@ -73,7 +73,7 @@ const Ajouternouvellemachine = () => {
   useEffect(() => {
  const fetchTools = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/ajouter/toolss', {
+        const response = await axios.get('https://grinding-backend.azurewebsites.net/ajouter/toolss', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },

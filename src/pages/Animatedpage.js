@@ -24,18 +24,18 @@ const AnimatedPage = () => {
   };
   const { role } = useContext(RoleContext);
   
-  const linkStyle = {
+const linkStyle = {
   textDecoration: 'none',
   color: 'white',
   fontWeight: 'bold',
   display: 'block',
-  padding: '12px 8px',
+  padding: '5px 2px',
   borderRadius: '5px',
   transition: '0.3s',
 };
   return (
     <div className="animated-page">
-       <div
+        <div
         style={{
           width: '100%',
           background: '#1b1b1b',
@@ -115,7 +115,26 @@ const AnimatedPage = () => {
             boxShadow: isOpen ? '4px 0 10px rgba(0, 0, 0, 0.2)' : 'none',
           }}
         >
+  <h1 style={{ 
+  color: 'white', 
+  fontSize: '30px', 
+  fontWeight: 'bold', 
+  borderBottom: '3px solid #87CEEB', 
+  marginBottom: "25px", 
+
+}}>
+  Sidebar
+</h1>
+
+
           <ul style={{ listStyle: 'none', padding: 0 }}>
+          {role === 'ADMIN' && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/form" style={linkStyle}>
+               Dashboard
+                </a>
+              </li>
+            )}
             {(role === 'ADMIN' || role === 'REGLEUR') && (
               <li style={{ padding: '10px 0' }}>
                 <a href="/form" style={linkStyle}>
@@ -174,7 +193,7 @@ const AnimatedPage = () => {
                 </a>
               </li>
             )}
-              {role === 'ADMIN' && (
+              {(role === 'ADMIN' || role === 'REGLEUR') && (
               <li style={{ padding: '10px 0' }}>
                 <a href="/updatereference" style={linkStyle}>
                   Changement  réferences

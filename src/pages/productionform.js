@@ -9,7 +9,7 @@ import { RoleContext } from './RoleContext';
 const { Option } = Select;
    
 const Form = () => {
-  const [machines, setMachines] = useState([]);
+const [machines, setMachines] = useState([]);
   const [problemes, setProblemes] = useState([]);
   const [problemespostecontrole, setProblemespostecontrole] = useState([]);
   const [selectedMachine, setSelectedMachine] = useState(null);
@@ -19,17 +19,12 @@ const Form = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [refprod, setRefprod] = useState('');
   const [shift, setShift] = useState('');
-  const [typedefautproduction, setTypedefautproduction] = useState([]);
-  const [totaldefautproduction, setTotaldefaut] = useState('');
   const [typeproblemeproduction, setTypeproblemeproduction] = useState([]);
   const [dateproblemeproduction, setDateproblemeproduction] = useState('');
-  const [typedefautcf, setTypedefautcf] = useState('');
-  const [totaldefautcf, setTotaldefautcf] = useState('');
+
   const [typeproblemecf, setTypeproblemecf] = useState([]);
   const [dateproblemecf, setDateproblemecf] = useState('');
-  const [typedefautcsl, setTypedefautcsl] = useState([]);
 
-  const [totaldefautcsl, setTotaldefautcsl] = useState('');
   const [typeproblemecsl, setTypeproblemecsl] = useState([]);
   const [dateproblemecsl, setdateproblemecsl] = useState('');
   const [commentaires, setCommentaires] = useState('');

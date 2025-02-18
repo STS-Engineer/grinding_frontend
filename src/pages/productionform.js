@@ -72,6 +72,12 @@ const Form = () => {
   const [defauts, setDefauts] = useState([{ totaldefautproduction: '', typedefautproduction: [] }]);
   const [defautscf, setDefautscf] = useState([{ totaldefautcf: '', typedefautcf: [] }]);
   const [defautscsl, setDefautscsl] = useState([{ totaldefautcsl: '', typedefautcsl: [] }]);
+  const [totaldefautproduction, setTotalDefautproduction] = useState("");
+  const [typedefautproduction, setTypeDefautproduction] = useState("");
+  const [totaldefautcf, setTotalDefautcf] = useState("");
+  const [typedefautcf, setTypeDefautcf] = useState("");
+  const [totaldefautcsl ,setTotalDefautcsl] = useState("");
+  const [typedefautcsl, setTypeDefautcsl] = useState("");
    const [isOpen, setIsOpen] = useState(false);
 
 
@@ -498,9 +504,6 @@ const Form = () => {
       setObjectiveProduction(productionObjective);
       setObjectiveCF(cfObjective);
       setObjectiveCSL(cslObjective);
-      setNombreoperateurproduction(Nombreopearateurproduction);
-      setNombreoperateurcf(Nombreopearateurcf);
-      setNombreoperateurcsl(Nombreopearateurcsl);
  
   
       console.log("Production Objective:", productionObjective);

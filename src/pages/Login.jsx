@@ -34,7 +34,7 @@ const Login = () => {
         // Optionally, navigate to a different page or set a token in local storage
       }
       if(response.data.role === 'ADMIN'){
-        navigate('/calendar');
+        navigate('/home');
       } else if(response.data.role === 'REGLEUR'){
         navigate('/detailoutil');
       }

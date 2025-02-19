@@ -182,9 +182,9 @@ const ToolDetails = () => {
   
               <div className="button-container" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                 <div className="machine-details">
-                  <p><strong>Nom_outil:</strong> {machine.nom_outil}</p>
-                  <p><strong>Phase:</strong> {machine.phase}</p>
-                    <p><strong>Durée de vie:</strong> {machine.dureedeviepointeur}</p>
+                  <p><strong>Nom_outil:</strong> {machine.outil}</p>
+                  <p><strong>dureedevie:</strong> {machine.dureedeviepointeur}</p>
+                  <p><strong>Réference:</strong> {machine.reference}</p>
                
                 </div>
               </div>
@@ -241,26 +241,16 @@ const ToolDetails = () => {
           onFinish={handleUpdate}
           layout="vertical"
         >
-          <Form.Item label="Nom_outil" name="nom_outil" rules={[{ required: true }]}>
+            <Form.Item label="Nom_outil" name="outil" >
             <Input type="text" />
           </Form.Item>
-          <Form.Item label="Phase" name="phase" rules={[{ required: true }]}>
-          <Select
-              placeholder="Select a phase"
-              >
-             <Option value="roueavancement">Roue d'avancement</Option>
-              <Option value="Usinagehauteur">Usinage Hauteur</Option>
-              <Option value="Usinagelargeur">Usinage Largeur</Option>
-              <Option value="Usinagechanfreins">Usinage Chanfreins</Option>
-              <Option value="Usinagerainure">Usinage rainure</Option>
-              <Option value="Usinagerayonnage">Usinage rayonnage</Option>
-              <Option value="Usinagetete">Usinage tete</Option>
-             </Select>
-          </Form.Item>
-            <Form.Item label="Durée de vie" name="dureedeviepointeur" >
+         
+          <Form.Item label="Durée de vie" name="dureedeviepointeur" >
             <Input type="text" />
           </Form.Item>
-       
+          <Form.Item label="Réference" name="reference" >
+            <Input type="text" />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Tool

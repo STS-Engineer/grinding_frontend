@@ -39,7 +39,7 @@ const Login = () => {
         navigate('/detailoutil');
       }
              
-    } catch (error) {
+    } catch (error) {   
       console.error("Failed login", error);
       alert("Invalid email or password. Please try again.");
     }

@@ -10,12 +10,14 @@ const UpdateDeclaration = () => {
   const [oldReference, setOldReference] = useState('');
   const [newReference, setNewReference] = useState('');
   const [tools, setTools] = useState([]);
+  const [toolsoutil, setToolsoutil] = useState([]);
   const [dureedevie, setDureedevie] = useState('');
   const [message, setMessage] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { role } = useContext(RoleContext);
 
-    const references = {
+
+  const references = {
     "NGG1": [1026047, 1026348],
     "NGG3": [1027649],
     "NGG4": [1026577, 1026578],
@@ -74,6 +76,8 @@ const UpdateDeclaration = () => {
     }
   }, [selectedMachine]);
 
+  
+
   // Handle reference change and update dureedevie based on the selected tools
   useEffect(() => {
     if (oldReference && newReference) {
@@ -89,7 +93,7 @@ const UpdateDeclaration = () => {
     }
   }, [oldReference, newReference, oldReferences]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (oldReference) {
       const fetchTools = async () => {
         try {
@@ -102,53 +106,81 @@ const UpdateDeclaration = () => {
   
       fetchTools();
     }
-  }, [oldReference, selectedMachine]); 
+  }, [oldReference, selectedMachine]); // Fetch tools only when oldReference changes
+  
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    if (newReference && selectedMachine) {
+      const fetchTools = async () => {
+        try {
+          const response = await axios.get(`https://grinding-backend.azurewebsites.net/ajouter/get/toolss/${newReference}/${selectedMachine}`);
+          setToolsoutil(response.data);
+        } catch (error) {
+          console.error('Error fetching tools:', error);
+        }
+      };
+  
+      fetchTools();
+    }
+  }, [newReference, selectedMachine]);
+   // Fetch tools only when oldReference changes
+  
+
+   const handleSubmit = async (e) => {
     e.preventDefault();
 
-        const toolsArray = Array.isArray(tools) 
-        ? tools.map((tool) => tool.outil.trim()).filter(Boolean) // Extract 'outil' values
-        : [];
+    // Extract tool names from old reference
+    const oldToolsSet = new Set(tools.map((tool) => tool.outil.trim()));
+
+    // Extract tool names from new reference
+    const newToolsSet = new Set(toolsoutil.map((tool) => tool.nom_outil.trim()));
+
+    // Determine tools to keep (exist in both)
+    const commonTools = [...oldToolsSet].filter((tool) => newToolsSet.has(tool));
+
+    // Determine tools to add (exist in new reference but not in old)
+    const toolsToAdd = [...newToolsSet].filter((tool) => !oldToolsSet.has(tool));
+
+    // Final list of tools (common + added)
+    const updatedTools = [...commonTools, ...toolsToAdd];
 
     const payload = {
-      nom_machine: selectedMachine,     
-      old_reference: oldReference,
-      new_reference: newReference,
-      tools: toolsArray,
-      dureedevie
+        nom_machine: selectedMachine,
+        old_reference: oldReference,
+        new_reference: newReference,
+        tools: updatedTools, // Updated tools list
+        dureedevie
     };
 
     console.log('Payload:', payload);
 
     try {
-      const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/updateDeclaration', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch('https://grinding-backend.azurewebsites.net/ajouter/updateDeclaration', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
 
-      const result = await response.json();
-      console.log('Response:', result);
+        const result = await response.json();
+        console.log('Response:', result);
 
-      if (response.ok) {
-      
-     alert("Reference has been updated successfully")
-
-      } else {
-        setMessage('Error updating declaration');
-      }
+        if (response.ok) {
+            alert("Reference has been updated successfully");
+        } else {
+            setMessage('Error updating declaration');
+        }
     } catch (error) {
-      console.error('Error updating declaration:', error);
-      setMessage('Error updating declaration');
+        console.error('Error updating declaration:', error);
+        setMessage('Error updating declaration');
     }
-  };
+};
 
 
-  // Get available references excluding the selected old reference
+    // Get available references excluding the selected old reference
     const availableReferences = selectedMachine
     ? references[selectedMachine].filter((ref) => ref !== Number(oldReference))
     : [];
+
   const linkStyle = {
     textDecoration: 'none',
     color: 'white',
@@ -305,7 +337,7 @@ const UpdateDeclaration = () => {
           </ul>
         </div>
       </div>
-      <h1 style={{marginBottom:'20px', fontWeight:'bold', fontSize:'25px'}}>Update References</h1>
+      <h1 style={{marginBottom:'20px', fontWeight:'bold', fontSize:'25px'}}>Update Reference</h1>
       <form onSubmit={handleSubmit} style={styles.form}>
         {/* Machine Dropdown */}
         <div style={styles.formGroup}>
@@ -341,9 +373,20 @@ const UpdateDeclaration = () => {
           </select>
         </div>
 
-        {/* New Reference */}
-            {/* New Reference Dropdown */}
-      {oldReference && (
+        
+        <div style={styles.formGroup}>
+  <label htmlFor="tools" style={styles.label}>Tools old reference</label>
+  <div style={styles.inputContainer}>
+    {tools && tools.map((tool, index) => (
+      <div key={index} style={styles.inputWrapper}>
+        <input type="text"  value={`${tool.outil} - ${tool.dureedeviepointeur}`}   readOnly style={styles.input} />
+      </div>
+    ))}
+  </div>
+</div>
+
+          {/* New Reference Dropdown */}
+          {oldReference && (
         <div>
           <label>New Reference:</label>
           <select
@@ -360,19 +403,17 @@ const UpdateDeclaration = () => {
         </div>
       )}
 
-        {/* Tools */}
-    
-       <div style={styles.formGroup}>
-      <label htmlFor="tools" style={styles.label}>Tools</label>
-      <div style={styles.inputContainer}>
-      {tools && tools.map((tool, index) => (
-      <div key={index} style={styles.inputWrapper}>
-        <input type="text"  value={`${tool.outil} - ${tool.dureedeviepointeur}`}   readOnly style={styles.input} />
-      </div>
-      ))}
-      </div>
-      </div>
 
+<div style={styles.formGroup}>
+  <label htmlFor="tools" style={styles.label}>Tools new reference</label>
+  <div style={styles.inputContainer}>
+    {toolsoutil && toolsoutil.map((tool, index) => (
+      <div key={index} style={styles.inputWrapper}>
+        <input type="text" value={`${tool.nom_outil} - ${tool.dureedevie}`} readOnly style={styles.input} />
+      </div>
+    ))}
+  </div>
+</div>
 
     
 

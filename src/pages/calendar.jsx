@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './calendar.css'
 import { useNavigate } from 'react-router-dom';  
+import { RoleContext } from "./RoleContext";
 
 const { Option } = Select;
 
@@ -1956,7 +1957,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     const handleLogout = () => {
       navigate('/login');
     };
-
+const { role } = useContext(RoleContext);
       const linkStyle = {
       textDecoration: 'none',
       color: 'white',

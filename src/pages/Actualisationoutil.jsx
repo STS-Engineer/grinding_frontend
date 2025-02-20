@@ -8,6 +8,7 @@ const Actualisationoutil = () => {
   const [outils, setOutils] = useState([]);
   const [machines, setMachines] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // Search term state
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { role } = useContext(RoleContext);
 
@@ -69,9 +70,9 @@ const Actualisationoutil = () => {
     if (dureedeviepointeur <= dureedevie * 0.2) {
       return { backgroundColor: 'red', color: 'white' };
     }
-    if (dureedeviepointeur <= dureedevie * 0.5) {
+    if (dureedeviepointeur > dureedevie * 0.2 && dureedeviepointeur <= dureedevie * 0.5) {
       return { backgroundColor: 'orange', color: 'white' };
-    }
+  }
     return { backgroundColor: 'green', color: 'white' };
   };
 
@@ -131,22 +132,186 @@ const Actualisationoutil = () => {
 
     return (isOrange || isRed) && machine.outil.toLowerCase().includes(searchTerm.toLowerCase()); // Fixed field name
   });
+  
+  const linkStyle = {
+    textDecoration: 'none',
+    color: 'white',
+    fontWeight: 'bold',
+    display: 'block',
+    padding: '5px 2px',
+    borderRadius: '5px',
+    transition: '0.3s',
+  };
 
   return (
     <div className="body_container">
-      <div className="navbar">
-        <ul className="navbar-links">
-          {(role === 'ADMIN' || role === 'REGLEUR') && <li><a href="/form">Ajouter Production</a></li>}
-          {(role === 'ADMIN' || role === 'REGLEUR') && <li><a href="/changementmeules">Changement des meules</a></li>}
-          {role === 'ADMIN' && <li><a href="/ajouternouvellemachine">Ajouter une machine</a></li>}
-          {role === 'ADMIN' && <li><a href="/listregleur">List des régleurs</a></li>}
-          {role === 'ADMIN' && <li><a href="/detailoutil">List des outils</a></li>}
-          {role === 'ADMIN' && <li><a href="/listoperateur">List des Opérateurs</a></li>}
-          {role === 'ADMIN' && <li><a href="/ajouterdefaut">List des defauts</a></li>}
-          {role === 'ADMIN' && <li><a href="/history">Historique</a></li>}
-          {role === 'ADMIN' && <li><a href="/details">Détails des machines</a></li>}
-          <button className='logout-button' onClick={handleLogout}>Logout</button>
-        </ul>
+ <div
+        style={{
+          width: '100%',
+          background: '#1b1b1b',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+       <img 
+  style={{ width: '150px', height: '40px' }} 
+  src="/images/machines/logo-avocarbon.png" 
+  alt="Logo" 
+     />
+
+
+        <div
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',    
+            cursor: 'pointer',
+            padding: '10px',
+          }}
+        >
+          <div
+            style={{
+              width: '30px',
+              height: '5px',
+              backgroundColor: '#fff',
+              margin: '5px 0',
+              transition: '0.3s',
+              transform: isOpen
+                ? 'rotate(45deg) translate(5px, 5px)'
+                : 'none',
+            }}
+          ></div>
+          <div
+            style={{
+              width: '30px',
+              height: '4px',
+              backgroundColor: '#fff',
+              margin: '5px 0',
+              opacity: isOpen ? 0 : 1,
+              transition: '0.3s',
+            }}
+          ></div>
+          <div
+            style={{
+              width: '30px',
+              height: '4px',
+              backgroundColor: '#fff',
+              margin: '5px 0',
+              transition: '0.3s',
+              transform: isOpen
+                ? 'rotate(-45deg) translate(5px, -5px)'
+                : 'none',
+            }}
+          ></div>
+        </div>
+
+        {/* Sidebar Navigation */}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: isOpen ? '0' : '-250px',
+            width: '250px',
+            height: '100vh',
+            background: '#282828',
+            padding: '20px',
+            transition: 'left 0.4s ease-in-out',
+            boxShadow: isOpen ? '4px 0 10px rgba(0, 0, 0, 0.2)' : 'none',
+          }}
+        >
+  <h1 style={{ 
+  color: 'white', 
+  fontSize: '30px', 
+  fontWeight: 'bold', 
+  borderBottom: '3px solid #87CEEB', 
+  marginBottom: "25px", 
+
+}}>
+  Sidebar
+</h1>
+
+
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+          {(role === 'ADMIN' || role === 'REGLEUR') && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/dashboard" style={linkStyle}>
+                Dashboard
+                </a>
+              </li>
+            )}
+            {(role === 'ADMIN' || role === 'REGLEUR') && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/form" style={linkStyle}>
+                  Ajouter Production
+                </a>
+              </li>
+            )}
+            {role === 'ADMIN' && (
+              <>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/calendar" style={linkStyle}>
+                    Plannification
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/history" style={linkStyle}>
+                    Historique
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/ajouternouvellemachine" style={linkStyle}>
+                    Ajouter une machine
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/listregleur" style={linkStyle}>
+                    List des régleurs
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/detailoutil" style={linkStyle}>
+                    List des outils
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/listoperateur" style={linkStyle}>
+                    List des Opérateurs
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/ajouterdefaut" style={linkStyle}>
+                    List des défauts
+                  </a>
+                </li>
+                <li style={{ padding: '10px 0' }}>
+                  <a href="/details" style={linkStyle}>
+                    Détails des machines
+                  </a>
+                </li>
+              </>
+            )}
+            {(role === 'ADMIN' || role === 'REGLEUR') && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/changementmeules" style={linkStyle}>
+                  Changement  meules
+                </a>
+              </li>
+            )}
+              {(role === 'ADMIN' || role === 'REGLEUR') && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/updatereference" style={linkStyle}>
+                  Changement  réferences
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
 
       <div className="machine-form-container">

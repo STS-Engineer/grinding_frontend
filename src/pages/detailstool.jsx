@@ -20,6 +20,7 @@ const ToolDetails = () => {
 
   });
    const [form] = Form.useForm(); 
+    const [isOpen, setIsOpen] = useState(false);
 
   // Fetch machines from the backend
   const fetchTool = async () => {
@@ -137,7 +138,7 @@ const ToolDetails = () => {
   };
 
 
-
+  const { role } = useContext(RoleContext);
   const navigate = useNavigate();
   const handleLogout = () => {
     navigate('/login');
@@ -145,15 +146,115 @@ const ToolDetails = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
-
+  
+  const linkStyle = {
+    textDecoration: 'none',
+    color: 'white',
+    fontWeight: 'bold',
+    display: 'block',
+    padding: '12px 8px',
+    borderRadius: '5px',
+    transition: '0.3s',
+  };
   return (
     <div>
-        <div className='navbar'>
-        <ul className="navbar-links">
-        <li><a href="/form">Ajouter Production</a></li>
-        <li><a href="/changementmeules">Changement des meules</a></li>
-        <button className='logout-button' onClick={handleLogout}>Logout</button>  
-        </ul>
+     <div
+        style={{
+          width: '100%',
+          background: '#1b1b1b',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+       <img 
+  style={{ width: '150px', height: '40px' }} 
+  src="/images/machines/logo-avocarbon.png" 
+  alt="Logo" 
+     />
+
+
+        <div
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',    
+            cursor: 'pointer',
+            padding: '10px',
+          }}
+        >
+          <div
+            style={{
+              width: '30px',
+              height: '5px',
+              backgroundColor: '#fff',
+              margin: '5px 0',
+              transition: '0.3s',
+              transform: isOpen
+                ? 'rotate(45deg) translate(5px, 5px)'
+                : 'none',
+            }}
+          ></div>
+          <div
+            style={{
+              width: '30px',
+              height: '4px',
+              backgroundColor: '#fff',
+              margin: '5px 0',
+              opacity: isOpen ? 0 : 1,
+              transition: '0.3s',
+            }}
+          ></div>
+          <div
+            style={{
+              width: '30px',
+              height: '4px',
+              backgroundColor: '#fff',
+              margin: '5px 0',
+              transition: '0.3s',
+              transform: isOpen
+                ? 'rotate(-45deg) translate(5px, -5px)'
+                : 'none',
+            }}
+          ></div>
+        </div>
+
+        {/* Sidebar Navigation */}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: isOpen ? '0' : '-250px',
+            width: '250px',
+            height: '100vh',
+            background: '#282828',
+            padding: '20px',
+            transition: 'left 0.4s ease-in-out',
+            boxShadow: isOpen ? '4px 0 10px rgba(0, 0, 0, 0.2)' : 'none',
+          }}
+        >
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {(role === 'ADMIN' || role === 'REGLEUR') && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/form" style={linkStyle}>
+                  Ajouter Production
+                </a>
+              </li>
+            )}
+            {(role === 'ADMIN' || role === 'REGLEUR') && (
+              <li style={{ padding: '10px 0' }}>
+                <a href="/changementmeules" style={linkStyle}>
+                  Changement des meules
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
       
   

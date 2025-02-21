@@ -289,7 +289,7 @@ const [machines, setMachines] = useState([]);
         typedeproblemeproduction: typeproblemeproduction.join(','),
         commentaires: commentaires,
         totalrealise: totalproduit || 0,
-        machine_id: machineId,
+        machine_id: machineId,    
         dureedeproblemeproduction: durationproduction,
         nombreoperateur: Nombreopearateurproduction,
       };

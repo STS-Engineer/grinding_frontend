@@ -64,17 +64,16 @@ const Actualisationoutil = () => {
 
 
   const getButtonColor = (dureedevie, dureedeviepointeur) => {
-    dureedevie = Number(dureedevie);
-    dureedeviepointeur = Number(dureedeviepointeur);
-  
-    if (dureedeviepointeur <= dureedevie * 0.2) {
-      return { backgroundColor: 'red', color: 'white' };
+    const ratio = dureedeviepointeur / dureedevie;
+
+    if (ratio >= 0.25) {
+        return { backgroundColor: "#65D841", color: "white" }; // Green (≥ 25%)
     }
-    if (dureedeviepointeur > dureedevie * 0.2 && dureedeviepointeur <= dureedevie * 0.5) {
-      return { backgroundColor: 'orange', color: 'white' };
-  }
-    return { backgroundColor: 'green', color: 'white' };
-  };
+    if (ratio > 0.05) {
+        return { backgroundColor: "#F6A623", color: "white" }; // Orange (≥ 5% and < 25%)
+    }
+    return { backgroundColor: "#F62B2B", color: "white" }; // Red (< 5%)
+};
 
   const updateDureedevie = async (id) => {
     try {

@@ -984,10 +984,6 @@ const handleLogout = () => {
     <label style={{ fontWeight: "bold" }}>Total produit CF</label>
     <Input type="text" value={totalproduitcf} onChange={(e) => setTotalproduitcf(e.target.value)} />
     </div>
-   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontWeight: 'bold' }}>Nombre Operateur</label>
-      <Input value={Nombreopearateurcf} onChange={(e)=>setNombreoperateurcf(e.target.value)}></Input>
-    </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CF:</label>
         <span>{objectiveCF !== null ? objectiveCF : "No data for today"}</span>
@@ -1197,10 +1193,6 @@ const handleLogout = () => {
   <label style={{ fontWeight: "bold" }}>Total produit CSL</label>
    <Input type="text" value={totalproduitcsl} onChange={(e) => setTotalproduitcsl(e.target.value)} />
   </div>
-  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-      <label style={{ fontWeight: 'bold' }}>Nombre Operateur:</label>
-      <Input value={Nombreopearateurcsl} onChange={(e)=>setNombreoperateurcsl(e.target.value)}></Input>
-    </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
     <label style={{ fontWeight: "bold", marginRight: "10px" }}>Objective CSL:</label>
     <span>{objectiveCSL !== null ? objectiveCSL : "No data for today"}</span>

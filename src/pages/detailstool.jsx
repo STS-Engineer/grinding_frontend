@@ -238,6 +238,17 @@ const ToolDetails = () => {
             boxShadow: isOpen ? '4px 0 10px rgba(0, 0, 0, 0.2)' : 'none',
           }}
         >
+
+         <h1 style={{ 
+          color: 'white', 
+         fontSize: '30px', 
+         fontWeight: 'bold', 
+        borderBottom: '3px solid #87CEEB', 
+       marginBottom: "25px", 
+
+        }}>
+  Sidebar
+</h1>
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {(role === 'ADMIN' || role === 'REGLEUR') && (
               <li style={{ padding: '10px 0' }}>

@@ -179,50 +179,71 @@ const ToolDetails = () => {
      />
 
 
+   <div style={{ display: "flex", alignItems: "center" }}>
+      {/* Hamburger Icon (for opening/closing the menu) */}
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          cursor: "pointer",
+          padding: "10px",
+        }}
+      >
         <div
-          onClick={() => setIsOpen(!isOpen)}
           style={{
-            display: 'flex',
-            flexDirection: 'column',    
-            cursor: 'pointer',
-            padding: '10px',
+            width: "30px",
+            height: "5px",
+            backgroundColor: "#fff",
+            margin: "5px 0",
+            transition: "0.3s",
+            transform: isOpen
+              ? "rotate(45deg) translate(5px, 5px)"
+              : "none",
           }}
-        >
-          <div
-            style={{
-              width: '30px',
-              height: '5px',
-              backgroundColor: '#fff',
-              margin: '5px 0',
-              transition: '0.3s',
-              transform: isOpen
-                ? 'rotate(45deg) translate(5px, 5px)'
-                : 'none',
-            }}
-          ></div>
-          <div
-            style={{
-              width: '30px',
-              height: '4px',
-              backgroundColor: '#fff',
-              margin: '5px 0',
-              opacity: isOpen ? 0 : 1,
-              transition: '0.3s',
-            }}
-          ></div>
-          <div
-            style={{
-              width: '30px',
-              height: '4px',
-              backgroundColor: '#fff',
-              margin: '5px 0',
-              transition: '0.3s',
-              transform: isOpen
-                ? 'rotate(-45deg) translate(5px, -5px)'
-                : 'none',
-            }}
-          ></div>
-        </div>
+        ></div>
+        <div
+          style={{
+            width: "30px",
+            height: "4px",
+            backgroundColor: "#fff",
+            margin: "5px 0",
+            opacity: isOpen ? 0 : 1,
+            transition: "0.3s",
+          }}
+        ></div>
+        <div
+          style={{
+            width: "30px",
+            height: "4px",
+            backgroundColor: "#fff",
+            margin: "5px 0",
+            transition: "0.3s",
+            transform: isOpen
+              ? "rotate(-45deg) translate(5px, -5px)"
+              : "none",
+          }}
+        ></div>
+      </div>
+
+      {/* Logout Button beside the menu */}
+      <button
+        onClick={handleLogout}
+        style={{
+          marginLeft: "20px",
+          paddingRight: "20px",
+          marginRight: "30px",
+          backgroundColor: "#007bff", // Red color for logout
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          transition: "background-color 0.3s",
+        }}
+      >
+        Logout
+      </button>
+    </div>
 
         {/* Sidebar Navigation */}
         <div

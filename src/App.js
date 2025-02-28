@@ -65,7 +65,7 @@ function App() {
            
 
             {/* Specific Role-Based Access */}
-             <Route path="/updatereference" element={<ProtectedRoute allowedRoles={['ADMIN']}><UpdateDeclaration /></ProtectedRoute>} />
+             <Route path="/updatereference" element={<ProtectedRoute allowedRoles={['ADMIN','REGLEUR']}><UpdateDeclaration /></ProtectedRoute>} />
             <Route path="/affectationoutilref" element={<ProtectedRoute allowedRoles={['ADMIN']}><ReferenceUpdater /></ProtectedRoute>} />
             <Route path="/form" element={<ProtectedRoute allowedRoles={['ADMIN','REGLEUR']}><Form /></ProtectedRoute>} />
             <Route path="/ajouterdeclaration" element={<ProtectedRoute allowedRoles={['REGLEUR','ADMIN']}><Ajouterdeclaration /></ProtectedRoute>} />  

@@ -499,7 +499,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
       return;
     }
 
-    console.log("Nombre opérateurs before sending:", nombreoperateurproductionshift1);
+
   
     try {
       const plannificationData = {
@@ -1912,28 +1912,24 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
     // ✅ Handle selection changes and update nombreoperateurproduction
     const handleSelectChangeproductionshift1 = (selectedValues) => {
       setOperateurchargementshift1(selectedValues);
-      setNombreoperateurproductionshift1(selectedValues.length); // ✅ Update count dynamically
     };
 
     const handleSelectChangecfshift1 = (selectedValues) => {
       setOperateurcfshift1(selectedValues);
-      setNombreoperateurcfshift1(selectedValues.length); // ✅ Update count dynamically
+ 
     };
     const handleSelectChangecslshift1 = (selectedValues) => {
       setOperateurcslshift1(selectedValues);
-      setNombreoperateurcslshift1(selectedValues.length); // ✅ Update count dynamically
+
     };
     const handleSelectChangeproductionshift2 = (selectedValues) => {
       setOperateurchargementshift2(selectedValues);
-      setNombreoperateurproductionshift2(selectedValues.length); // ✅ Update count dynamically
     };
     const handleSelectChangecfshift2 = (selectedValues) => {
       setOperateurcfshift2(selectedValues);
-      setNombreoperateurcfshift2(selectedValues.length); // ✅ Update count dynamically
     };
     const handleSelectChangecslshift2 = (selectedValues) => {
       setOperateurcslshift2(selectedValues);
-      setNombreoperateurcslshift2(selectedValues.length); // ✅ Update count dynamically
     };
    
     const navigate = useNavigate();
@@ -2324,8 +2320,7 @@ key={selectedMachine.id}
       </Option>
     ))}
   </Select>
-     {/* Display the count of selected operators */}
-     <p>Nombre d'opérateurs sélectionnés: {nombreoperateurproductionshift1}</p>
+
 <Checkbox.Group style={{ width: '100%' }}>
         <Row>
        

@@ -106,12 +106,6 @@ const Calendar = () => {
     });
     const [updatedEvent, setUpdatedEvent] = useState(null);
     const [selectedPlannification, setSelectedPlannification] = useState(null); // For editing
-    const[nombreoperateurproductionshift1, setNombreoperateurproductionshift1] = useState(0);
-    const[nombreoperateurcfshift1, setNombreoperateurcfshift1] = useState(0);
-    const[nombreoperateurcslshift1, setNombreoperateurcslshift1] = useState(0);
-    const[nombreoperateurproductionshift2, setNombreoperateurproductionshift2] = useState(0);
-    const[nombreoperateurcfshift2, setNombreoperateurcfshift2] = useState(0);
-    const[nombreoperateurcslshift2, setNombreoperateurcslshift2] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
@@ -523,8 +517,8 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
-        nombreoperateurprod: nombreoperateurproductionshift1
+        referenceproduit: selectedReference
+        
       };
   
       const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -594,8 +588,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manqueregleurshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
-        nombreoperateurprod: nombreoperateurproductionshift1
+        referenceproduit: selectedReference
       };
   
     const response=  await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -663,8 +656,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecfshift1,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcfshift1
+          referenceproduit: selectedReference
         };
   
         // Send request for each weekly plannification
@@ -720,8 +712,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecslshift1,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcslshift1
+          referenceproduit: selectedReference
         };
   
         // Send request for each weekly plannification
@@ -791,9 +782,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquechargementshift2,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurproductionshift2
-          
+          referenceproduit: selectedReference
         };
   
         // Send request for each weekly plannification
@@ -862,8 +851,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manqueregleurshift2,
           start_date: startDate,  // Add the plannification date here
           end_date: endDate,   // Add end_date field for duplication
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurproductionshift2
+          referenceproduit: selectedReference
         };
   
         // Send request for each weekly plannification
@@ -933,8 +921,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecfshift2,
           start_date: date,
           end_date: endDate,
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcfshift2
+          referenceproduit: selectedReference
         };
   
      const response = await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -1018,8 +1005,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecslshift2,
           start_date: date,
           end_date: endDate,
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcslshift2
+          referenceproduit: selectedReference
         };
   
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -1103,8 +1089,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecslshift2,
           start_date: date,
           end_date: endDate,
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcslshift2
+          referenceproduit: selectedReference
         };
   
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -1188,8 +1173,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecslshift2,
           start_date: date,
           end_date: endDate,
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcslshift2
+          referenceproduit: selectedReference
         };
   
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -1270,8 +1254,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
           nombredemanqueoperateur: manquecslshift2,
           start_date: date,
           end_date: endDate,
-          referenceproduit: selectedReference,
-          nombreoperateurprod: nombreoperateurcslshift2
+          referenceproduit: selectedReference
         };
   
         await axios.post("https://grinding-backend.azurewebsites.net/ajouter/plannification", plannificationData, {
@@ -1314,7 +1297,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
       const plannificationId = selectedEvent.id;
@@ -1373,7 +1356,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     
@@ -1438,7 +1421,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     
@@ -1502,7 +1485,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     
@@ -1566,7 +1549,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     
@@ -1631,7 +1614,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     
@@ -1696,7 +1679,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     
@@ -1761,7 +1744,7 @@ const fetchEvents = async (startDate, endDate, machineId = null) => {
         nombredemanqueoperateur: manquechrgementshift1,
         start_date: startDate,
         end_date: endDate,
-        referenceproduit: selectedReference,
+        referenceproduit: selectedReference
       };
   
     

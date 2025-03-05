@@ -88,7 +88,10 @@ const Ajouteroutil = () => {
           <li><a href="/ajouterprobleme">Ajouter des problémes techniques </a></li>
           <li><a href="/details">Détails des machines</a></li>
           <li><a href="/calendar">Plannification</a></li>
-          <button className='logout-button' onClick={handleLogout}>logout</button>
+          <button  className="logout-button" onClick={handleLogout} style={{ padding: "10px 15px" }}>
+          Logout
+         </button>
+
         </ul>
       </div>
   

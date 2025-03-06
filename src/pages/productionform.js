@@ -603,22 +603,9 @@ const handleLogout = () => {
       </div>
 
       {/* Logout Button beside the menu */}
-      <button
-        onClick={handleLogout}
-        style={{
-          marginLeft: "20px",
-          paddingRight: "10px",
-          marginRight: "20px",
-          backgroundColor: "#007bff", // Red color for logout
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          transition: "background-color 0.3s",
-        }}
-      >
-        Logout
-      </button>
+   <button  className="logout-button" onClick={handleLogout} style={{ padding: "10px 15px" }}>
+          Logout
+         </button>
     </div>
 
         {/* Sidebar Navigation */}

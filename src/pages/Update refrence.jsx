@@ -181,6 +181,10 @@ const UpdateDeclaration = () => {
     ? references[selectedMachine].filter((ref) => ref !== Number(oldReference))
     : [];
 
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
   const linkStyle = {
     textDecoration: 'none',
     color: 'white',

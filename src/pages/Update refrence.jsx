@@ -259,6 +259,11 @@ const UpdateDeclaration = () => {
                 : 'none',
             }}
           ></div>
+
+        {/* Logout Button beside the menu */}
+         <button  className="logout-button" onClick={handleLogout} style={{ padding: "10px 15px" }}>
+          Logout
+         </button>
         </div>
 
         {/* Sidebar Navigation */}

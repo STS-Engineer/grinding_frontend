@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { RoleContext } from './RoleContext';
 import { Modal, Input, message, Select,  Form, Button } from 'antd';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const UpdateDeclaration = () => {
   const [machines, setMachines] = useState([]);
@@ -42,6 +44,8 @@ const UpdateDeclaration = () => {
     "MK100-1-3": [1026620,1026621],
     "SSS14699": [1023628,1026151],
   };
+
+  const navigate = useNavigate();
 
   // Fetch the list of machines on mount
   useEffect(() => {

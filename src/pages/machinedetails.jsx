@@ -231,7 +231,7 @@ const MachineDetails = () => {
               transform: isOpen
                 ? 'rotate(-45deg) translate(5px, -5px)'
                 : 'none',
-            }}
+            }}    
           ></div>
 
         {/* Logout Button beside the menu */}

@@ -163,10 +163,7 @@ const MachineDetails = () => {
 
 
   
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate('/login');
-  };
+
   return (
     <div>
    <div

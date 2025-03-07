@@ -162,7 +162,15 @@ const MachineDetails = () => {
   if (error) return <div>{error}</div>;
 
 
-  
+    const linkStyle = {
+    textDecoration: 'none',
+    color: 'white',
+    fontWeight: 'bold',
+    display: 'block',
+    padding: '12px 8px',
+    borderRadius: '5px',
+    transition: '0.3s',
+  };
 
   return (
     <div>
